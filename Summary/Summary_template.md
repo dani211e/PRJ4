@@ -1,52 +1,52 @@
-# Mødereferat
+# Meeting Minutes
 
-**Projekt:**  
-**Møde nr.:**  
-**Dato:**  
-**Tid:**  
-**Sted / Online:**  
+**Project:**  
+**Meeting No.:**  
+**Date:**  
+**Time:**  
+**Location / Online:**  
 
-## Deltagere
+## Attendees
 - 
 - 
 
-## Fraværende
+## Absent
 - 
 
-## Dagsorden
+## Agenda
 1. 
 2. 
 3. 
 
-## Referat
-### 1. Punkt
-- Kort opsummering af diskussion
-- Vigtige beslutninger
+## Minutes
+### 1. Agenda Item
+- Brief summary of discussion
+- Key decisions made
 
-### 2. Punkt
+### 2. Agenda Item
 - 
 
-### 3. Punkt
+### 3. Agenda Item
 - 
 
-## Beslutninger
+## Decisions
 - 
 - 
 
-## Opgaver / Action points
-| Opgave | Ansvarlig | Deadline |
-|------|-----------|----------|
-|      |           |          |
+## Tasks / Action Items
+| Task | Responsible | Deadline |
+|------|------------|----------|
+|      |            |          |
 
-## Næste møde
-- **Dato:**  
-- **Tid:**  
-- **Sted:**  
+## Next Meeting
+- **Date:**  
+- **Time:**  
+- **Location:**  
 
-## Eventuelt
+## Any Other Business
 - 
 
 ---
 
-*Referent:*  
-*Godkendt af:*  
+*Minutes taken by:*  
+*Approved by:*  
