@@ -79,8 +79,9 @@ We keep a casual and respectful tone and communicate as we do in everyday life.
 ## Communication
 - Primary communication platform: **Discord**
 - All members are expected to check Discord regularly and respond in a timely manner, within a day of the message.
-- Important decisions and votes may take place at meetings
+- Important decisions and votes may take place at meetings, if absent without reason and/or vote been casted a person cannot vote for the given topic
 - The Projects onedrive calendar must reflect each persons availability, if nothing you are considered free, yellow busy but can be contacted if needed, red do not disturb
+- When a meeting notice has been put up, you interact with the post
 
 
 ---
@@ -164,13 +165,18 @@ All meetings follow this structure described in the meetingNotice / summary file
 ---
 
 ## Cake Arrangement 🍰
-KR is responsible for managing the cake arrangement.  
-All members contribute financially.
+- KR is responsible for managing the cake arrangement.  
+- All members contribute financially expect KR he pays in work.
+- Payments must be complete before eating cake
 
 ---
 
 ## Supervisor / Contact Person
-**(vejleder)**
+### Supervisor
+
+### Contact person
+- Name: Mikkel Kristiansen
+- Mail: au749063@uni.au.dk
 
 ---
 
