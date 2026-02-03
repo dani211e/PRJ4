@@ -1,0 +1,6 @@
+@MTG_Emulator.Backend_HostAddress = http://localhost:5042
+
+GET {{MTG_Emulator.Backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
