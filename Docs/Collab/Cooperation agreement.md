@@ -62,7 +62,7 @@ The reviewer becomes the contact person for the task if issues arise later.
   Maintains branch strategy, file naming conventions, variable naming, and code ethics.
 
 - **Product lead – NH**  
-  Maintains branch strategy, file naming conventions, variable naming, and code ethics.
+  Maintains and backlog
 
 ---
 
