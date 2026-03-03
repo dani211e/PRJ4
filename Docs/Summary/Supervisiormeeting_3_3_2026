@@ -1,0 +1,60 @@
+
+# Meeting Minutes
+
+**Project: MTG**  
+**Meeting No.: 4**  
+**Date: 3/3/2026**  
+**Time:12:30**  
+**Location / Online: 5123-314**  
+
+## Attendees
+- Mikkel
+- Christopher
+- Johan
+- Frederik
+- Nicolai
+- Kasper
+- Daniel
+
+## Absent
+-    - 00 +
+
+## Agenda
+1. Get supervisor opinion about acceptance test
+2. Get jenny to look at the C4 model and get feedback
+3. Questions about synchronization
+
+## Minutes
+### 1. Get supervisor opinion about acceptance test
+- More specific in the criteria, what is pinging defination
+
+### 2. Get jenny to look at the C4 model and get feedback
+- 
+
+### 3. Questions about synchronization
+- Websocket is okay, depends on our realtime synch
+- bigger packages and less often, what we value?
+- SignalR, GraphQL
+
+
+## Decisions
+- 
+- 
+
+## Tasks / Action Items
+| Task | Responsible | Deadline |
+|------|------------|----------|
+|      |            |          |
+
+## Next Meeting
+- **Date:10/03/2026**  
+- **Time:12:30**  
+- **Location:5123-314**  
+
+## Any Other Business
+- Look into risici analysis
+
+---
+
+*Minutes taken by:*  
+*Approved by:Johan*  
