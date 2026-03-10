@@ -10,8 +10,8 @@ using (var db = new MTGContext())
 
 void seedDb(MTGContext db)
 {
-    var c1 = new Card { Name = "Test", OraceText = "Very good card", ImageURI = "https://cards.scryfall.io/large/front/a/9/a9b2a843-c6fe-4d19-801e-1538e4381ab0.jpg?1764119928"};
-    var c2 = new Card { Name = "Good card", OraceText = "Even better card", ImageURI = "https://cards.scryfall.io/large/front/8/2/829d91e9-4878-4e55-a262-ac0d55b65d4e.jpg?1764119935"};
+    var c1 = new Card { Name = "Test", OracleText = "Very good card", ImageURI = "https://cards.scryfall.io/large/front/a/9/a9b2a843-c6fe-4d19-801e-1538e4381ab0.jpg?1764119928"};
+    var c2 = new Card { Name = "Good card", OracleText = "Even better card", ImageURI = "https://cards.scryfall.io/large/front/8/2/829d91e9-4878-4e55-a262-ac0d55b65d4e.jpg?1764119935"};
 
     var player1 = new Player { Username = "Kasper", Password = "Loser", GamesWon = 0, GamesLost = 1242, GamesDrawed = 2 };
 
