@@ -17,7 +17,7 @@ namespace MTG_Emulator.Backend.DB
                 .AddUserSecrets<MTGContext>()
                 .Build();
 
-            var connectionString = configuration["ConnectionStrings:DefaultConnection"];
+            string? connectionString = configuration["ConnectionStrings:DefaultConnection"];
             options.UseSqlServer(connectionString);
         }
     }

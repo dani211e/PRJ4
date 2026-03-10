@@ -1,9 +1,10 @@
-﻿namespace MTG_Emulator.Backend;
-
-public static class BackendTestClass
+﻿namespace MTG_Emulator.Backend
 {
-    public static int TestInt()
+    public static class BackendTestClass
     {
-        return 42;
+        public static int TestInt()
+        {
+            return 42;
+        }
     }
 }
