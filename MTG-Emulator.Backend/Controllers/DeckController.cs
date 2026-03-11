@@ -24,8 +24,22 @@ namespace MTG_Emulator.Backend.Controllers
             string DeckName = DeckInfo[1].DeckName;
             string Commander =  DeckInfo[2].Commander;
             string CardListRaw = DeckInfo[3].CardList;
-            List<Card> deck = new List<Card>();
+            List<Card> Deck = new List<Card>();
+            Deck = await ListOfCardsAsync(context, json);
+            return new CreateDeckDTO()
+            {
+                PlayerName = PlayerName,
+                DeckName = DeckName,
+                Commander = Commander,
+                Cards = Deck,
+            };
+        }
 
+        public async Task<List<Card>> ListOfCardsAsync(MTGContext context, JsonElement json)
+        {
+            var DeckInfo = JsonSerializer.Deserialize<CreateDeckDTO[]>(json.GetRawText());
+            List<Card> deck = new List<Card>();
+            string CardListRaw = DeckInfo[3].CardList;
             string[] lines = CardListRaw.Split('\n', StringSplitOptions.RemoveEmptyEntries);
             foreach(string line in lines)
             {
@@ -34,19 +48,55 @@ namespace MTG_Emulator.Backend.Controllers
                 string name = line.Substring(firstSpace + 1);
                 for (int i = 0; i < num; i++)
                 {
-                   var Card = await context.Cards
+                    var Card = await context.Cards
                         .FirstOrDefaultAsync(card => card.Name == name);
-                   deck.Add(Card);
+                    deck.Add(Card);
                 }
             }
+            return deck;
+        }
+
+
+        [HttpGet("{DeckName}")]
+        public async Task<ActionResult<CreateDeckDTO>> GetDeckNameBy(MTGContext context, string DeckName)
+        {
+            var Deck = await context.Decks
+                .FirstOrDefaultAsync(deck => deck.DeckName == DeckName);
+            if (Deck == null) return NotFound();
 
             return new CreateDeckDTO()
             {
-                PlayerName = PlayerName,
-                DeckName = DeckName,
-                Commander = Commander,
-                Cards = deck,
+                DeckName = Deck.DeckName,
+                Commander = Deck.DeckCommander,
+                Cards = Deck.Cards,
             };
+        }
+
+        [HttpDelete("{DeckName}")]
+        public async Task<ActionResult<Deck>> GetDeckByName(MTGContext context, string DeckName)
+        {
+            if(string.IsNullOrEmpty(DeckName)) return BadRequest();
+            context.Decks.Remove(await context.Decks.FirstOrDefaultAsync(deck => deck.DeckName == DeckName));
+            await context.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpPut("{DeckName}")]
+        public async Task<ActionResult<CreateDeckDTO>> RemakeDeck(MTGContext context, string DeckName, JsonElement json)
+        {
+            if (string.IsNullOrEmpty(DeckName)) return BadRequest();
+            if(json.ValueKind == JsonValueKind.Null) return BadRequest();
+
+            var DeckInfo = JsonSerializer.Deserialize<CreateDeckDTO[]>(json.GetRawText());
+            var Deck = await context.Decks
+                .FirstOrDefaultAsync(deck => deck.DeckName == DeckName);
+            if(Deck == null)return NotFound();
+
+            Deck.DeckName = DeckInfo[1].DeckName;
+            Deck.DeckCommander = DeckInfo[2].Commander;
+            Deck.Cards = await ListOfCardsAsync(context, json);
+            await context.SaveChangesAsync();
+            return Ok();
         }
     }
 }
