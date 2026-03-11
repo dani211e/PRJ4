@@ -24,14 +24,13 @@ namespace MTG_Emulator.Backend.Controllers
             string DeckName = DeckInfo[1].DeckName;
             string Commander =  DeckInfo[2].Commander;
             string CardListRaw = DeckInfo[3].CardList;
-            List<Card> Deck = new List<Card>();
-            Deck = await ListOfCardsAsync(context, json);
+
             return new CreateDeckDTO()
             {
                 PlayerName = PlayerName,
                 DeckName = DeckName,
                 Commander = Commander,
-                Cards = Deck,
+                Cards = await ListOfCardsAsync(context, json),
             };
         }
 
@@ -76,8 +75,12 @@ namespace MTG_Emulator.Backend.Controllers
         public async Task<ActionResult<Deck>> GetDeckByName(MTGContext context, string DeckName)
         {
             if(string.IsNullOrEmpty(DeckName)) return BadRequest();
-            context.Decks.Remove(await context.Decks.FirstOrDefaultAsync(deck => deck.DeckName == DeckName));
+            Deck DeckToRemove = await context.Decks.FirstOrDefaultAsync(deck => deck.DeckName == DeckName);
+
+            if(DeckToRemove == null) return NotFound();
+            context.Decks.Remove(DeckToRemove);
             await context.SaveChangesAsync();
+
             return Ok();
         }
 
