@@ -5,7 +5,6 @@ namespace MTG_Emulator.Backend.DB.Models
     {
         public int CardId { get; set; }
         public string Name { get; set; }
-        public string[] AllParts { get; set; }
         public string OracleText { get; set; }
         public string ImageURI { get; set; }
         public List<RelatedCard> RelatedCard { get; set; }

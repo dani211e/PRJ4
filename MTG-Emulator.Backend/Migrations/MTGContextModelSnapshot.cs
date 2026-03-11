@@ -79,7 +79,7 @@ namespace MTG_Emulator.Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OraceText")
+                    b.Property<string>("OracleText")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -155,15 +155,7 @@ namespace MTG_Emulator.Backend.Migrations
                     b.Property<int>("CardId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Component")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TypeLine")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
