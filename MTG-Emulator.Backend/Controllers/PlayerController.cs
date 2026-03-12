@@ -14,14 +14,20 @@ namespace MTG_Emulator.Backend.Controllers
     [ApiController]
     public class PlayerController : ControllerBase
     {
-        [HttpPost]
-        public async Task<ActionResult<Player>> CreateProfile(MTGContext context, string PlayerName, string Password)
+        private readonly MTGContext context;
+        public PlayerController(MTGContext context)
         {
-            if (string.IsNullOrEmpty(PlayerName) || string.IsNullOrEmpty(Password)) return BadRequest();
+            context = context;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Player>> CreateProfile(string email, string playerName, string password)
+        {
+            if (string.IsNullOrEmpty(playerName) || string.IsNullOrEmpty(password)) return BadRequest();
             return new Player()
             {
-                Username = PlayerName,
-                Password = Password,
+                Username = playerName,
+                Password = password,
                 GamesWon = 0,
                 GamesLost = 0,
                 GamesDrawed = 0
@@ -29,28 +35,76 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpGet("{PlayerName}")]
-        public async Task<ActionResult<Player>> GetProfile(MTGContext context, string PlayerName)
+        public async Task<ActionResult<Player>> GetProfile(string playerName)
         {
-            var Player = context.Players
-                .FirstOrDefaultAsync(Player => Player.Username == PlayerName);
+            var player = context.Players
+                .FirstOrDefaultAsync(player => player.Username == playerName);
 
-            if (Player == null) return NotFound();
+            if (player == null) return NotFound();
 
-            return Ok(Player);
+            return Ok(player);
         }
 
         [HttpDelete("{PlayerName}")]
-        public async Task<ActionResult<Player>> DeleteProfile(MTGContext context, string PlayerName)
+        public async Task<ActionResult<Player>> DeleteProfile(string playerName)
         {
-            if(string.IsNullOrEmpty(PlayerName)) return BadRequest();
-            Player PlayerToRemove = await context.Players.FirstOrDefaultAsync(Player => Player.Username == PlayerName);
+            if(string.IsNullOrEmpty(playerName)) return BadRequest();
+            Player playerToRemove = await context.Players.FirstOrDefaultAsync(player => player.Username == playerName);
 
-            if(PlayerToRemove == null) return NotFound();
-            context.Players.Remove(PlayerToRemove);
+            if(playerToRemove == null) return NotFound();
+            context.Players.Remove(playerToRemove);
             await context.SaveChangesAsync();
 
             return Ok();
+        }
 
+        public enum GameResults
+        {
+            Win = 1,
+            Draw = 0,
+            Loss = -1
+        }
+
+        [HttpPut("{PlayerName}")]
+        public async Task<ActionResult<Player>> UpdatePlayerStats(string playerName, GameResults result)
+        {
+            var player = await context.Players
+                .FirstOrDefaultAsync(player => player.Username == playerName);
+            if(player == null) return NotFound();
+
+            switch (result)
+            {
+                case GameResults.Win:
+                    player.GamesWon += 1;
+                    await context.SaveChangesAsync();
+                    return Ok(player);
+                case GameResults.Draw:
+                    player.GamesDrawed += 1;
+                    await context.SaveChangesAsync();
+                    return Ok(player);
+                case GameResults.Loss:
+                    player.GamesLost += 1;
+                    await context.SaveChangesAsync();
+                    return Ok(player);
+                default:
+                    return BadRequest();
+            }
+        }
+
+        [HttpPut("Profile/{PlayerName}")]
+        public async Task<ActionResult<Player>> ResetPlayerPassword(string playerName, string password)
+        {
+            var player = await context.Players
+                .FirstOrDefaultAsync(player => player.Username == playerName);
+            if(player == null) NotFound();
+
+            if (playerName == player.Username)
+            {
+                player.Password = password;
+                await context.SaveChangesAsync();
+                return Ok(player);
+            }
+            return BadRequest();
         }
     }
 }

@@ -14,32 +14,37 @@ namespace MTG_Emulator.Backend.Controllers
     [ApiController]
     public class DeckController : ControllerBase
     {
+        private readonly MTGContext context;
+        public DeckController(MTGContext context)
+        {
+            context = context;
+        }
+
         [HttpPost]
-        public async Task<ActionResult<CreateDeckDTO>> CreateDeck(MTGContext context, [FromBody] JsonElement json)
+        public async Task<ActionResult<CreateDeckDTO>> CreateDeck([FromBody] JsonElement json)
         {
             if (json.ValueKind == JsonValueKind.Null) return BadRequest();
-            var DeckInfo = JsonSerializer.Deserialize<CreateDeckDTO[]>(json.GetRawText());
+            var deckInfo = JsonSerializer.Deserialize<CreateDeckDTO[]>(json.GetRawText());
 
-            string PlayerName = DeckInfo[0].PlayerName;
-            string DeckName = DeckInfo[1].DeckName;
-            string Commander =  DeckInfo[2].Commander;
-            string CardListRaw = DeckInfo[3].CardList;
+            string playerName = deckInfo[0].PlayerName;
+            string deckName = deckInfo[1].DeckName;
+            string commander =  deckInfo[2].Commander;
 
             return new CreateDeckDTO()
             {
-                PlayerName = PlayerName,
-                DeckName = DeckName,
-                Commander = Commander,
-                Cards = await ListOfCardsAsync(context, json),
+                PlayerName = playerName,
+                DeckName = deckName,
+                Commander = commander,
+                Cards = await ListOfCardsAsync(json),
             };
         }
 
-        public async Task<List<Card>> ListOfCardsAsync(MTGContext context, JsonElement json)
+        public async Task<List<Card>> ListOfCardsAsync(JsonElement json)
         {
-            var DeckInfo = JsonSerializer.Deserialize<CreateDeckDTO[]>(json.GetRawText());
+            var deckInfo = JsonSerializer.Deserialize<CreateDeckDTO[]>(json.GetRawText());
             List<Card> deck = new List<Card>();
-            string CardListRaw = DeckInfo[3].CardList;
-            string[] lines = CardListRaw.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            string cardListRaw = deckInfo[3].CardList;
+            string[] lines = cardListRaw.Split('\n', StringSplitOptions.RemoveEmptyEntries);
             foreach(string line in lines)
             {
                 int firstSpace = line.IndexOf(' ');
@@ -47,9 +52,9 @@ namespace MTG_Emulator.Backend.Controllers
                 string name = line.Substring(firstSpace + 1);
                 for (int i = 0; i < num; i++)
                 {
-                    var Card = await context.Cards
+                    var card = await context.Cards
                         .FirstOrDefaultAsync(card => card.Name == name);
-                    deck.Add(Card);
+                    deck.Add(card);
                 }
             }
             return deck;
@@ -57,47 +62,47 @@ namespace MTG_Emulator.Backend.Controllers
 
 
         [HttpGet("{DeckName}")]
-        public async Task<ActionResult<CreateDeckDTO>> GetDeckNameBy(MTGContext context, string DeckName)
+        public async Task<ActionResult<CreateDeckDTO>> GetDeckNameBy(string deckName)
         {
-            var Deck = await context.Decks
-                .FirstOrDefaultAsync(deck => deck.DeckName == DeckName);
-            if (Deck == null) return NotFound();
+            var deck = await context.Decks
+                .FirstOrDefaultAsync(deck => deck.DeckName == deckName);
+            if (deck == null) return NotFound();
 
             return new CreateDeckDTO()
             {
-                DeckName = Deck.DeckName,
-                Commander = Deck.DeckCommander,
-                Cards = Deck.Cards,
+                DeckName = deck.DeckName,
+                Commander = deck.DeckCommander,
+                Cards = deck.Cards,
             };
         }
 
         [HttpDelete("{DeckName}")]
-        public async Task<ActionResult<Deck>> GetDeckByName(MTGContext context, string DeckName)
+        public async Task<ActionResult<Deck>> GetDeckByName(string deckName)
         {
-            if(string.IsNullOrEmpty(DeckName)) return BadRequest();
-            Deck DeckToRemove = await context.Decks.FirstOrDefaultAsync(deck => deck.DeckName == DeckName);
+            if(string.IsNullOrEmpty(deckName)) return BadRequest();
+            Deck deckToRemove = await context.Decks.FirstOrDefaultAsync(deck => deck.DeckName == deckName);
 
-            if(DeckToRemove == null) return NotFound();
-            context.Decks.Remove(DeckToRemove);
+            if(deckToRemove == null) return NotFound();
+            context.Decks.Remove(deckToRemove);
             await context.SaveChangesAsync();
 
             return Ok();
         }
 
         [HttpPut("{DeckName}")]
-        public async Task<ActionResult<CreateDeckDTO>> RemakeDeck(MTGContext context, string DeckName, JsonElement json)
+        public async Task<ActionResult<CreateDeckDTO>> RemakeDeck(string deckName, JsonElement json)
         {
-            if (string.IsNullOrEmpty(DeckName)) return BadRequest();
+            if (string.IsNullOrEmpty(deckName)) return BadRequest();
             if(json.ValueKind == JsonValueKind.Null) return BadRequest();
 
-            var DeckInfo = JsonSerializer.Deserialize<CreateDeckDTO[]>(json.GetRawText());
-            var Deck = await context.Decks
-                .FirstOrDefaultAsync(deck => deck.DeckName == DeckName);
-            if(Deck == null)return NotFound();
+            var deckInfo = JsonSerializer.Deserialize<CreateDeckDTO[]>(json.GetRawText());
+            var deck = await context.Decks
+                .FirstOrDefaultAsync(deck => deck.DeckName == deckName);
+            if(deck == null)return NotFound();
 
-            Deck.DeckName = DeckInfo[1].DeckName;
-            Deck.DeckCommander = DeckInfo[2].Commander;
-            Deck.Cards = await ListOfCardsAsync(context, json);
+            deck.DeckName = deckInfo[1].DeckName;
+            deck.DeckCommander = deckInfo[2].Commander;
+            deck.Cards = await ListOfCardsAsync(json);
             await context.SaveChangesAsync();
             return Ok();
         }
