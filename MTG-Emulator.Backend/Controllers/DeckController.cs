@@ -14,10 +14,10 @@ namespace MTG_Emulator.Backend.Controllers
     [ApiController]
     public class DeckController : ControllerBase
     {
-        private readonly MTGContext context;
+        private readonly MTGContext _context;
         public DeckController(MTGContext context)
         {
-            context = context;
+            _context = context;
         }
 
         [HttpPost]
@@ -52,7 +52,7 @@ namespace MTG_Emulator.Backend.Controllers
                 string name = line.Substring(firstSpace + 1);
                 for (int i = 0; i < num; i++)
                 {
-                    var card = await context.Cards
+                    var card = await _context.Cards
                         .FirstOrDefaultAsync(card => card.Name == name);
                     deck.Add(card);
                 }
@@ -62,9 +62,9 @@ namespace MTG_Emulator.Backend.Controllers
 
 
         [HttpGet("{DeckName}")]
-        public async Task<ActionResult<CreateDeckDTO>> GetDeckNameBy(string deckName)
+        public async Task<ActionResult<CreateDeckDTO>> GetDeckByName(string deckName)
         {
-            var deck = await context.Decks
+            var deck = await _context.Decks
                 .FirstOrDefaultAsync(deck => deck.DeckName == deckName);
             if (deck == null) return NotFound();
 
@@ -77,14 +77,14 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpDelete("{DeckName}")]
-        public async Task<ActionResult<Deck>> GetDeckByName(string deckName)
+        public async Task<ActionResult<Deck>> DeleteDeckByName(string deckName)
         {
             if(string.IsNullOrEmpty(deckName)) return BadRequest();
-            Deck deckToRemove = await context.Decks.FirstOrDefaultAsync(deck => deck.DeckName == deckName);
+            Deck deckToRemove = await _context.Decks.FirstOrDefaultAsync(deck => deck.DeckName == deckName);
 
             if(deckToRemove == null) return NotFound();
-            context.Decks.Remove(deckToRemove);
-            await context.SaveChangesAsync();
+            _context.Decks.Remove(deckToRemove);
+            await _context.SaveChangesAsync();
 
             return Ok();
         }
@@ -96,14 +96,14 @@ namespace MTG_Emulator.Backend.Controllers
             if(json.ValueKind == JsonValueKind.Null) return BadRequest();
 
             var deckInfo = JsonSerializer.Deserialize<CreateDeckDTO[]>(json.GetRawText());
-            var deck = await context.Decks
+            var deck = await _context.Decks
                 .FirstOrDefaultAsync(deck => deck.DeckName == deckName);
             if(deck == null)return NotFound();
 
             deck.DeckName = deckInfo[1].DeckName;
             deck.DeckCommander = deckInfo[2].Commander;
             deck.Cards = await ListOfCardsAsync(json);
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return Ok();
         }
     }
