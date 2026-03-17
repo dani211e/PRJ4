@@ -66,8 +66,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task GetTokenByName_NonExistingToken_ReturnsNull()
         {
-            var response = await uut.GetTokenByName("DoesNotExist");
-            Assert.That(response.Result, Is.InstanceOf<NotFoundResult>());
+            var result = await uut.GetTokenByName("DoesNotExist");
+            Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
         }
     }
 }

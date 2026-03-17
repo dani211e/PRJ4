@@ -54,11 +54,11 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpGet("{PlayerName}")]
         public async Task<ActionResult<PlayerDto>> GetProfile(string playerName)
         {
+            if(string.IsNullOrEmpty(playerName)) return BadRequest();
             var player = await _context.Players
                 .FirstOrDefaultAsync(p => p.Username == playerName);
 
-            if (player == null)
-                return NotFound();
+            if (player == null) return NotFound();
 
             var dto = new PlayerDto
             {
@@ -91,6 +91,8 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpPut("{PlayerName}")]
         public async Task<ActionResult<Player>> UpdatePlayerStats(string playerName, GameResults result)
         {
+            if (string.IsNullOrEmpty(playerName)) return NotFound();
+
             var player = await _context.Players
                 .FirstOrDefaultAsync(p => p.Username == playerName);
 
