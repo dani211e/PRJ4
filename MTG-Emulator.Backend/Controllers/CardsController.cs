@@ -17,7 +17,7 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpGet("{CardName}")]
-        public async Task<ActionResult<GetCardDTO>> GetCardNameBy(string cardName)
+        public async Task<ActionResult<GetCardDTO>> GetCardByName(string cardName)
         {
             var card = await _context.Cards
                 .FirstOrDefaultAsync(card => card.Name == cardName);

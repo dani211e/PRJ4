@@ -14,10 +14,10 @@ namespace MTG_Emulator.Backend.Controllers
     [ApiController]
     public class PlayerController : ControllerBase
     {
-        private readonly MTGContext context;
+        private readonly MTGContext _context;
         public PlayerController(MTGContext context)
         {
-            context = context;
+            _context = context;
         }
 
         [HttpPost]
@@ -37,7 +37,7 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpGet("{PlayerName}")]
         public async Task<ActionResult<Player>> GetProfile(string playerName)
         {
-            var player = context.Players
+            var player = _context.Players
                 .FirstOrDefaultAsync(player => player.Username == playerName);
 
             if (player == null) return NotFound();
@@ -49,11 +49,11 @@ namespace MTG_Emulator.Backend.Controllers
         public async Task<ActionResult<Player>> DeleteProfile(string playerName)
         {
             if(string.IsNullOrEmpty(playerName)) return BadRequest();
-            Player playerToRemove = await context.Players.FirstOrDefaultAsync(player => player.Username == playerName);
+            Player playerToRemove = await _context.Players.FirstOrDefaultAsync(player => player.Username == playerName);
 
             if(playerToRemove == null) return NotFound();
-            context.Players.Remove(playerToRemove);
-            await context.SaveChangesAsync();
+            _context.Players.Remove(playerToRemove);
+            await _context.SaveChangesAsync();
 
             return Ok();
         }
@@ -68,7 +68,7 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpPut("{PlayerName}")]
         public async Task<ActionResult<Player>> UpdatePlayerStats(string playerName, GameResults result)
         {
-            var player = await context.Players
+            var player = await _context.Players
                 .FirstOrDefaultAsync(player => player.Username == playerName);
             if(player == null) return NotFound();
 
@@ -76,15 +76,15 @@ namespace MTG_Emulator.Backend.Controllers
             {
                 case GameResults.Win:
                     player.GamesWon += 1;
-                    await context.SaveChangesAsync();
+                    await _context.SaveChangesAsync();
                     return Ok(player);
                 case GameResults.Draw:
                     player.GamesDrawed += 1;
-                    await context.SaveChangesAsync();
+                    await _context.SaveChangesAsync();
                     return Ok(player);
                 case GameResults.Loss:
                     player.GamesLost += 1;
-                    await context.SaveChangesAsync();
+                    await _context.SaveChangesAsync();
                     return Ok(player);
                 default:
                     return BadRequest();
@@ -94,14 +94,14 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpPut("Profile/{PlayerName}")]
         public async Task<ActionResult<Player>> ResetPlayerPassword(string playerName, string password)
         {
-            var player = await context.Players
+            var player = await _context.Players
                 .FirstOrDefaultAsync(player => player.Username == playerName);
             if(player == null) NotFound();
 
             if (playerName == player.Username)
             {
                 player.Password = password;
-                await context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
                 return Ok(player);
             }
             return BadRequest();
