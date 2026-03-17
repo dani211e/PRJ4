@@ -1,4 +1,3 @@
-
 namespace MTG_Emulator.Backend.DB.Models
 {
     public class Card

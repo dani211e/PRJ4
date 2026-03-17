@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.DTO;
-using MTG_Emulator.Backend.DB.Models;
 
 namespace MTG_Emulator.Backend.Controllers
 {
@@ -11,27 +10,27 @@ namespace MTG_Emulator.Backend.Controllers
     public class CardsController : ControllerBase
     {
         private readonly MTGContext context;
+
         public CardsController(MTGContext context)
         {
             this.context = context;
         }
 
         [HttpGet("{CardName}")]
-        public async Task<ActionResult<GetCardDTO>> GetCardByName(string cardName)
+        public async Task<ActionResult<CardDto>> GetCardByName(string cardName)
         {
             var card = await context.Cards
                 .FirstOrDefaultAsync(card => card.Name == cardName);
 
             if (card == null) return NotFound();
 
-            return new GetCardDTO()
+            return new CardDto
             {
                 CardId = card.CardId,
                 Name = card.Name,
                 OracleText = card.OracleText,
-                ImageURI = card.ImageURI
+                ImageUri = card.ImageURI
             };
         }
-
     }
 }

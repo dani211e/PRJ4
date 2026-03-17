@@ -1,12 +1,8 @@
-﻿using System.Net;
-using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.DTO;
 using MTG_Emulator.Backend.DB.Models;
-using MTG_Emulator.Backend.Controllers;
-using System.Text.Json;
 
 namespace MTG_Emulator.Backend.Controllers
 {
@@ -15,96 +11,171 @@ namespace MTG_Emulator.Backend.Controllers
     public class DeckController : ControllerBase
     {
         private readonly MTGContext _context;
+
         public DeckController(MTGContext context)
         {
             _context = context;
         }
 
+        // POST: api/Deck
         [HttpPost]
-        public async Task<ActionResult<CreateDeckDTO>> CreateDeck([FromBody] JsonElement json)
+        public async Task<ActionResult<DeckDto>> CreateDeck([FromBody] CreateDeckDto deckDto)
         {
-            if (json.ValueKind == JsonValueKind.Null) return BadRequest();
-            var deckInfo = JsonSerializer.Deserialize<CreateDeckDTO[]>(json.GetRawText());
+            if (deckDto == null) return BadRequest();
 
-            string playerName = deckInfo[0].PlayerName;
-            string deckName = deckInfo[1].DeckName;
-            string commander =  deckInfo[2].Commander;
-
-            return new CreateDeckDTO()
+            // Map cards from names
+            var cards = new List<Card>();
+            if (!string.IsNullOrWhiteSpace(deckDto.CardList))
             {
-                PlayerName = playerName,
-                DeckName = deckName,
-                Commander = commander,
-                Cards = await ListOfCardsAsync(json),
-            };
-        }
-
-        public async Task<List<Card>> ListOfCardsAsync(JsonElement json)
-        {
-            var deckInfo = JsonSerializer.Deserialize<CreateDeckDTO[]>(json.GetRawText());
-            List<Card> deck = new List<Card>();
-            string cardListRaw = deckInfo[3].CardList;
-            string[] lines = cardListRaw.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-            foreach(string line in lines)
-            {
-                int firstSpace = line.IndexOf(' ');
-                int num = int.Parse(line.Substring(0, firstSpace));
-                string name = line.Substring(firstSpace + 1);
-                for (int i = 0; i < num; i++)
+                string[] lines = deckDto.CardList.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                foreach (string line in lines)
                 {
-                    var card = await _context.Cards
-                        .FirstOrDefaultAsync(card => card.Name == name);
-                    deck.Add(card);
+                    int firstSpace = line.IndexOf(' ');
+                    int num = int.Parse(line.Substring(0, firstSpace));
+                    string name = line.Substring(firstSpace + 1);
+
+                    var cardEntity = await _context.Cards
+                        .FirstOrDefaultAsync(c => c.Name == name);
+
+                    if (cardEntity != null)
+                        for (int i = 0; i < num; i++)
+                            cards.Add(cardEntity);
                 }
             }
-            return deck;
-        }
 
+            var player = await _context.Players
+                .FirstOrDefaultAsync(p => p.Username == deckDto.PlayerName);
 
-        [HttpGet("{DeckName}")]
-        public async Task<ActionResult<CreateDeckDTO>> GetDeckByName(string deckName)
-        {
-            var deck = await _context.Decks
-                .FirstOrDefaultAsync(deck => deck.DeckName == deckName);
-            if (deck == null) return NotFound();
+            if (player == null)
+                return BadRequest(new { error = $"Player '{deckDto.PlayerName}' not found." });
 
-            return new CreateDeckDTO()
+            var deck = new Deck
+            {
+                DeckName = deckDto.DeckName,
+                DeckCommander = deckDto.Commander,
+                Cards = cards,
+                Player = player
+            };
+
+            _context.Decks.Add(deck);
+            await _context.SaveChangesAsync();
+
+            // Map to DTO for return
+            var resultDto = new DeckDto
             {
                 DeckName = deck.DeckName,
-                Commander = deck.DeckCommander,
-                Cards = deck.Cards,
+                DeckCommander = deck.DeckCommander,
+                Cards = deck.Cards.Select(c => new CardDto
+                {
+                    CardId = c.CardId,
+                    Name = c.Name,
+                    OracleText = c.OracleText,
+                    ImageUri = c.ImageURI
+                }).ToList()
             };
+
+            return CreatedAtAction(nameof(GetDeckByName), new { deck.DeckName }, resultDto);
         }
 
-        [HttpDelete("{DeckName}")]
-        public async Task<ActionResult<Deck>> DeleteDeckByName(string deckName)
+        // GET: api/Deck/{DeckName}
+        [HttpGet("{DeckName}")]
+        public async Task<ActionResult<DeckDto>> GetDeckByName(string deckName)
         {
-            if(string.IsNullOrEmpty(deckName)) return BadRequest();
-            Deck deckToRemove = await _context.Decks.FirstOrDefaultAsync(deck => deck.DeckName == deckName);
-
-            if(deckToRemove == null) return NotFound();
-            _context.Decks.Remove(deckToRemove);
-            await _context.SaveChangesAsync();
-
-            return Ok();
-        }
-
-        [HttpPut("{DeckName}")]
-        public async Task<ActionResult<CreateDeckDTO>> RemakeDeck(string deckName, JsonElement json)
-        {
-            if (string.IsNullOrEmpty(deckName)) return BadRequest();
-            if(json.ValueKind == JsonValueKind.Null) return BadRequest();
-
-            var deckInfo = JsonSerializer.Deserialize<CreateDeckDTO[]>(json.GetRawText());
             var deck = await _context.Decks
-                .FirstOrDefaultAsync(deck => deck.DeckName == deckName);
-            if(deck == null)return NotFound();
+                .Include(d => d.Cards)
+                .FirstOrDefaultAsync(d => d.DeckName == deckName);
 
-            deck.DeckName = deckInfo[1].DeckName;
-            deck.DeckCommander = deckInfo[2].Commander;
-            deck.Cards = await ListOfCardsAsync(json);
+            if (deck == null) return NotFound();
+
+            var deckDto = new DeckDto
+            {
+                DeckName = deck.DeckName,
+                DeckCommander = deck.DeckCommander,
+                Cards = deck.Cards?
+                    .Select(c => new CardDto
+                    {
+                        CardId = c.CardId,
+                        Name = c.Name,
+                        OracleText = c.OracleText,
+                        ImageUri = c.ImageURI
+                    })
+                    .ToList() ?? new List<CardDto>()
+            };
+
+            return Ok(deckDto);
+        }
+
+        // DELETE: api/Deck/{DeckName}
+        [HttpDelete("{DeckName}")]
+        public async Task<IActionResult> DeleteDeckByName(string deckName)
+        {
+            if (string.IsNullOrWhiteSpace(deckName)) return BadRequest();
+
+            var deck = await _context.Decks
+                .Include(d => d.Cards)
+                .FirstOrDefaultAsync(d => d.DeckName == deckName);
+
+            if (deck == null) return NotFound();
+
+            _context.Decks.Remove(deck);
             await _context.SaveChangesAsync();
-            return Ok();
+
+            return NoContent();
+        }
+
+        // PUT: api/Deck/{DeckName}
+        [HttpPut("{DeckName}")]
+        public async Task<ActionResult<DeckDto>> UpdateDeck(string deckName, [FromBody] CreateDeckDto deckDto)
+        {
+            if (string.IsNullOrWhiteSpace(deckName) || deckDto == null) return BadRequest();
+
+            var deck = await _context.Decks
+                .Include(d => d.Cards)
+                .FirstOrDefaultAsync(d => d.DeckName == deckName);
+
+            if (deck == null) return NotFound();
+
+            // Update deck properties
+            deck.DeckName = deckDto.DeckName;
+            deck.DeckCommander = deckDto.Commander;
+
+            // Update cards
+            deck.Cards.Clear();
+            if (!string.IsNullOrWhiteSpace(deckDto.CardList))
+            {
+                string[] lines = deckDto.CardList.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                foreach (string line in lines)
+                {
+                    int firstSpace = line.IndexOf(' ');
+                    int num = int.Parse(line.Substring(0, firstSpace));
+                    string name = line.Substring(firstSpace + 1);
+
+                    var cardEntity = await _context.Cards
+                        .FirstOrDefaultAsync(c => c.Name == name);
+
+                    if (cardEntity != null)
+                        for (int i = 0; i < num; i++)
+                            deck.Cards.Add(cardEntity);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Return updated DTO
+            var resultDto = new DeckDto
+            {
+                DeckName = deck.DeckName,
+                DeckCommander = deck.DeckCommander,
+                Cards = deck.Cards.Select(c => new CardDto
+                {
+                    CardId = c.CardId,
+                    Name = c.Name,
+                    OracleText = c.OracleText,
+                    ImageUri = c.ImageURI
+                }).ToList()
+            };
+
+            return Ok(resultDto);
         }
     }
 }

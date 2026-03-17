@@ -24,12 +24,12 @@ namespace MTG_Emulator.Backend
 
             await downloadBulkCardsAsync(client);
 
-            IAsyncEnumerable<ScryfallCard> cardsEnum = readScryfallCards(downloadPath!);
+            var cardsEnum = readScryfallCards(downloadPath!);
 
             if (count.HasValue)
                 cardsEnum = cardsEnum.Take(count.Value);
 
-            List<Card> cards = await cardsEnum.Select(c => c.ToCard()).ToListAsync();
+            var cards = await cardsEnum.Select(c => c.ToCard()).ToListAsync();
 
             var player1 = new Player
             {
@@ -37,7 +37,7 @@ namespace MTG_Emulator.Backend
                 Password = "Loser",
                 GamesWon = 0,
                 GamesLost = 1242,
-                GamesDrawed = 2,
+                GamesDrawed = 2
             };
 
             var deck1 = new Deck
@@ -45,7 +45,7 @@ namespace MTG_Emulator.Backend
                 DeckName = "Best deck ever",
                 Cards = cards,
                 DeckCommander = cards[0].Name,
-                Player = player1,
+                Player = player1
             };
 
             dropAllRows(db);
@@ -67,16 +67,16 @@ namespace MTG_Emulator.Backend
 
         private static async Task downloadBulkCardsAsync(HttpClient client)
         {
-            string baseUrl = $@"https://api.scryfall.com/bulk-data";
+            string baseUrl = @"https://api.scryfall.com/bulk-data";
             // We need to make an initial request that tells us where the actual download url is located
-            Stream s1 = await client.GetStreamAsync(baseUrl);
-            ScryfallBulkResponse r = await JsonSerializer.DeserializeAsync<ScryfallBulkResponse>(s1);
+            var s1 = await client.GetStreamAsync(baseUrl);
+            var r = await JsonSerializer.DeserializeAsync<ScryfallBulkResponse>(s1);
 
             string? downloadUrl = r.Data.First(x => x.Type == "oracle_cards").DownloadUri.ToString();
             if (downloadUrl.IsNullOrEmpty())
                 return;
 
-            Stream s2 = await client.GetStreamAsync(downloadUrl);
+            var s2 = await client.GetStreamAsync(downloadUrl);
             using var fs = new FileStream(downloadPath, FileMode.Create, FileAccess.Write);
             await s2.CopyToAsync(fs);
         }

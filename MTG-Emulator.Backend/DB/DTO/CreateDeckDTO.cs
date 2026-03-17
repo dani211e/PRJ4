@@ -1,13 +1,10 @@
-using MTG_Emulator.Backend.DB.Models;
-
 namespace MTG_Emulator.Backend.DB.DTO
 {
-    public class CreateDeckDTO
+    public class CreateDeckDto
     {
-        public string PlayerName { get; set; }
-        public string DeckName { get; set; }
-        public string Commander {get; set;}
-        public string CardList {get; set;}
-        public List<Card> Cards {get; set;}
+        public string PlayerName { get; set; } = string.Empty;
+        public string DeckName { get; set; } = string.Empty;
+        public string Commander { get; set; } = string.Empty;
+        public string CardList { get; set; } = string.Empty;
     }
 }

@@ -13,8 +13,7 @@ namespace MTG_Emulator.Backend.Scryfall
         //[JsonPropertyName("large")]
         //public string Large { get; set; }
 
-        [JsonPropertyName("png")]
-        public string Png { get; set; }
+        [JsonPropertyName("png")] public string Png { get; set; }
 
         //[JsonPropertyName("art_crop")]
         //public string ArtCrop { get; set; }

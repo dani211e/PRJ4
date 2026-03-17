@@ -16,15 +16,13 @@ namespace MTG_Emulator.Backend.Scryfall
                 altFace = new AltFace
                 {
                     ImageURI = apiFace.ImageUris?.Png ?? string.Empty,
-                    OracleText = apiFace.FlavorText ?? string.Empty,
+                    OracleText = apiFace.FlavorText ?? string.Empty
                 };
             }
 
             var relatedCards = new List<RelatedCard>();
             if (card.AllParts != null)
-            {
-                relatedCards.AddRange(card.AllParts.Select(r => new RelatedCard { Name = r.Name, URI = r.Uri, }));
-            }
+                relatedCards.AddRange(card.AllParts.Select(r => new RelatedCard { Name = r.Name, URI = r.Uri }));
 
             return new Card
             {
@@ -32,7 +30,7 @@ namespace MTG_Emulator.Backend.Scryfall
                 ImageURI = card.ImageUris?.Png ?? string.Empty,
                 OracleText = card.OracleText ?? string.Empty,
                 AltFace = altFace,
-                RelatedCard = relatedCards,
+                RelatedCard = relatedCards
             };
         }
     }
