@@ -179,6 +179,8 @@ csharp_style_prefer_switch_expression = false:none
 
 csharp_style_namespace_declarations = block_scoped:warning
 
+dotnet_diagnostic.IDE0057.severity = silent
+
 [*.{yaml,yml}]
 insert_final_newline = true
 indent_style = space
