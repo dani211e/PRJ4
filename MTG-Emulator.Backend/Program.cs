@@ -1,5 +1,6 @@
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using Microsoft.EntityFrameworkCore;
+using MTG_Emulator.Backend;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.Models;
 using Scalar.AspNetCore;
@@ -27,8 +28,7 @@ internal abstract class Program
             httpClient.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
 
             var db = scope.ServiceProvider.GetRequiredService<MTGContext>();
-
-            // await DbHelper.SeedDb(db, httpClient);
+            await DbHelper.SeedDb(db, httpClient);
         }
 
         app.MapControllers();

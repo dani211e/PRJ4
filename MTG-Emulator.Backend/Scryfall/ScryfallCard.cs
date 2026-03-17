@@ -38,7 +38,8 @@ namespace MTG_Emulator.Backend.Scryfall
         //[JsonPropertyName("object")]
         //public string CardObject { get; set; }
 
-        [JsonPropertyName("layout")] public string Layout { get; set; }
+        [JsonPropertyName("layout")]
+        public string Layout { get; set; }
 
         //[JsonPropertyName("oracle_id")]
         //public Guid? OracleId { get; set; }
@@ -46,26 +47,36 @@ namespace MTG_Emulator.Backend.Scryfall
         //[JsonPropertyName("prints_search_uri")]
         //public string PrintsSearchUri { get; set; }
 
-        [JsonPropertyName("rulings_uri")] public string RulingsUri { get; set; }
+        [JsonPropertyName("rulings_uri")]
+        public string RulingsUri { get; set; }
 
-        [JsonPropertyName("scryfall_uri")] public string ScryfallUri { get; set; }
+        [JsonPropertyName("scryfall_uri")]
+        public string ScryfallUri { get; set; }
 
-        [JsonPropertyName("uri")] public string Uri { get; set; }
+        [JsonPropertyName("uri")]
+        public string Uri { get; set; }
 
         // Gameplay fields
-        [JsonPropertyName("all_parts")] public ScryfallCardRelatedCard[]? AllParts { get; set; }
+        [JsonPropertyName("all_parts")]
+        public ScryfallCardRelatedCard[]? AllParts { get; set; }
 
-        [JsonPropertyName("card_faces")] public ScryfallCardFace[]? CardFaces { get; set; }
+        [JsonPropertyName("card_faces")]
+        public ScryfallCardFace[]? CardFaces { get; set; }
 
-        [JsonPropertyName("cmc")] public decimal Cmc { get; set; }
+        [JsonPropertyName("cmc")]
+        public decimal Cmc { get; set; }
 
-        [JsonPropertyName("color_identity")] public string[] ColorIdentity { get; set; }
+        [JsonPropertyName("color_identity")]
+        public string[] ColorIdentity { get; set; }
 
-        [JsonPropertyName("color_indicator")] public string[]? ColorIndicator { get; set; }
+        [JsonPropertyName("color_indicator")]
+        public string[]? ColorIndicator { get; set; }
 
-        [JsonPropertyName("colors")] public string[]? Colors { get; set; }
+        [JsonPropertyName("colors")]
+        public string[]? Colors { get; set; }
 
-        [JsonPropertyName("defense")] public string? Defense { get; set; }
+        [JsonPropertyName("defense")]
+        public string? Defense { get; set; }
 
         //[JsonPropertyName("edhrec_rank")]
         //public int? EdhrecRank { get; set; }
@@ -76,34 +87,44 @@ namespace MTG_Emulator.Backend.Scryfall
         //[JsonPropertyName("hand_modifier")]
         //public string? HandModifier { get; set; }
 
-        [JsonPropertyName("keywords")] public string[] Keywords { get; set; }
+        [JsonPropertyName("keywords")]
+        public string[] Keywords { get; set; }
 
-        [JsonPropertyName("legalities")] public ScryfallCardLegalities Legalities { get; set; }
+        [JsonPropertyName("legalities")]
+        public ScryfallCardLegalities Legalities { get; set; }
 
-        [JsonPropertyName("life_modifier")] public string? LifeModifier { get; set; }
+        [JsonPropertyName("life_modifier")]
+        public string? LifeModifier { get; set; }
 
         //[JsonPropertyName("loyalty")]
         //public string? Loyalty { get; set; }
 
-        [JsonPropertyName("mana_cost")] public string? ManaCost { get; set; }
+        [JsonPropertyName("mana_cost")]
+        public string? ManaCost { get; set; }
 
-        [JsonPropertyName("name")] public string Name { get; set; }
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
 
-        [JsonPropertyName("oracle_text")] public string? OracleText { get; set; }
+        [JsonPropertyName("oracle_text")]
+        public string? OracleText { get; set; }
 
         //[JsonPropertyName("penny_rank")]
         //public int? PennyRank { get; set; }
 
-        [JsonPropertyName("power")] public string? Power { get; set; }
+        [JsonPropertyName("power")]
+        public string? Power { get; set; }
 
-        [JsonPropertyName("produced_mana")] public string[]? ProducedMana { get; set; }
+        [JsonPropertyName("produced_mana")]
+        public string[]? ProducedMana { get; set; }
 
         //[JsonPropertyName("reserved")]
         //public bool Reserved { get; set; }
 
-        [JsonPropertyName("toughness")] public string? Toughness { get; set; }
+        [JsonPropertyName("toughness")]
+        public string? Toughness { get; set; }
 
-        [JsonPropertyName("type_line")] public string TypeLine { get; set; }
+        [JsonPropertyName("type_line")]
+        public string TypeLine { get; set; }
 
         // print fields
         //[JsonPropertyName("artist")]
@@ -163,7 +184,8 @@ namespace MTG_Emulator.Backend.Scryfall
         //[JsonPropertyName("image_status")]
         //public string ImageStatus { get; set; }
 
-        [JsonPropertyName("image_uris")] public ScryfallCardImages? ImageUris { get; set; }
+        [JsonPropertyName("image_uris")]
+        public ScryfallCardImages? ImageUris { get; set; }
 
         //[JsonPropertyName("oversized")]
         //public bool Oversized { get; set; }
