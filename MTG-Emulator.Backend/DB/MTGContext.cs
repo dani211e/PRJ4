@@ -11,6 +11,10 @@ namespace MTG_Emulator.Backend.DB
         public DbSet<Player> Players { get; set; }
         public DbSet<AltFace> AltFaces { get; set; }
 
+        public MTGContext(DbContextOptions<MTGContext> options) : base(options)
+        {
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             var configuration = new ConfigurationBuilder()

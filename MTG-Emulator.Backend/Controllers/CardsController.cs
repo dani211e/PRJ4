@@ -10,16 +10,16 @@ namespace MTG_Emulator.Backend.Controllers
     [ApiController]
     public class CardsController : ControllerBase
     {
-        private readonly MTGContext context;
+        private readonly MTGContext _context;
         public CardsController(MTGContext context)
         {
-            context = context;
+            _context = context;
         }
 
         [HttpGet("{CardName}")]
         public async Task<ActionResult<GetCardDTO>> GetCardNameBy(string cardName)
         {
-            var card = await context.Cards
+            var card = await _context.Cards
                 .FirstOrDefaultAsync(card => card.Name == cardName);
 
             if (card == null) return NotFound();
