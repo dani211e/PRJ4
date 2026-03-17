@@ -48,14 +48,15 @@ namespace MTG_Emulator.Backend
                 Player = player1,
             };
 
-            await dropAllRows(db);
+            dropAllRows(db);
+
             db.AddRange(cards);
             db.Add(player1);
             db.Add(deck1);
             await db.SaveChangesAsync();
         }
 
-        private static async Task dropAllRows(MTGContext dbContext)
+        private static void dropAllRows(MTGContext dbContext)
         {
             dbContext.Cards.RemoveRange();
             dbContext.AltFaces.RemoveRange();
