@@ -48,6 +48,7 @@ namespace UnitTests.Backend
 
             var resultToken = okResult.Value as RelatedCardDto;
             Assert.That(resultToken.Name, Is.EqualTo("Germ"));
+            Assert.That(resultToken.Uri, Is.EqualTo("http://Test.com"));
         }
 
         [Test]

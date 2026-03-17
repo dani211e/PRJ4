@@ -31,23 +31,34 @@ namespace MTG_Emulator.Backend.Controllers
 
             // Map cards from names
             var cards = new List<Card>();
+            var invalidCardnames = new List<string>();
             if (!string.IsNullOrWhiteSpace(deckDto.CardList))
             {
                 string[] lines = deckDto.CardList.Split('\n', StringSplitOptions.RemoveEmptyEntries);
                 foreach (string line in lines)
                 {
                     int firstSpace = line.IndexOf(' ');
-                    int num = int.Parse(line.Substring(0, firstSpace));
+                    if (firstSpace == -1) return BadRequest(new { error = $"Wrong line in card list: '{line}'" });
+                    if (!int.TryParse(line.Substring(0, firstSpace), out int num)) return BadRequest(new { error = $"Invalid quantity in line: '{line}'" });
+                    int amount = int.Parse(line.Substring(0, firstSpace));
                     string name = line.Substring(firstSpace + 1);
 
                     var cardEntity = await context.Cards
                         .FirstOrDefaultAsync(c => c.Name == name);
 
                     if (cardEntity != null)
-                        for (int i = 0; i < num; i++)
+                    {
+                        for (int i = 0; i < amount; i++)
                             cards.Add(cardEntity);
+                    }
+                    else
+                    {
+                        invalidCardnames.Add(name);
+                    }
                 }
             }
+
+            if(invalidCardnames.Any()) return BadRequest(new  { error = $"The following cards does not exist", invalidCards = invalidCardnames});
 
             var player = await context.Players
                 .FirstOrDefaultAsync(p => p.Username == deckDto.PlayerName);
