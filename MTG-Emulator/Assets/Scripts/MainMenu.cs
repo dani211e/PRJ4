@@ -7,25 +7,24 @@ public class MainMenu : MonoBehaviour
 {
     public void CreateGame()
     {
-        SceneManager.LoadSceneAsync(1);
+        SceneManager.LoadSceneAsync("Create game");
     }
 
 
     public void JoinGame()
     {
-        SceneManager.LoadSceneAsync(2);
+        SceneManager.LoadSceneAsync("Join game");
     }
 
 
     public void ImportDeck()
     {
-        SceneManager.LoadSceneAsync(3);
-        Debug.Log("Meep");
+        SceneManager.LoadSceneAsync("Deck_Viewer");
     }
 
 
     public void Logout()
     {
-        SceneManager.LoadSceneAsync(4);
+        SceneManager.LoadSceneAsync("Login screen");
     }
 }
