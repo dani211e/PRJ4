@@ -1,6 +1,4 @@
-﻿
-
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.Controllers;
 using MTG_Emulator.Backend.DB;
@@ -13,6 +11,18 @@ namespace UnitTests.Backend
     {
         private CardsController uut;
         private MTGContext context;
+
+        public Card CreateTestCard()
+        {
+            var testCard = new Card
+            {
+                Name = "Test",
+                OracleText = "Test text",
+                ImageUri = "http://Test.com",
+            };
+
+            return testCard;
+        }
 
         //Creates a test server
         [SetUp]
@@ -37,12 +47,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task GetCardByName_ExistingCard_ReturnsCard()
         {
-            var testCard = new Card
-            {
-                Name = "Test",
-                OracleText = "Test text",
-                ImageURI = "http://Test.com",
-            };
+            var testCard = CreateTestCard();
+
             context.Cards.Add(testCard);
             await context.SaveChangesAsync();
 
