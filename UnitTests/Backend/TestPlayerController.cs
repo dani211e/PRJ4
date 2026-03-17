@@ -34,7 +34,13 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateProfile_NewProfile_ReturnPlayer()
         {
-            Assert.Pass();
+            var testPlayer = uut.CreateProfile("testPlayer", "testPassword");
+
+            context.Add(testPlayer);
+            await context.SaveChangesAsync();
+
+            var okResult = await uut.CreateProfile("testPlayer", "testPassword");
+            Assert.That(testPlayer, Is.Not.Null);
         }
     }
 }
