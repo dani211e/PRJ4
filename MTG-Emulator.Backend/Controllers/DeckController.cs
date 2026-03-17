@@ -10,11 +10,11 @@ namespace MTG_Emulator.Backend.Controllers
     [ApiController]
     public class DeckController : ControllerBase
     {
-        private readonly MTGContext _context;
+        private readonly MTGContext context;
 
         public DeckController(MTGContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         // POST: api/Deck
@@ -34,7 +34,7 @@ namespace MTG_Emulator.Backend.Controllers
                     int num = int.Parse(line.Substring(0, firstSpace));
                     string name = line.Substring(firstSpace + 1);
 
-                    var cardEntity = await _context.Cards
+                    var cardEntity = await context.Cards
                         .FirstOrDefaultAsync(c => c.Name == name);
 
                     if (cardEntity != null)
@@ -43,7 +43,7 @@ namespace MTG_Emulator.Backend.Controllers
                 }
             }
 
-            var player = await _context.Players
+            var player = await context.Players
                 .FirstOrDefaultAsync(p => p.Username == deckDto.PlayerName);
 
             if (player == null)
@@ -57,8 +57,8 @@ namespace MTG_Emulator.Backend.Controllers
                 Player = player
             };
 
-            _context.Decks.Add(deck);
-            await _context.SaveChangesAsync();
+            context.Decks.Add(deck);
+            await context.SaveChangesAsync();
 
             // Map to DTO for return
             var resultDto = new DeckDto
@@ -70,7 +70,7 @@ namespace MTG_Emulator.Backend.Controllers
                     CardId = c.CardId,
                     Name = c.Name,
                     OracleText = c.OracleText,
-                    ImageUri = c.ImageURI
+                    ImageUri = c.ImageUri
                 }).ToList()
             };
 
@@ -81,7 +81,7 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpGet("{DeckName}")]
         public async Task<ActionResult<DeckDto>> GetDeckByName(string deckName)
         {
-            var deck = await _context.Decks
+            var deck = await context.Decks
                 .Include(d => d.Cards)
                 .FirstOrDefaultAsync(d => d.DeckName == deckName);
 
@@ -97,7 +97,7 @@ namespace MTG_Emulator.Backend.Controllers
                         CardId = c.CardId,
                         Name = c.Name,
                         OracleText = c.OracleText,
-                        ImageUri = c.ImageURI
+                        ImageUri = c.ImageUri
                     })
                     .ToList() ?? new List<CardDto>()
             };
@@ -111,14 +111,14 @@ namespace MTG_Emulator.Backend.Controllers
         {
             if (string.IsNullOrWhiteSpace(deckName)) return BadRequest();
 
-            var deck = await _context.Decks
+            var deck = await context.Decks
                 .Include(d => d.Cards)
                 .FirstOrDefaultAsync(d => d.DeckName == deckName);
 
             if (deck == null) return NotFound();
 
-            _context.Decks.Remove(deck);
-            await _context.SaveChangesAsync();
+            context.Decks.Remove(deck);
+            await context.SaveChangesAsync();
 
             return NoContent();
         }
@@ -129,7 +129,7 @@ namespace MTG_Emulator.Backend.Controllers
         {
             if (string.IsNullOrWhiteSpace(deckName) || deckDto == null) return BadRequest();
 
-            var deck = await _context.Decks
+            var deck = await context.Decks
                 .Include(d => d.Cards)
                 .FirstOrDefaultAsync(d => d.DeckName == deckName);
 
@@ -150,7 +150,7 @@ namespace MTG_Emulator.Backend.Controllers
                     int num = int.Parse(line.Substring(0, firstSpace));
                     string name = line.Substring(firstSpace + 1);
 
-                    var cardEntity = await _context.Cards
+                    var cardEntity = await context.Cards
                         .FirstOrDefaultAsync(c => c.Name == name);
 
                     if (cardEntity != null)
@@ -159,7 +159,7 @@ namespace MTG_Emulator.Backend.Controllers
                 }
             }
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             // Return updated DTO
             var resultDto = new DeckDto
@@ -171,7 +171,7 @@ namespace MTG_Emulator.Backend.Controllers
                     CardId = c.CardId,
                     Name = c.Name,
                     OracleText = c.OracleText,
-                    ImageUri = c.ImageURI
+                    ImageUri = c.ImageUri
                 }).ToList()
             };
 

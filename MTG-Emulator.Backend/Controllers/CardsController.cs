@@ -31,7 +31,7 @@ namespace MTG_Emulator.Backend.Controllers
                 CardId = card.CardId,
                 Name = card.Name,
                 OracleText = card.OracleText,
-                ImageUri = card.ImageURI
+                ImageUri = card.ImageUri
             };
         }
     }

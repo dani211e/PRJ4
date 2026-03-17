@@ -4,6 +4,6 @@
     {
         public string DeckName { get; set; } = string.Empty;
         public string DeckCommander { get; set; } = string.Empty;
-        public List<CardDto> Cards { get; set; } = new();
+        public List<CardDto> Cards { get; set; } = [];
     }
 }

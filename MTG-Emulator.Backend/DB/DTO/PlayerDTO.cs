@@ -2,7 +2,7 @@
 {
     public class PlayerDto
     {
-        public string Username { get; set; }
+        public string Username { get; set; } = string.Empty;
         public int GamesWon { get; set; }
         public int GamesLost { get; set; }
         public int GamesDrawed { get; set; }
