@@ -1,6 +1,6 @@
 ﻿namespace UnitTests.Backend
 {
-    public class PlayerControllerTest
+    public class TestDeckController
     {
         [SetUp]
         public void Setup()

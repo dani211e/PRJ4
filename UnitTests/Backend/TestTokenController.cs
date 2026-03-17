@@ -7,10 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace UnitTests.Backend
 {
-    public class TokenControllerTest
+    public class TestTokenController
     {
-        private TokenController _controller;
-        private MTGContext _context;
+        private TokenController uut;
+        private MTGContext context;
 
         //Creates a test server
         [SetUp]
@@ -20,17 +20,16 @@ namespace UnitTests.Backend
                 .UseInMemoryDatabase(databaseName: "TestDb")
                 .Options;
 
-            _context = new MTGContext(options);
-            _controller = new TokenController(_context);
-
+            context = new MTGContext(options);
+            uut = new TokenController(context);
         }
 
         //Tears down test database
         [TearDown]
         public void TearDown()
         {
-            _context.Database.EnsureDeleted();
-            _context.Dispose();
+            context.Database.EnsureDeleted();
+            context.Dispose();
         }
 
 
@@ -51,10 +50,10 @@ namespace UnitTests.Backend
                 Card = testCard
             };
 
-            _context.RelatedCards.Add(testToken);
-            await _context.SaveChangesAsync();
+            context.RelatedCards.Add(testToken);
+            await context.SaveChangesAsync();
 
-            var  result = await _controller.GetTokenByName("Germ");
+            var  result = await uut.GetTokenByName("Germ");
 
             var okResult = result.Result as OkObjectResult;
             Assert.That(okResult, Is.Not.Null);
@@ -65,7 +64,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task GetTokenByName_NonExistingToken_ReturnsNull()
         {
-            var response = await _controller.GetTokenByName("DoesNotExist");
+            var response = await uut.GetTokenByName("DoesNotExist");
             Assert.That(response.Result, Is.InstanceOf<NotFoundResult>());
         }
     }
