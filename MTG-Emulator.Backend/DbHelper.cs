@@ -10,17 +10,22 @@ namespace MTG_Emulator.Backend
     public static class DbHelper
     {
         private const string download_file_name = "ScryfallBulkCards.json";
-        private static readonly string path = Path.Combine(Path.GetTempPath(), download_file_name);
+        private static readonly string downloadPath = Path.Combine(Path.GetTempPath(), download_file_name);
 
-        public static async Task SeedDb(MTGContext db, HttpClient client, int count = 1)
+        public static async Task SeedDb(MTGContext db, HttpClient client, int? count = null)
         {
-            if (!File.Exists(path) || File.GetCreationTime(path).Date < DateTime.Today.Date)
+            if (!File.Exists(downloadPath) || File.GetCreationTime(downloadPath).Date < DateTime.Today.Date)
                 await downloadBulkCardsAsync(client);
 
-            if (path.IsNullOrEmpty())
-                throw new FileNotFoundException($@"File not found at: {path}");
+            if (downloadPath.IsNullOrEmpty())
+                throw new FileNotFoundException($@"File not found at: {downloadPath}");
 
-            var cards = await readScryfallCards(path!).Take(count).Select(x => x.ToCard()).ToListAsync();
+            IAsyncEnumerable<ScryfallCard> cardsEnum = readScryfallCards(downloadPath!);
+
+            if (count.HasValue)
+                cardsEnum = cardsEnum.Take(count.Value);
+
+            List<Card> cards = await cardsEnum.Select(c => c.ToCard()).ToListAsync();
 
             var player1 = new Player
             {
@@ -33,7 +38,9 @@ namespace MTG_Emulator.Backend
 
             var deck1 = new Deck
             {
-                DeckName = "Best deck ever", Cards = cards, DeckCommander = cards[0].Name,
+                DeckName = "Best deck ever",
+                Cards = cards,
+                DeckCommander = cards[0].Name,
                 Player = player1,
             };
 
@@ -55,7 +62,7 @@ namespace MTG_Emulator.Backend
                 return;
 
             Stream s2 = await client.GetStreamAsync(downloadUrl);
-            using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
+            using var fs = new FileStream(downloadPath, FileMode.Create, FileAccess.Write);
             await s2.CopyToAsync(fs);
         }
 

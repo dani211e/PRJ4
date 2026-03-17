@@ -15,7 +15,7 @@ namespace MTG_Emulator.Backend
             httpClient.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
 
             await using var db = new MTGContext();
-            await DbHelper.SeedDb(db, httpClient, 20);
+            await DbHelper.SeedDb(db, httpClient);
 
             /*
             // Add services to the container.
