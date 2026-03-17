@@ -12,17 +12,6 @@ namespace UnitTests.Backend
         private CardsController uut;
         private MTGContext context;
 
-        public Card CreateTestCard()
-        {
-            var testCard = new Card
-            {
-                Name = "Test",
-                OracleText = "Test text",
-                ImageUri = "http://Test.com",
-            };
-
-            return testCard;
-        }
 
         //Creates a test server
         [SetUp]
@@ -83,6 +72,19 @@ namespace UnitTests.Backend
             var resultNull = await uut.GetCardByName(null);
 
             Assert.That(resultNull.Result, Is.TypeOf<BadRequestResult>());
+        }
+
+
+        public Card CreateTestCard()
+        {
+            var testCard = new Card
+            {
+                Name = "Test",
+                OracleText = "Test text",
+                ImageUri = "http://Test.com",
+            };
+
+            return testCard;
         }
     }
 }

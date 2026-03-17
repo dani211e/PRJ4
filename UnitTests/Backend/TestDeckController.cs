@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.Controllers;
 using MTG_Emulator.Backend.DB;
+using MTG_Emulator.Backend.DB.DTO;
 using MTG_Emulator.Backend.DB.Models;
 
 namespace UnitTests.Backend
@@ -9,52 +11,6 @@ namespace UnitTests.Backend
     {
         private DeckController uut;
         private MTGContext context;
-
-        public Deck CreateTestDeck()
-        {
-
-            var testDeck = new Deck
-            {
-                DeckId = 1,
-                DeckName =  "Test Deck",
-                DeckCommander =  "Test Deck Commander",
-                Cards = new List<Card>
-                {
-                    new Card()
-                    {
-                        CardId = 1,
-                        Name = "Test Card 1",
-                        OracleText = "Test1 text",
-                        ImageUri = "http://Test1.com"
-                    },
-                    new Card()
-                    {
-                        CardId = 2,
-                        Name = "Test Card 2",
-                        OracleText = "Test2 text",
-                        ImageUri = "http://Test2.com"
-                    },
-                    new Card()
-                    {
-                        CardId = 3,
-                        Name = "Test Card 3",
-                        OracleText = "Test3 text",
-                        ImageUri = "http://Test3.com"
-                    }
-                },
-                Player = new Player
-                {
-                    PlayerId = 1,
-                    GamesWon = 0,
-                    GamesDrawed = 0,
-                    GamesLost = 0,
-                    Username = "Test Username",
-                    Password = "Test Password"
-                }
-            };
-
-            return testDeck;
-        }
 
         //Creates a test server
         [SetUp]
@@ -77,10 +33,75 @@ namespace UnitTests.Backend
         }
 
         [Test]
-        public void CreateDeck_NewDeck_ReturnsNewDeck()
+        public async Task CreateDeck_ValidInput_ReturnsCreatedDec()
         {
+            createPlayer("Test player");
+            createCard("Test card");
+            createCard("Test card2");
 
-            Assert.Pass();
+            var dto = new CreateDeckDto
+            {
+                PlayerName = "Test player",
+                DeckName = "Test deck",
+                Commander = "Test commander",
+                CardList = "1 Test card\n2 Test card2\n"
+            };
+
+            var result = await uut.CreateDeck(dto);
+
+            Assert.That(result.Result, Is.TypeOf<CreatedAtActionResult>());
+        }
+
+        private Player createPlayer(string username = "Test player")
+        {
+            var player = new Player
+            {
+                Username = username,
+                GamesWon = 0,
+                GamesLost = 0,
+                GamesDrawed = 0,
+                Password = "Test"
+            };
+
+            context.Players.Add(player);
+            context.SaveChanges();
+
+            return player;
+        }
+
+        private Card createCard(string name)
+        {
+            var card = new Card
+            {
+                Name = "name",
+                OracleText = "Test text",
+                ImageUri = "http://Test.com"
+            };
+
+            context.Cards.Add(card);
+            context.SaveChanges();
+
+            return card;
+        }
+
+
+        private Deck createDeck(string deckName = "Test deck")
+        {
+            var player = createPlayer();
+            var card = createCard("Test card");
+
+            var deck = new Deck
+            {
+                DeckName = deckName,
+                DeckCommander = "Commander",
+                Player = player,
+                Cards = new List<Card> { card }
+            };
+
+            context.Decks.Add(deck);
+            context.SaveChanges();
+
+            return deck;
         }
     }
 }
