@@ -33,23 +33,41 @@ namespace UnitTests.Backend
         }
 
         [Test]
-        public async Task CreateDeck_ValidInput_ReturnsCreatedDec()
+        public async Task CreateDeck_ValidInput_ReturnsCreatedDeck()
         {
-            createPlayer("Test player");
+            createPlayer();
             createCard("Test card");
             createCard("Test card2");
 
-            var dto = new CreateDeckDto
-            {
-                PlayerName = "Test player",
-                DeckName = "Test deck",
-                Commander = "Test commander",
-                CardList = "1 Test card\n2 Test card2\n"
-            };
+            var dto =  createDeckDto();
 
             var result = await uut.CreateDeck(dto);
 
             Assert.That(result.Result, Is.TypeOf<CreatedAtActionResult>());
+        }
+
+        [Test]
+        public async Task CreateDeck_PlayerDoesNotExist_ReturnsBadRequest()
+        {
+            createCard("Test card");
+            createCard("Test card2");
+
+            var dto = createDeckDto();
+
+            var result = await uut.CreateDeck(dto);
+
+            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
+        }
+
+        [Test]
+        public async Task CreateDeck_CardDoesNotExist_ReturnsBadRequest()
+        {
+            createPlayer();
+            var dto = createDeckDto();
+
+            var result = await uut.CreateDeck(dto);
+
+            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
         }
 
         private Player createPlayer(string username = "Test player")
@@ -102,6 +120,19 @@ namespace UnitTests.Backend
             context.SaveChanges();
 
             return deck;
+        }
+
+        private CreateDeckDto createDeckDto()
+        {
+            var dto = new CreateDeckDto
+            {
+                PlayerName = "Test player",
+                DeckName = "Test deck",
+                Commander = "Test commander",
+                CardList = "1 Test card\n2 Test card2\n"
+            };
+
+            return dto;
         }
     }
 }

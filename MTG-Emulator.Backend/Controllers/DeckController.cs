@@ -21,7 +21,13 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<DeckDto>> CreateDeck([FromBody] CreateDeckDto deckDto)
         {
-            if (deckDto == null) return BadRequest();
+            if (string.IsNullOrWhiteSpace(deckDto.DeckName) ||
+                string.IsNullOrWhiteSpace(deckDto.PlayerName) ||
+                string.IsNullOrWhiteSpace(deckDto.CardList) ||
+                string.IsNullOrWhiteSpace(deckDto.Commander))
+            {
+                return BadRequest("Invalid deck data");
+            }
 
             // Map cards from names
             var cards = new List<Card>();
