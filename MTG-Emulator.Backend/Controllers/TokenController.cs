@@ -10,10 +10,16 @@ namespace MTG_Emulator.Backend.Controllers
     [ApiController]
     public class TokenController : ControllerBase
     {
+        List<RelatedCard> _relatedCards = new List<RelatedCard>();
         private readonly MTGContext _context;
         public TokenController(MTGContext context)
         {
             _context = context;
+        }
+
+        public TokenController(List<RelatedCard> relatedCards)
+        {
+            _relatedCards = relatedCards;
         }
 
         [HttpGet("{tokenName}")]
@@ -26,5 +32,7 @@ namespace MTG_Emulator.Backend.Controllers
 
             return Ok(token);
         }
+
+
     }
 }
