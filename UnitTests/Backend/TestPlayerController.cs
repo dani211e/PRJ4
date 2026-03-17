@@ -47,6 +47,45 @@ namespace UnitTests.Backend
         }
 
         [Test]
+        public async Task CreateProfile_ExistingProfile_ReturnPlayer()
+        {
+            var testPlayer = this.testPlayer();
+            context.Players.Add(testPlayer);
+            await context.SaveChangesAsync();
+            var result = await uut.CreateProfile("testPlayer", "testPassword");
+
+            Assert.That(result.Result, Is.TypeOf<ConflictObjectResult>());
+        }
+
+        [Test]
+        public async Task CreateProfile_NullUserName_ReturnNotFound()
+        {
+            var result = await uut.CreateProfile(null, "testPassword");
+            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
+        }
+
+        [Test]
+        public async Task CreateProfile_EmptyUserName_ReturnNotFound()
+        {
+            var result = await uut.CreateProfile("", "testPassword");
+            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
+        }
+
+        [Test]
+        public async Task CreateProfile_NullPassword_ReturnNotFound()
+        {
+            var result = await uut.CreateProfile("testPlayer", null);
+            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
+        }
+
+        [Test]
+        public async Task CreateProfile_EmptyPassword_ReturnNotFound()
+        {
+            var result = await uut.CreateProfile("testPlayer", "");
+            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
+        }
+
+        [Test]
         public async Task GetProfile_ExistingProfile_ReturnPlayer()
         {
             var testPlayer = this.testPlayer();
@@ -174,6 +213,41 @@ namespace UnitTests.Backend
 
             var endGameResult = (PlayerController.GameResults)input;
             var result = await uut.UpdatePlayerStats(testPlayer.Username, endGameResult);
+            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
+        }
+
+        [Test]
+        public async Task ResetPlayerPassword_NewPassword_ReturnPlayer()
+        {
+            var testPlayer = this.testPlayer();
+            context.Players.Add(testPlayer);
+            await context.SaveChangesAsync();
+
+            var result = await uut.ResetPlayerPassword(testPlayer.Username, "testPassword");
+            await context.SaveChangesAsync();
+
+            Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
+        }
+
+        [Test]
+        public async Task ResetPlayerPassword_NullPassword_ReturnNull()
+        {
+            var testPlayer = this.testPlayer();
+            context.Players.Add(testPlayer);
+            await context.SaveChangesAsync();
+
+            var result = await uut.ResetPlayerPassword(testPlayer.Username, null);
+            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
+        }
+
+        [Test]
+        public async Task ResetPlayerPassword_EmptyPassword_ReturnNull()
+        {
+            var testPlayer = this.testPlayer();
+            context.Players.Add(testPlayer);
+            await context.SaveChangesAsync();
+
+            var result = await uut.ResetPlayerPassword(testPlayer.Username, "");
             Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
         }
 
