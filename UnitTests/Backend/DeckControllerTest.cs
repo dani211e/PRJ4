@@ -1,6 +1,6 @@
 ﻿namespace UnitTests.Backend
 {
-    public class DeckController
+    public class DeckControllerTest
     {
         [SetUp]
         public void Setup()

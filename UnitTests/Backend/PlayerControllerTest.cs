@@ -1,17 +1,14 @@
-﻿
-
-namespace UnitTests.Backend
+﻿namespace UnitTests.Backend
 {
-    public class CardController
+    public class PlayerControllerTest
     {
         [SetUp]
         public void Setup()
         {
-
         }
 
         [Test]
-        public void GetCardByName_ExistingCard_ReturnsCard()
+        public void Test1()
         {
             Assert.Pass();
         }
