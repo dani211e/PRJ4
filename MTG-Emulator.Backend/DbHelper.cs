@@ -12,13 +12,17 @@ namespace MTG_Emulator.Backend
         private const string download_file_name = "ScryfallBulkCards.json";
         private static readonly string downloadPath = Path.Combine(Path.GetTempPath(), download_file_name);
 
-        public static async Task SeedDb(MTGContext db, HttpClient client, int? count = null)
+        public static async Task SeedDb(MTGContext db, HttpClient client, int? count = null, bool forceSeed = false)
         {
-            if (!File.Exists(downloadPath) || File.GetCreationTime(downloadPath).Date < DateTime.Today.Date)
-                await downloadBulkCardsAsync(client);
+            //Only reseed if file is stale
+            if (!forceSeed &&
+                (File.Exists(downloadPath) && File.GetCreationTime(downloadPath).Date == DateTime.Today.Date))
+                return;
 
             if (downloadPath.IsNullOrEmpty())
                 throw new FileNotFoundException($@"File not found at: {downloadPath}");
+
+            await downloadBulkCardsAsync(client);
 
             IAsyncEnumerable<ScryfallCard> cardsEnum = readScryfallCards(downloadPath!);
 
