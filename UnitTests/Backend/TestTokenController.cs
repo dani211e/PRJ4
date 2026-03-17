@@ -37,20 +37,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task GetTokenByName_ExistingToken_ReturnsToken()
         {
-            var testCard = new Card
-            {
-                Name = "Test",
-                OracleText = "Test text",
-                ImageUri = "http://Test.com",
-            };
-
-            var testToken = new RelatedCard
-            {
-                Name = "Germ",
-                URI = "http://Test.com",
-                Card = testCard
-            };
-
+            var testToken = this.testToken();
             context.RelatedCards.Add(testToken);
             await context.SaveChangesAsync();
 
@@ -68,6 +55,39 @@ namespace UnitTests.Backend
         {
             var result = await uut.GetTokenByName("DoesNotExist");
             Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+        }
+
+        [Test]
+        public async Task GetTokenByName_NullToken_ReturnsToken()
+        {
+            var result = await uut.GetTokenByName(null);
+            Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
+        }
+
+        [Test]
+        public async Task GetTokenByName_EmptyToken_ReturnsToken()
+        {
+            var result = await uut.GetTokenByName("");
+            Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
+        }
+
+
+        private RelatedCard testToken()
+        {
+            var testCard = new Card
+            {
+                Name = "Test",
+                OracleText = "Test text",
+                ImageUri = "http://Test.com",
+            };
+
+            var testToken = new RelatedCard
+            {
+                Name = "Germ",
+                URI = "http://Test.com",
+                Card = testCard
+            };
+            return testToken;
         }
     }
 }
