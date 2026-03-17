@@ -22,7 +22,7 @@ namespace MTG_Emulator.Backend.Controllers
             var card = await context.Cards
                 .FirstOrDefaultAsync(card => card.Name == cardName);
 
-            if (card == null) return NotFound();
+            if (card == null) return BadRequest();
 
             return new CardDto
             {
