@@ -28,40 +28,6 @@ internal abstract class Program
 
             var db = scope.ServiceProvider.GetRequiredService<MTGContext>();
 
-
-            // 1️⃣ Create some players
-            var player1 = new Player { Username = "Alice", Password = "Hej" };
-            var player2 = new Player { Username = "Bob", Password = "Hej" };
-
-            db.Players.AddRange(player1, player2);
-            await db.SaveChangesAsync();
-
-            // 2️⃣ Optional: get some cards from DB
-            var cards = await db.Cards.Take(5).ToListAsync();
-            if (!cards.Any()) Console.WriteLine("No cards in DB to seed decks.");
-
-            // 3️⃣ Create some decks
-            var deck1 = new Deck
-            {
-                DeckName = "Alice's Aggro Deck",
-                DeckCommander = "Goblin King",
-                Player = player1,
-                Cards = new List<Card>(cards)
-            };
-
-            var deck2 = new Deck
-            {
-                DeckName = "Bob's Control Deck",
-                DeckCommander = "Blue Wizard",
-                Player = player2,
-                Cards = new List<Card>(cards)
-            };
-
-            db.Decks.AddRange(deck1, deck2);
-            await db.SaveChangesAsync();
-
-            Console.WriteLine("Seeded test players and decks.");
-
             // await DbHelper.SeedDb(db, httpClient);
         }
 
