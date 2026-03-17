@@ -41,7 +41,7 @@ namespace UnitTests.Backend
             {
                 Name = "Test",
                 OracleText = "Test text",
-                ImageURI = "http://Test.com",
+                ImageUri = "http://Test.com",
             };
 
             var testToken = new RelatedCard
