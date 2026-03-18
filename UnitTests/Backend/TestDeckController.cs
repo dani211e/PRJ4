@@ -333,6 +333,47 @@ namespace UnitTests.Backend
 
 
 
+        // Test DeleteDeckByName
+
+        [Test]
+        public async Task DeleteDeckByName_ExistingDeck_DeletesDeck()
+        {
+            var player = await createPlayerAsync();
+            var deck = new Deck
+            {
+                DeckName = "DeckToDelete",
+                DeckCommander = "Commander",
+                Player = player
+            };
+
+            context.Decks.Add(deck);
+            await context.SaveChangesAsync();
+
+            var result = await uut.DeleteDeckByName("DeckToDelete");
+            Assert.That(result, Is.TypeOf<NoContentResult>());
+
+            // Verify deck is removed from database
+            var deleted = await context.Decks.FirstOrDefaultAsync(d => d.DeckName == "DeckToDelete");
+            Assert.That(deleted, Is.Null);
+        }
+
+        [Test]
+        public async Task DeleteDeckByName_DeckDoesNotExist_ReturnsNotFound()
+        {
+            var result = await uut.DeleteDeckByName("NonExistingDeck");
+            Assert.That(result, Is.TypeOf<NotFoundResult>());
+        }
+
+        [TestCase("")]
+        [TestCase(" ")]
+        public async Task DeleteDeckByName_InvalidDeckName_ReturnsBadRequest(string deckName)
+        {
+            var result = await uut.DeleteDeckByName(deckName ?? string.Empty);
+            Assert.That(result, Is.TypeOf<BadRequestResult>());
+        }
+
+
+
         // Helper functions
 
         private async Task<Player> createPlayerAsync(string username = "Test player")
