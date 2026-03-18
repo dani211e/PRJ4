@@ -9,7 +9,7 @@ namespace MTG_Emulator.Backend.Controllers
     public class InvalidCardsResponse
     {
         public string Error { get; set; } = string.Empty;
-        public List<string> InvalidCards { get; set; } = new List<string>();
+        public List<string> InvalidCards { get; set; } = new();
     }
 
     [Route("api/[controller]")]
@@ -29,9 +29,7 @@ namespace MTG_Emulator.Backend.Controllers
             if (string.IsNullOrWhiteSpace(deckDto.DeckName) ||
                 string.IsNullOrWhiteSpace(deckDto.PlayerName) ||
                 string.IsNullOrWhiteSpace(deckDto.CardList))
-            {
                 return BadRequest("Invalid deck data");
-            }
 
             // Map cards from names
             var cards = new List<Card>();
@@ -43,7 +41,8 @@ namespace MTG_Emulator.Backend.Controllers
                 {
                     int firstSpace = line.IndexOf(' ');
                     if (firstSpace == -1) return BadRequest(new { error = $"Wrong line in card list: '{line}'" });
-                    if (!int.TryParse(line.Substring(0, firstSpace), out int num)) return BadRequest(new { error = $"Invalid quantity in line: '{line}'" });
+                    if (!int.TryParse(line.Substring(0, firstSpace), out int num))
+                        return BadRequest(new { error = $"Invalid quantity in line: '{line}'" });
                     int amount = int.Parse(line.Substring(0, firstSpace));
                     string name = line.Substring(firstSpace + 1);
 
@@ -51,14 +50,10 @@ namespace MTG_Emulator.Backend.Controllers
                         .FirstOrDefaultAsync(c => c.Name == name);
 
                     if (cardEntity != null)
-                    {
                         for (int i = 0; i < amount; i++)
                             cards.Add(cardEntity);
-                    }
                     else
-                    {
                         invalidCardnames.Add(name);
-                    }
                 }
             }
 
@@ -162,7 +157,8 @@ namespace MTG_Emulator.Backend.Controllers
             deck.DeckName = deckDto.DeckName;
             deck.DeckCommander = deckDto.Commander;
 
-            // Update cards
+            // Handle cards
+            var invalidCardnames = new List<string>();
             deck.Cards.Clear();
             if (!string.IsNullOrWhiteSpace(deckDto.CardList))
             {
@@ -170,21 +166,30 @@ namespace MTG_Emulator.Backend.Controllers
                 foreach (string line in lines)
                 {
                     int firstSpace = line.IndexOf(' ');
-                    int num = int.Parse(line.Substring(0, firstSpace));
-                    string name = line.Substring(firstSpace + 1);
+                    if (firstSpace == -1) return BadRequest(new { error = $"Wrong line in card list: '{line}'" });
+                    if (!int.TryParse(line.Substring(0, firstSpace), out int num))
+                        return BadRequest(new { error = $"Invalid quantity in line: '{line}'" });
 
-                    var cardEntity = await context.Cards
-                        .FirstOrDefaultAsync(c => c.Name == name);
+                    string name = line.Substring(firstSpace + 1);
+                    var cardEntity = await context.Cards.FirstOrDefaultAsync(c => c.Name == name);
 
                     if (cardEntity != null)
                         for (int i = 0; i < num; i++)
                             deck.Cards.Add(cardEntity);
+                    else
+                        invalidCardnames.Add(name);
                 }
             }
 
+            if (invalidCardnames.Any())
+                return BadRequest(new InvalidCardsResponse
+                {
+                    Error = "The following cards do not exist",
+                    InvalidCards = invalidCardnames
+                });
+
             await context.SaveChangesAsync();
 
-            // Return updated DTO
             var resultDto = new DeckDto
             {
                 DeckName = deck.DeckName,

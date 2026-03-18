@@ -9,8 +9,8 @@ namespace UnitTests.Backend
 {
     public class TestDeckController
     {
-        private DeckController uut;
         private MTGContext context;
+        private DeckController uut;
 
         //Creates a test server
         [SetUp]
@@ -93,11 +93,11 @@ namespace UnitTests.Backend
             Assert.That(deck.Cards.Count, Is.EqualTo(expectedCount));
         }
 
-        [TestCase((string)null, "Test player", "1 Test card\n")]
+        [TestCase(null, "Test player", "1 Test card\n")]
         [TestCase("", "Test player", "1 Test card\n")]
-        [TestCase("Test deck", (string)null, "1 Test card\n")]
+        [TestCase("Test deck", null, "1 Test card\n")]
         [TestCase("Test deck", "", "1 Test card\n")]
-        [TestCase("Test deck", "Test player", (string)null)]
+        [TestCase("Test deck", "Test player", null)]
         [TestCase("Test deck", "Test player", "")]
         public async Task CreateDeck_InvalidInput_ReturnsBadRequest(
             string? deckName,
@@ -230,8 +230,6 @@ namespace UnitTests.Backend
         }
 
 
-
-
         // Test GetByName
 
         [Test]
@@ -327,10 +325,9 @@ namespace UnitTests.Backend
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
 
-            var result = await uut.GetDeckByName("exactcasedeck"); // different case
+            var result = await uut.GetDeckByName("exactcasedeck");
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
         }
-
 
 
         // Test DeleteDeckByName
@@ -352,7 +349,6 @@ namespace UnitTests.Backend
             var result = await uut.DeleteDeckByName("DeckToDelete");
             Assert.That(result, Is.TypeOf<NoContentResult>());
 
-            // Verify deck is removed from database
             var deleted = await context.Decks.FirstOrDefaultAsync(d => d.DeckName == "DeckToDelete");
             Assert.That(deleted, Is.Null);
         }
@@ -372,6 +368,189 @@ namespace UnitTests.Backend
             Assert.That(result, Is.TypeOf<BadRequestResult>());
         }
 
+
+        // Test Update deck
+
+        [Test]
+        public async Task UpdateDeck_ExistingDeck_UpdatesDeckAndCards()
+        {
+            var player = await createPlayerAsync();
+            var card1 = await createCardAsync("Card1");
+            var card2 = await createCardAsync("Card2");
+
+            var deck = new Deck
+            {
+                DeckName = "DeckToUpdate",
+                DeckCommander = "OldCommander",
+                Player = player,
+                Cards = new List<Card> { card1 }
+            };
+            context.Decks.Add(deck);
+            await context.SaveChangesAsync();
+
+            var updateDto = createDeckDto(
+                deckName: "DeckToUpdate",
+                commander: "NewCommander",
+                cardList: "2 Card2\n"
+            );
+
+            var result = await uut.UpdateDeck("DeckToUpdate", updateDto);
+            Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
+
+            var ok = result.Result as OkObjectResult;
+            var updatedDeck = ok?.Value as DeckDto;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(updatedDeck, Is.Not.Null);
+                Assert.That(updatedDeck.DeckCommander, Is.EqualTo("NewCommander"));
+                Assert.That(updatedDeck.Cards.Count, Is.EqualTo(2));
+                Assert.That(updatedDeck.Cards.All(c => c.Name == "Card2"), Is.True);
+            });
+
+            var dbDeck = await context.Decks.Include(d => d.Cards)
+                .FirstOrDefaultAsync(d => d.DeckName == "DeckToUpdate");
+            Assert.That(dbDeck.Cards.Count, Is.EqualTo(2));
+            Assert.That(dbDeck.DeckCommander, Is.EqualTo("NewCommander"));
+        }
+
+        [Test]
+        public async Task UpdateDeck_DeckDoesNotExist_ReturnsNotFound()
+        {
+            var updateDto = createDeckDto();
+            var result = await uut.UpdateDeck("NonExistingDeck", updateDto);
+            Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
+        }
+
+        [Test]
+        public async Task UpdateDeck_InvalidDeckNameOrDto_ReturnsBadRequest()
+        {
+            var updateDto = createDeckDto();
+
+            var result1 = await uut.UpdateDeck(null!, updateDto);
+            Assert.That(result1.Result, Is.TypeOf<BadRequestResult>());
+
+            var result2 = await uut.UpdateDeck("DeckName", null!);
+            Assert.That(result2.Result, Is.TypeOf<BadRequestResult>());
+        }
+
+        [Test]
+        public async Task UpdateDeck_InvalidCardNames_ReturnsBadRequestWithInvalidCards()
+        {
+            var player = await createPlayerAsync();
+            var card1 = await createCardAsync("ValidCard");
+
+            var deck = new Deck
+            {
+                DeckName = "DeckToUpdateCards",
+                DeckCommander = "Commander",
+                Player = player,
+                Cards = new List<Card> { card1 }
+            };
+            context.Decks.Add(deck);
+            await context.SaveChangesAsync();
+
+            var updateDto = createDeckDto(
+                deckName: "DeckToUpdateCards",
+                commander: "Commander",
+                cardList: "1 ValidCard\n2 MissingCard\n"
+            );
+
+            var result = await uut.UpdateDeck("DeckToUpdateCards", updateDto);
+            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
+
+            var badRequest = result.Result as BadRequestObjectResult;
+            var value = badRequest?.Value as InvalidCardsResponse;
+
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value.InvalidCards, Does.Contain("MissingCard"));
+            Assert.That(value.InvalidCards, Does.Not.Contain("ValidCard"));
+        }
+
+        [Test]
+        public async Task UpdateDeck_EmptyCardList_ClearsCards()
+        {
+            var player = await createPlayerAsync();
+            var card = await createCardAsync("Card1");
+
+            var deck = new Deck
+            {
+                DeckName = "DeckEmptyCards",
+                DeckCommander = "Commander",
+                Player = player,
+                Cards = new List<Card> { card }
+            };
+            context.Decks.Add(deck);
+            await context.SaveChangesAsync();
+
+            var updateDto = createDeckDto(
+                deckName: "DeckEmptyCards",
+                commander: "Commander",
+                cardList: ""
+            );
+
+            var result = await uut.UpdateDeck("DeckEmptyCards", updateDto);
+            Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
+
+            var updatedDeck = (result.Result as OkObjectResult)?.Value as DeckDto;
+            Assert.That(updatedDeck.Cards.Count, Is.EqualTo(0));
+
+            var dbDeck = await context.Decks.Include(d => d.Cards)
+                .FirstOrDefaultAsync(d => d.DeckName == "DeckEmptyCards");
+            Assert.That(dbDeck.Cards.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task UpdateDeck_InvalidCardLineFormat_ReturnsBadRequest()
+        {
+            await createPlayerAsync();
+            var card = await createCardAsync("Card1");
+
+            var deck = new Deck
+            {
+                DeckName = "DeckWithBadLine",
+                DeckCommander = "Commander",
+                Player = await createPlayerAsync(),
+                Cards = new List<Card> { card }
+            };
+            context.Decks.Add(deck);
+            await context.SaveChangesAsync();
+
+            var updateDto = createDeckDto(
+                deckName: "DeckWithBadLine",
+                commander: "Commander",
+                cardList: "InvalidLineWithoutSpace"
+            );
+
+            var result = await uut.UpdateDeck("DeckWithBadLine", updateDto);
+            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
+        }
+
+        [Test]
+        public async Task UpdateDeck_InvalidQuantityInCardList_ReturnsBadRequest()
+        {
+            await createPlayerAsync();
+            var card = await createCardAsync("Card1");
+
+            var deck = new Deck
+            {
+                DeckName = "DeckWithBadQuantity",
+                DeckCommander = "Commander",
+                Player = await createPlayerAsync(),
+                Cards = new List<Card> { card }
+            };
+            context.Decks.Add(deck);
+            await context.SaveChangesAsync();
+
+            var updateDto = createDeckDto(
+                deckName: "DeckWithBadQuantity",
+                commander: "Commander",
+                cardList: "X Card1"
+            );
+
+            var result = await uut.UpdateDeck("DeckWithBadQuantity", updateDto);
+            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
+        }
 
 
         // Helper functions
