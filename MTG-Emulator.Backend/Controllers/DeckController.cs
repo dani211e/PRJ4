@@ -6,6 +6,12 @@ using MTG_Emulator.Backend.DB.Models;
 
 namespace MTG_Emulator.Backend.Controllers
 {
+    public class InvalidCardsResponse
+    {
+        public string Error { get; set; } = string.Empty;
+        public List<string> InvalidCards { get; set; } = new List<string>();
+    }
+
     [Route("api/[controller]")]
     [ApiController]
     public class DeckController : ControllerBase
@@ -23,8 +29,7 @@ namespace MTG_Emulator.Backend.Controllers
         {
             if (string.IsNullOrWhiteSpace(deckDto.DeckName) ||
                 string.IsNullOrWhiteSpace(deckDto.PlayerName) ||
-                string.IsNullOrWhiteSpace(deckDto.CardList) ||
-                string.IsNullOrWhiteSpace(deckDto.Commander))
+                string.IsNullOrWhiteSpace(deckDto.CardList))
             {
                 return BadRequest("Invalid deck data");
             }
@@ -58,7 +63,12 @@ namespace MTG_Emulator.Backend.Controllers
                 }
             }
 
-            if(invalidCardnames.Any()) return BadRequest(new  { error = $"The following cards does not exist", invalidCards = invalidCardnames});
+            if (invalidCardnames.Any())
+                return BadRequest(new InvalidCardsResponse
+                {
+                    Error = "The following cards does not exist",
+                    InvalidCards = invalidCardnames
+                });
 
             var player = await context.Players
                 .FirstOrDefaultAsync(p => p.Username == deckDto.PlayerName);
