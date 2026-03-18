@@ -231,6 +231,108 @@ namespace UnitTests.Backend
 
 
 
+
+        // Test GetByName
+
+        [Test]
+        public async Task GetDeckByName_ExistingDeck_ReturnsCorrectDeck()
+        {
+            var player = await createPlayerAsync();
+            var card = await createCardAsync("Test card");
+
+            var deck = new Deck
+            {
+                DeckName = "Test deck",
+                DeckCommander = "Test commander",
+                Player = player,
+                Cards = new List<Card> { card }
+            };
+
+            context.Decks.Add(deck);
+            await context.SaveChangesAsync();
+
+            var result = await uut.GetDeckByName("Test deck");
+
+            Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
+            var ok = result.Result as OkObjectResult;
+            var deckDto = ok?.Value as DeckDto;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(deckDto, Is.Not.Null);
+                Assert.That(deckDto.DeckName, Is.EqualTo("Test deck"));
+                Assert.That(deckDto.DeckCommander, Is.EqualTo("Test commander"));
+                Assert.That(deckDto.Cards.Count, Is.EqualTo(1));
+                Assert.That(deckDto.Cards[0].Name, Is.EqualTo("Test card"));
+            });
+        }
+
+        [Test]
+        public async Task GetDeckByName_DeckDoesNotExist_ReturnsNotFound()
+        {
+            var result = await uut.GetDeckByName("NonExistingDeck");
+            Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
+        }
+
+        [TestCase("")]
+        [TestCase("Test deck")]
+        public async Task GetDeckByName_InvalidDeckName_ReturnsNotFound(string deckName)
+        {
+            var result = await uut.GetDeckByName(deckName);
+            Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
+        }
+
+        [Test]
+        public async Task GetDeckByName_DeckWithMultipleCards_ReturnsAllCards()
+        {
+            var player = await createPlayerAsync();
+            var card1 = await createCardAsync("Test Card1");
+            var card2 = await createCardAsync("Test Card2");
+
+            var deck = new Deck
+            {
+                DeckName = "MultiCardDeck",
+                DeckCommander = "Test Commander",
+                Player = player,
+                Cards = new List<Card> { card1, card1, card2 }
+            };
+
+            context.Decks.Add(deck);
+            await context.SaveChangesAsync();
+
+            var result = await uut.GetDeckByName("MultiCardDeck");
+            var deckDto = (result.Result as OkObjectResult)?.Value as DeckDto;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(deckDto, Is.Not.Null);
+                Assert.That(deckDto.DeckName, Is.EqualTo("MultiCardDeck"));
+                Assert.That(deckDto.DeckCommander, Is.EqualTo("Test Commander"));
+                Assert.That(deckDto.Cards.Count, Is.EqualTo(3));
+                Assert.That(deckDto.Cards.Count(c => c.Name == "Test Card1"), Is.EqualTo(2));
+                Assert.That(deckDto.Cards.Count(c => c.Name == "Test Card2"), Is.EqualTo(1));
+            });
+        }
+
+        [Test]
+        public async Task GetDeckByName_CaseSensitiveDeckName_ReturnsNotFound()
+        {
+            var player = await createPlayerAsync();
+            var deck = new Deck
+            {
+                DeckName = "ExactCaseDeck",
+                DeckCommander = "Commander",
+                Player = player
+            };
+            context.Decks.Add(deck);
+            await context.SaveChangesAsync();
+
+            var result = await uut.GetDeckByName("exactcasedeck"); // different case
+            Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
+        }
+
+
+
         // Helper functions
 
         private async Task<Player> createPlayerAsync(string username = "Test player")
