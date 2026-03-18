@@ -319,7 +319,7 @@ namespace UnitTests.Backend
             var deck = new Deck
             {
                 DeckName = "ExactCaseDeck",
-                DeckCommander = "Commander",
+                DeckCommander = "Test Commander",
                 Player = player
             };
             context.Decks.Add(deck);
@@ -339,7 +339,7 @@ namespace UnitTests.Backend
             var deck = new Deck
             {
                 DeckName = "DeckToDelete",
-                DeckCommander = "Commander",
+                DeckCommander = "Test Commander",
                 Player = player
             };
 
@@ -375,8 +375,8 @@ namespace UnitTests.Backend
         public async Task UpdateDeck_ExistingDeck_UpdatesDeckAndCards()
         {
             var player = await createPlayerAsync();
-            var card1 = await createCardAsync("Card1");
-            var card2 = await createCardAsync("Card2");
+            var card1 = await createCardAsync("Test Card1");
+            var card2 = await createCardAsync("Test Card2");
 
             var deck = new Deck
             {
@@ -391,7 +391,7 @@ namespace UnitTests.Backend
             var updateDto = createDeckDto(
                 deckName: "DeckToUpdate",
                 commander: "NewCommander",
-                cardList: "2 Card2\n"
+                cardList: "2 Test Card2\n"
             );
 
             var result = await uut.UpdateDeck("DeckToUpdate", updateDto);
@@ -405,7 +405,7 @@ namespace UnitTests.Backend
                 Assert.That(updatedDeck, Is.Not.Null);
                 Assert.That(updatedDeck.DeckCommander, Is.EqualTo("NewCommander"));
                 Assert.That(updatedDeck.Cards.Count, Is.EqualTo(2));
-                Assert.That(updatedDeck.Cards.All(c => c.Name == "Card2"), Is.True);
+                Assert.That(updatedDeck.Cards.All(c => c.Name == "Test Card2"), Is.True);
             });
 
             var dbDeck = await context.Decks.Include(d => d.Cards)
@@ -443,7 +443,7 @@ namespace UnitTests.Backend
             var deck = new Deck
             {
                 DeckName = "DeckToUpdateCards",
-                DeckCommander = "Commander",
+                DeckCommander = "Test Commander",
                 Player = player,
                 Cards = new List<Card> { card1 }
             };
@@ -452,7 +452,7 @@ namespace UnitTests.Backend
 
             var updateDto = createDeckDto(
                 deckName: "DeckToUpdateCards",
-                commander: "Commander",
+                commander: "Test Commander",
                 cardList: "1 ValidCard\n2 MissingCard\n"
             );
 
@@ -471,12 +471,12 @@ namespace UnitTests.Backend
         public async Task UpdateDeck_EmptyCardList_ClearsCards()
         {
             var player = await createPlayerAsync();
-            var card = await createCardAsync("Card1");
+            var card = await createCardAsync("Test Card");
 
             var deck = new Deck
             {
                 DeckName = "DeckEmptyCards",
-                DeckCommander = "Commander",
+                DeckCommander = "Test Commander",
                 Player = player,
                 Cards = new List<Card> { card }
             };
@@ -485,7 +485,7 @@ namespace UnitTests.Backend
 
             var updateDto = createDeckDto(
                 deckName: "DeckEmptyCards",
-                commander: "Commander",
+                commander: "Test Commander",
                 cardList: ""
             );
 
@@ -504,12 +504,12 @@ namespace UnitTests.Backend
         public async Task UpdateDeck_InvalidCardLineFormat_ReturnsBadRequest()
         {
             await createPlayerAsync();
-            var card = await createCardAsync("Card1");
+            var card = await createCardAsync("Test Card");
 
             var deck = new Deck
             {
                 DeckName = "DeckWithBadLine",
-                DeckCommander = "Commander",
+                DeckCommander = "Test Commander",
                 Player = await createPlayerAsync(),
                 Cards = new List<Card> { card }
             };
@@ -518,7 +518,7 @@ namespace UnitTests.Backend
 
             var updateDto = createDeckDto(
                 deckName: "DeckWithBadLine",
-                commander: "Commander",
+                commander: "Test Commander",
                 cardList: "InvalidLineWithoutSpace"
             );
 
@@ -530,12 +530,12 @@ namespace UnitTests.Backend
         public async Task UpdateDeck_InvalidQuantityInCardList_ReturnsBadRequest()
         {
             await createPlayerAsync();
-            var card = await createCardAsync("Card1");
+            var card = await createCardAsync("Test Card");
 
             var deck = new Deck
             {
                 DeckName = "DeckWithBadQuantity",
-                DeckCommander = "Commander",
+                DeckCommander = "Test Commander",
                 Player = await createPlayerAsync(),
                 Cards = new List<Card> { card }
             };
@@ -544,7 +544,7 @@ namespace UnitTests.Backend
 
             var updateDto = createDeckDto(
                 deckName: "DeckWithBadQuantity",
-                commander: "Commander",
+                commander: "Test Commander",
                 cardList: "X Card1"
             );
 
