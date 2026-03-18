@@ -35,9 +35,9 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_ValidInput_CreatesDeckWithCorrectCards()
         {
-            createPlayer();
-            createCard("Test card");
-            createCard("Test card2");
+            createPlayerAsync();
+            createCardAsync("Test card");
+            createCardAsync("Test card2");
 
             var dto = createDeckDto();
 
@@ -58,7 +58,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_PlayerDoesNotExist_ReturnsBadRequest()
         {
-            createCard("Test card");
+            createCardAsync("Test card");
             var dto = createDeckDto();
 
             var result = await uut.CreateDeck(dto);
@@ -69,7 +69,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_CardDoesNotExist_ReturnsBadRequest()
         {
-            createPlayer();
+            createPlayerAsync();
             var dto = createDeckDto();
 
             var result = await uut.CreateDeck(dto);
@@ -82,8 +82,8 @@ namespace UnitTests.Backend
         [TestCase("3 Test card\n", 3)]
         public async Task CreateDeck_ParsesCardQuantitiesCorrectly(string cardList, int expectedCount)
         {
-            createPlayer();
-            createCard("Test card");
+            createPlayerAsync();
+            createCardAsync("Test card");
 
             var dto = createDeckDto(cardList: cardList);
 
@@ -119,7 +119,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_InvalidCardLineFormat_ReturnsBadRequest()
         {
-            createPlayer();
+            createPlayerAsync();
             var dto = createDeckDto(cardList: "InvalidLineWithoutSpace");
 
             var result = await uut.CreateDeck(dto);
@@ -130,7 +130,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_InvalidQuantity_ReturnsBadRequest()
         {
-            createPlayer();
+            createPlayerAsync();
             var dto = createDeckDto(cardList: "X Test card");
 
             var result = await uut.CreateDeck(dto);
@@ -141,7 +141,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_MultipleInvalidCards_ReturnsAllInvalidNames()
         {
-            createPlayer();
+            createPlayerAsync();
             var dto = createDeckDto(cardList: "1 Test card\n2 Test card2\n");
 
             var result = await uut.CreateDeck(dto);
@@ -156,10 +156,27 @@ namespace UnitTests.Backend
         }
 
         [Test]
+        public async Task CreateDeck_AddsInvalidCardNames_WhenSomeCardsDoNotExist()
+        {
+            await createPlayerAsync();
+            await createCardAsync("Valid Card");
+
+            var dto = createDeckDto(cardList: "1 Valid Card\n2 Missing Card\n");
+
+            var result = await uut.CreateDeck(dto);
+            var badRequest = result.Result as BadRequestObjectResult;
+
+            Assert.That(badRequest, Is.Not.Null);
+            var value = badRequest.Value as InvalidCardsResponse;
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value.InvalidCards, Does.Contain("Missing Card"));
+        }
+
+        [Test]
         public async Task CreateDeck_DuplicateCardLines_AreSummedCorrectly()
         {
-            createPlayer();
-            createCard("Test card");
+            createPlayerAsync();
+            createCardAsync("Test card");
 
             var dto = createDeckDto(cardList: "1 Test card\n2 Test card\n");
 
@@ -172,8 +189,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_HandlesEmptyLinesInCardList()
         {
-            createPlayer();
-            createCard("Test card");
+            createPlayerAsync();
+            createCardAsync("Test card");
 
             var dto = createDeckDto(cardList: "\n1 Test card\n\n");
 
@@ -186,8 +203,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_CaseMismatch_ReturnsBadRequest()
         {
-            createPlayer();
-            createCard("Test card");
+            createPlayerAsync();
+            createCardAsync("Test card");
 
             var dto = createDeckDto(cardList: "1 test card");
 
@@ -199,8 +216,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_PersistsDeckInDatabase()
         {
-            createPlayer();
-            createCard("Test card");
+            createPlayerAsync();
+            createCardAsync("Test card");
 
             var dto = createDeckDto(cardList: "1 Test card\n");
 
@@ -213,9 +230,10 @@ namespace UnitTests.Backend
         }
 
 
+
         // Helper functions
 
-        private Player createPlayer(string username = "Test player")
+        private async Task<Player> createPlayerAsync(string username = "Test player")
         {
             var player = new Player
             {
@@ -227,11 +245,11 @@ namespace UnitTests.Backend
             };
 
             context.Players.Add(player);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return player;
         }
 
-        private Card createCard(string name)
+        private async Task<Card> createCardAsync(string name)
         {
             var card = new Card
             {
@@ -241,7 +259,7 @@ namespace UnitTests.Backend
             };
 
             context.Cards.Add(card);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return card;
         }
 

@@ -23,7 +23,6 @@ namespace MTG_Emulator.Backend.Controllers
             this.context = context;
         }
 
-        // POST: api/Deck
         [HttpPost]
         public async Task<ActionResult<DeckDto>> CreateDeck([FromBody] CreateDeckDto deckDto)
         {
@@ -104,7 +103,6 @@ namespace MTG_Emulator.Backend.Controllers
             return CreatedAtAction(nameof(GetDeckByName), new { deck.DeckName }, resultDto);
         }
 
-        // GET: api/Deck/{DeckName}
         [HttpGet("{DeckName}")]
         public async Task<ActionResult<DeckDto>> GetDeckByName(string deckName)
         {
@@ -132,7 +130,6 @@ namespace MTG_Emulator.Backend.Controllers
             return Ok(deckDto);
         }
 
-        // DELETE: api/Deck/{DeckName}
         [HttpDelete("{DeckName}")]
         public async Task<IActionResult> DeleteDeckByName(string deckName)
         {
@@ -150,7 +147,6 @@ namespace MTG_Emulator.Backend.Controllers
             return NoContent();
         }
 
-        // PUT: api/Deck/{DeckName}
         [HttpPut("{DeckName}")]
         public async Task<ActionResult<DeckDto>> UpdateDeck(string deckName, [FromBody] CreateDeckDto deckDto)
         {
