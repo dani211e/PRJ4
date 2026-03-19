@@ -251,6 +251,17 @@ namespace UnitTests.Backend
             Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
         }
 
+        [Test]
+        public async Task ResetPlayerPassword_WhiteSpacePassword_ReturnBadRequest()
+        {
+            var testPlayer = this.testPlayer();
+            context.Players.Add(testPlayer);
+            await context.SaveChangesAsync();
+
+            var result = await uut.ResetPlayerPassword(testPlayer.Username, " ");
+            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
+        }
+
         private async Task AssertUpdateStats(PlayerController.GameResults endGameResult)
         {
             var testPlayer = this.testPlayer();
