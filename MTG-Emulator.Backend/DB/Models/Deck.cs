@@ -13,6 +13,6 @@ namespace MTG_Emulator.Backend.DB.Models
         public string DeckCommander { get; set; } = string.Empty;
 
         public List<Card> Cards { get; set; } = [];
-        public Player Player { get; set; } = new Player();
+        public Player Player { get; set; } = new();
     }
 }

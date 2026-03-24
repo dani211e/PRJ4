@@ -12,6 +12,6 @@ namespace MTG_Emulator.Backend.DB.Models
         [StringLength(256)]
         public string URI { get; set; } = string.Empty;
 
-        public Card Card { get; set; } = new Card();
+        public Card Card { get; set; } = new();
     }
 }

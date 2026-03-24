@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.DTO;
-using MTG_Emulator.Backend.DB.Models;
 
 namespace MTG_Emulator.Backend.Controllers
 {

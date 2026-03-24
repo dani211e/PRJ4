@@ -1,24 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.Controllers;
 using MTG_Emulator.Backend.DB;
-using MTG_Emulator.Backend.DB.Models;
-using NUnit.Framework;
-using Microsoft.AspNetCore.Mvc;
 using MTG_Emulator.Backend.DB.DTO;
+using MTG_Emulator.Backend.DB.Models;
 
 namespace UnitTests.Backend
 {
     public class TestTokenController
     {
-        private TokenController uut;
         private MTGContext context;
+        private TokenController uut;
 
         //Creates a test server
         [SetUp]
         public void Setup()
         {
             var options = new DbContextOptionsBuilder<MTGContext>()
-                .UseInMemoryDatabase(databaseName: "TestDb")
+                .UseInMemoryDatabase("TestDb")
                 .Options;
 
             context = new MTGContext(options);
@@ -41,7 +40,7 @@ namespace UnitTests.Backend
             context.RelatedCards.Add(testToken);
             await context.SaveChangesAsync();
 
-            var  result = await uut.GetTokenByName("Germ");
+            var result = await uut.GetTokenByName("Germ");
 
             var okResult = result.Result as OkObjectResult;
             Assert.That(okResult, Is.Not.Null);
@@ -79,7 +78,7 @@ namespace UnitTests.Backend
             {
                 Name = "Test",
                 OracleText = "Test text",
-                ImageUri = "http://Test.com",
+                ImageUri = "http://Test.com"
             };
 
             var testToken = new RelatedCard

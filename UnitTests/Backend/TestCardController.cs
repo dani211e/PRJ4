@@ -2,15 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.Controllers;
 using MTG_Emulator.Backend.DB;
-using MTG_Emulator.Backend.DB.DTO;
 using MTG_Emulator.Backend.DB.Models;
 
 namespace UnitTests.Backend
 {
     public class TestCardController
     {
-        private CardsController uut;
         private MTGContext context;
+        private CardsController uut;
 
 
         //Creates a test server
@@ -18,7 +17,7 @@ namespace UnitTests.Backend
         public void Setup()
         {
             var options = new DbContextOptionsBuilder<MTGContext>()
-                .UseInMemoryDatabase(databaseName: "TestDb")
+                .UseInMemoryDatabase("TestDb")
                 .Options;
 
             context = new MTGContext(options);
@@ -81,7 +80,7 @@ namespace UnitTests.Backend
             {
                 Name = "Test",
                 OracleText = "Test text",
-                ImageUri = "http://Test.com",
+                ImageUri = "http://Test.com"
             };
 
             return testCard;

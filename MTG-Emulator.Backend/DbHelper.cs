@@ -16,7 +16,7 @@ namespace MTG_Emulator.Backend
         {
             //Only reseed if file is stale
             if (!forceSeed &&
-                (File.Exists(downloadPath) && File.GetCreationTime(downloadPath).Date == DateTime.Today.Date))
+                File.Exists(downloadPath) && File.GetCreationTime(downloadPath).Date == DateTime.Today.Date)
                 return;
 
             if (downloadPath.IsNullOrEmpty())
