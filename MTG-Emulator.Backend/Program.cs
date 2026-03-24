@@ -22,8 +22,6 @@ void seedDb(MTGContext db)
     db.Add(player1);
     db.Add(deck1);
     db.SaveChanges();
-
-
 }
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
