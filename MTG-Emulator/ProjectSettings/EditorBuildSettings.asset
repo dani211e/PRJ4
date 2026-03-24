@@ -6,26 +6,26 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 8c9cfa26abfee488c85f1582747f6a02
-  - enabled: 1
     path: Assets/Scenes/0.unity
-    guid: 28855a88f05877949882eb84d9ca9d22
-  - enabled: 1
-    path: Assets/Scenes/Create game.unity
-    guid: 2476698cc31d2724cac416f3a0b17ee3
-  - enabled: 1
-    path: Assets/Scenes/Deck_Viewer.unity
-    guid: aba5f8e1bf0dcfa4b910c66c3cf2d937
-  - enabled: 1
-    path: Assets/Scenes/Join game.unity
-    guid: bb7b239412945b34a9d078cf603e38f8
-  - enabled: 1
-    path: Assets/Scenes/Login screen.unity
-    guid: c68a52a9e6f229a4aa763efa1114349c
+    guid: 1ea51363a177d034683b991ebec015fc
   - enabled: 1
     path: Assets/Scenes/Main Page.unity
-    guid: 86315b045bf827f41bd8e99b7029b76f
+    guid: 8c9cfa26abfee488c85f1582747f6a02
+  - enabled: 1
+    path: Assets/Scenes/Create game.unity
+    guid: 724eb5c41feeb554cbedc0753b679fae
+  - enabled: 1
+    path: Assets/Scenes/Deck_Viewer.unity
+    guid: 4d027150ec113b449b287e446b3e3293
+  - enabled: 1
+    path: Assets/Scenes/Join game.unity
+    guid: c6264b48b06fb624ab85f6066df58ada
+  - enabled: 1
+    path: Assets/Scenes/Login screen.unity
+    guid: 1528b82201ac1d4489e1b099ecc86c36
+  - enabled: 1
+    path: Assets/Scenes/Main Page.unity
+    guid: 8c9cfa26abfee488c85f1582747f6a02
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
