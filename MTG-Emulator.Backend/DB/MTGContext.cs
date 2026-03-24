@@ -5,6 +5,9 @@ namespace MTG_Emulator.Backend.DB
 {
     public class MTGContext : DbContext
     {
+        public MTGContext() { }
+
+        public MTGContext(DbContextOptions<MTGContext> options) : base(options) { } //Test constructor
         public DbSet<Card> Cards { get; set; }
         public DbSet<Deck> Decks { get; set; }
         public DbSet<RelatedCard> RelatedCards { get; set; }
@@ -13,11 +16,13 @@ namespace MTG_Emulator.Backend.DB
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
+            if (options.IsConfigured) return;
+
             var configuration = new ConfigurationBuilder()
                 .AddUserSecrets<MTGContext>()
                 .Build();
 
-            var connectionString = configuration["ConnectionStrings:DefaultConnection"];
+            string? connectionString = configuration["ConnectionStrings:DefaultConnection"];
             options.UseSqlServer(connectionString);
         }
     }

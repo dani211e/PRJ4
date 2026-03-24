@@ -1,66 +1,41 @@
+﻿using System.Net.Http.Headers;
+using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
-using MTG_Emulator.Backend.DB.Models;
+using Scalar.AspNetCore;
 
-//var builder = WebApplication.CreateBuilder(args);
-
-using (var db = new MTGContext())
+namespace MTG_Emulator.Backend
 {
-    seedDb(db);
+    internal abstract class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddControllers();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddOpenApi();
+
+            builder.Services.AddDbContext<MTGContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                using var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Clear();
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                httpClient.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
+
+                var db = scope.ServiceProvider.GetRequiredService<MTGContext>();
+                await DbHelper.SeedDb(db, httpClient);
+            }
+
+            app.MapControllers();
+            app.MapOpenApi();
+            app.MapScalarApiReference();
+
+            app.Run();
+        }
+    }
 }
-
-void seedDb(MTGContext db)
-{
-    var c1 = new Card { Name = "Test", OracleText = "Very good card", ImageURI = "https://cards.scryfall.io/large/front/a/9/a9b2a843-c6fe-4d19-801e-1538e4381ab0.jpg?1764119928"};
-    var c2 = new Card { Name = "Good card", OracleText = "Even better card", ImageURI = "https://cards.scryfall.io/large/front/8/2/829d91e9-4878-4e55-a262-ac0d55b65d4e.jpg?1764119935"};
-
-    var player1 = new Player { Username = "Kasper", Password = "Loser", GamesWon = 0, GamesLost = 1242, GamesDrawed = 2 };
-
-    var deck1 = new Deck { DeckName = "Best deck ever", Cards = new List<Card>{c1,c1,c1,c2,c2,c2,c2}, DeckCommander = c1.Name, Player = player1};
-
-    db.Add(c1);
-    db.Add(c2);
-    db.Add(player1);
-    db.Add(deck1);
-    db.SaveChanges();
-}
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-/*builder.Services.AddOpenApi();
-
-
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
-app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
-app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}*/
