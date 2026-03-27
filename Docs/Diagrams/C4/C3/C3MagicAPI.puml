@@ -1,0 +1,47 @@
+@startuml
+!NEW_C4_STYLE=1
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+SHOW_PERSON_OUTLINE()
+AddElementTag("backendContainer", $fontColor=$ELEMENT_FONT_COLOR, $bgColor="#335DA5", $shape=EightSidedShape(), $legendText="backend container (eight sided)")
+AddRelTag("async", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DashedLine())
+AddRelTag("sync/async", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DottedLine())
+
+Container(DSK,Desktop Application,"Container: C#","Contains the main application, that contains the game aswell as how we connect players")
+
+Container_Boundary(C3,"Magic API - C3"){
+    Component(Card, "Card Controller", Component: C#)
+    Component(Deck, "Deck Controller", Component: C#)
+    Component(Player, "Player Controller", Component: C#)
+    Component(Token, "Token Controller", Component: C#)
+    Component(Sync, "Syncronization Controller", Component: C#)
+    Component(Bulk, "Bulk Import", Component: C#)
+    Component(Con, "DB Context", Component: C#)
+    Component(Img, "Image Controller", Component: C#)
+    Component(Auth, "Authorization Controller", Component: C#)
+}
+System_Ext(Scry, Scryfall API, "Scryfalls api which card data is drawn from",,,,"Software system")
+ContainerDb(MTGDB, Magic Database, "Container SQL", "Stores all magic cards in SQL tables, to be fetched by magic API")
+ContainerDb(LogDB, Logging Database, "Container MongoDB", "Logs all API interactions and errors")
+
+Rel_D(DSK, Img, "Request from", HTTPS)
+Rel_D(DSK, Card, "Request from", HTTPS)
+Rel_D(DSK, Deck, "Request from", HTTPS)
+Rel_D(DSK, Player, "Request from", HTTPS)
+Rel_D(DSK, Token, "Request from", HTTPS)
+Rel_D(DSK, Sync, "Request from", HTTPS)
+Rel_D(DSK, Auth, "Request from", HTTPS)
+
+Rel_D(Img, Con, "Uses", HTTPS)
+Rel_D(Card, Con, "Uses", HTTPS)
+Rel_D(Deck, Con, "Uses", HTTPS)
+Rel_D(Player, Con, "Uses", HTTPS)
+Rel_D(Token, Con, "Uses", HTTPS)
+Rel_D(Sync, Con, "Uses", HTTPS)
+Rel_D(Auth, Con, "Uses", HTTPS)
+Rel_D(Con, MTGDB, "Reads/Writes to", HTTPS)
+Rel_D(Con, LogDB, "Writes to", HTTPS)
+Rel_R(Bulk, Con, "Imports", HTTPS)
+Rel_L(Bulk, Scry, "Imports", HTTPS)
+@enduml

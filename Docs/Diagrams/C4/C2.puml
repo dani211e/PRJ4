@@ -1,0 +1,26 @@
+@startuml
+
+!NEW_C4_STYLE=1
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+SHOW_PERSON_OUTLINE()
+AddElementTag("backendContainer", $fontColor=$ELEMENT_FONT_COLOR, $bgColor="#335DA5", $shape=EightSidedShape(), $legendText="backend container (eight sided)")
+AddRelTag("async", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DashedLine())
+AddRelTag("sync/async", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DottedLine())
+
+Person(User, Player, "User of this program")
+
+Container_Boundary(C2,"MTG Emulator - C2"){
+Container(DSK,Desktop Application,"Container: C#","Contains the main application, that contains the game aswell as how we connect players")
+Container(MTGAPI, Magic API, "Container: ASP.NET Core", "Reads from and writes data to the database containing the different magic cards as JSON objects. Handles synchronization and hosting of games")
+ContainerDb(MTGDB, Magic Database, "Container SQL", "Stores all magic cards in SQL tables, to be fetched by magic API")
+ContainerDb(LogDB, Logging Database, "Container MongoDB", "Logs all API interactions and errors")
+}
+
+System_Ext(Scry, Scryfall API, "Scryfalls api which card data is drawn from",,,,"Software system")
+
+Rel_D(User, DSK, Uses)
+Rel_D(DSK, MTGAPI, "Makes API calls too", HTTPS)
+Rel_L(MTGAPI, MTGDB, "Reads/Writes to", DBC)
+Rel_R(MTGAPI, LogDB, "Writes to", DBC)
+Rel_D(MTGAPI, Scry, "Fetchs from", HTTPS)
+@enduml
