@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpLogging;
 using MTG_Emulator.Backend.DB;
 using Scalar.AspNetCore;
+using Serilog;
 
 namespace MTG_Emulator.Backend
 {
@@ -12,12 +13,22 @@ namespace MTG_Emulator.Backend
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(builder.Configuration)
+                .Enrich.FromLogContext()
+                .CreateLogger();
+
+            builder.Host.UseSerilog();
+            
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddOpenApi();
 
             builder.Services.AddDbContext<MTGContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+                       .EnableSensitiveDataLogging() // only for development
+                       .EnableDetailedErrors()
+                       .LogTo(Log.Information, Microsoft.Extensions.Logging.LogLevel.Information));
 
             builder.Services.AddHttpLogging(logging =>
             {
