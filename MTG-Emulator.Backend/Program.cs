@@ -1,11 +1,6 @@
-﻿using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using System.Net.Http.Headers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpLogging;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using MTG_Emulator.Backend.DB;
 using Scalar.AspNetCore;
 
