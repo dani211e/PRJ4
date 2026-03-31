@@ -1,0 +1,13 @@
+﻿services:
+  mtg-emulator.backend:
+    image: mtg-emulator.backend
+    build:
+      context: .
+      dockerfile: MTG-Emulator.Backend/Dockerfile
+
+  unittests:
+    image: unittests
+    build:
+      context: .
+      dockerfile: UnitTests/Dockerfile
+
