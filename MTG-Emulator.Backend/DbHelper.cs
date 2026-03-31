@@ -48,21 +48,14 @@ namespace MTG_Emulator.Backend
                 Player = player1
             };
 
-            dropAllRows(db);
+            if (!db.Cards.Any())
+                db.AddRange(cards);
+            if (!db.Players.Any())
+                db.Add(player1);
+            if (!db.Decks.Any())
+                db.Add(deck1);
 
-            db.AddRange(cards);
-            db.Add(player1);
-            db.Add(deck1);
             await db.SaveChangesAsync();
-        }
-
-        private static void dropAllRows(MTGContext dbContext)
-        {
-            dbContext.Cards.RemoveRange();
-            dbContext.AltFaces.RemoveRange();
-            dbContext.Decks.RemoveRange();
-            dbContext.Players.RemoveRange();
-            dbContext.RelatedCards.RemoveRange();
         }
 
         private static async Task downloadBulkCardsAsync(HttpClient client)
