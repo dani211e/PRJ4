@@ -7,16 +7,17 @@ services:
       dockerfile: MTG-Emulator.Backend/Dockerfile
     container_name: mtg_game_api
     ports:
-      - "8080:8080"      # HTTP
+      - "8080:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
-      - ConnectionStrings__DefaultConnection=Server=mtg-sql;Database=MTGDB;User=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=Server=mtg-sql;Database=MTGDB;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
     depends_on:
       mtg-sql:
         condition: service_healthy
     volumes:
-      - ./logs:/app/logs   # persist Serilog logs
+      - ./logs:/app/logs
+      - scryfall_cache:/tmp
 
   mtg-sql:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -27,6 +28,8 @@ services:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=${SA_PASSWORD}
       - MSSQL_PID=Developer
+    volumes:
+      - sql_data:/var/opt/mssql
     healthcheck:
       test: [ "CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${SA_PASSWORD}", "-Q", "SELECT 1", "-No" ]
       interval: 10s
@@ -36,6 +39,4 @@ services:
 
 volumes:
   sql_data:
-      
-    volumes:
-      - sql_data:/var/opt/mssql
+  scryfall_cache:
