@@ -17,16 +17,14 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpGet("{CardName}")]
-        public async Task<ActionResult<CardDto>> GetCardByName(string cardName)
+        public async Task<ActionResult<CardDTO>> GetCardByName(string cardName)
         {
-            if (string.IsNullOrEmpty(cardName)) return BadRequest();
-
             var card = await context.Cards
                 .FirstOrDefaultAsync(card => card.Name == cardName);
 
             if (card == null) return NotFound();
 
-            return new CardDto
+            return new CardDTO
             {
                 CardId = card.CardId,
                 Name = card.Name,

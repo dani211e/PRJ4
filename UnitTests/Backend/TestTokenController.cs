@@ -45,7 +45,7 @@ namespace UnitTests.Backend
             var okResult = result.Result as OkObjectResult;
             Assert.That(okResult, Is.Not.Null);
 
-            var resultToken = okResult.Value as RelatedCardDto;
+            var resultToken = okResult.Value as RelatedCardDTO;
             Assert.That(resultToken.Name, Is.EqualTo("Germ"));
             Assert.That(resultToken.Uri, Is.EqualTo("http://Test.com"));
         }

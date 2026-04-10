@@ -97,7 +97,7 @@ namespace UnitTests.Backend
             var okResult = result.Result as OkObjectResult;
             Assert.That(okResult, Is.Not.Null);
 
-            var resultPlayer = okResult.Value as PlayerDto;
+            var resultPlayer = okResult.Value as PlayerDTO;
             Assert.That(resultPlayer.Username, Is.EqualTo("testPlayer"));
         }
 
@@ -113,7 +113,7 @@ namespace UnitTests.Backend
         {
             var resultNull = await uut.GetProfile(null);
 
-            Assert.That(resultNull.Result, Is.TypeOf<BadRequestResult>());
+            Assert.That(resultNull.Result, Is.TypeOf<NotFoundResult>());
         }
 
         [Test]
@@ -121,7 +121,7 @@ namespace UnitTests.Backend
         {
             var resultEmpty = await uut.GetProfile("");
 
-            Assert.That(resultEmpty.Result, Is.TypeOf<BadRequestResult>());
+            Assert.That(resultEmpty.Result, Is.TypeOf<NotFoundResult>());
         }
 
         [Test]
@@ -149,14 +149,14 @@ namespace UnitTests.Backend
         public async Task DeleteProfile_EmptyUsername_ReturnNotFound()
         {
             var result = await uut.DeleteProfile("");
-            Assert.That(result, Is.TypeOf<BadRequestResult>());
+            Assert.That(result, Is.TypeOf<NotFoundResult>());
         }
 
         [Test]
         public async Task DeleteProfile_NullUsername_ReturnNotFound()
         {
             var result = await uut.DeleteProfile(null);
-            Assert.That(result, Is.TypeOf<BadRequestResult>());
+            Assert.That(result, Is.TypeOf<NotFoundResult>());
         }
 
         [TestCase(1)]

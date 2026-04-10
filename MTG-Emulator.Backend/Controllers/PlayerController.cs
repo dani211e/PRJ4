@@ -52,15 +52,14 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpGet("{PlayerName}")]
-        public async Task<ActionResult<PlayerDto>> GetProfile(string playerName)
+        public async Task<ActionResult<PlayerDTO>> GetProfile(string playerName)
         {
-            if (string.IsNullOrEmpty(playerName)) return BadRequest();
             var player = await _context.Players
                 .FirstOrDefaultAsync(p => p.Username == playerName);
 
             if (player == null) return NotFound();
 
-            var dto = new PlayerDto
+            var dto = new PlayerDTO
             {
                 Username = player.Username,
                 GamesWon = player.GamesWon,
@@ -74,7 +73,6 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpDelete("{PlayerName}")]
         public async Task<ActionResult> DeleteProfile(string playerName)
         {
-            if (string.IsNullOrWhiteSpace(playerName)) return BadRequest();
 
             var player = await _context.Players
                 .FirstOrDefaultAsync(p => p.Username == playerName);
@@ -91,7 +89,6 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpPut("{PlayerName}")]
         public async Task<ActionResult<Player>> UpdatePlayerStats(string playerName, GameResults result)
         {
-            if (string.IsNullOrEmpty(playerName)) return NotFound();
 
             var player = await _context.Players
                 .FirstOrDefaultAsync(p => p.Username == playerName);

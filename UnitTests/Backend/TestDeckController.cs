@@ -104,7 +104,7 @@ namespace UnitTests.Backend
             string? playerName,
             string? cardList)
         {
-            var dto = new CreateDeckDto
+            var dto = new CreateDeckDTO
             {
                 DeckName = deckName,
                 PlayerName = playerName,
@@ -253,7 +253,7 @@ namespace UnitTests.Backend
 
             Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
             var ok = result.Result as OkObjectResult;
-            var deckDto = ok?.Value as DeckDto;
+            var deckDto = ok?.Value as DeckDTO;
 
             Assert.Multiple(() =>
             {
@@ -299,7 +299,7 @@ namespace UnitTests.Backend
             await context.SaveChangesAsync();
 
             var result = await uut.GetDeckByName("MultiCardDeck");
-            var deckDto = (result.Result as OkObjectResult)?.Value as DeckDto;
+            var deckDto = (result.Result as OkObjectResult)?.Value as DeckDTO;
 
             Assert.Multiple(() =>
             {
@@ -362,15 +362,26 @@ namespace UnitTests.Backend
 
         [TestCase("")]
         [TestCase(" ")]
-        public async Task DeleteDeckByName_InvalidDeckName_ReturnsBadRequest(string deckName)
+        public async Task DeleteDeckByName_InvalidDeckName_ReturnsNotFound(string deckName)
         {
             var result = await uut.DeleteDeckByName(deckName ?? string.Empty);
-            Assert.That(result, Is.TypeOf<BadRequestResult>());
+            Assert.That(result, Is.TypeOf<NotFoundResult>());
         }
 
+        private UpdateDeckDTO UpdateDeckDto(
+            string deckName = "Test deck",
+            string commander = "Test commander",
+            string cardList = "1 Test card\n2 Test card2\n")
+        {
+            return new UpdateDeckDTO
+            {
+                DeckName = deckName,
+                Commander = commander,
+                CardList = cardList
+            };
+        }
 
         // Test Update deck
-
         [Test]
         public async Task UpdateDeck_ExistingDeck_UpdatesDeckAndCards()
         {
@@ -388,7 +399,7 @@ namespace UnitTests.Backend
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
 
-            var updateDto = createDeckDto(
+            var updateDto = UpdateDeckDto(
                 deckName: "DeckToUpdate",
                 commander: "NewCommander",
                 cardList: "2 Test Card2\n"
@@ -398,7 +409,7 @@ namespace UnitTests.Backend
             Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
 
             var ok = result.Result as OkObjectResult;
-            var updatedDeck = ok?.Value as DeckDto;
+            var updatedDeck = ok?.Value as DeckDTO;
 
             Assert.Multiple(() =>
             {
@@ -417,7 +428,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task UpdateDeck_DeckDoesNotExist_ReturnsNotFound()
         {
-            var updateDto = createDeckDto();
+            var updateDto = UpdateDeckDto();
             var result = await uut.UpdateDeck("NonExistingDeck", updateDto);
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
         }
@@ -425,13 +436,13 @@ namespace UnitTests.Backend
         [Test]
         public async Task UpdateDeck_InvalidDeckNameOrDto_ReturnsBadRequest()
         {
-            var updateDto = createDeckDto();
+            var updateDto = UpdateDeckDto();
 
             var result1 = await uut.UpdateDeck(null!, updateDto);
-            Assert.That(result1.Result, Is.TypeOf<BadRequestResult>());
+            Assert.That(result1.Result, Is.TypeOf<NotFoundResult>());
 
             var result2 = await uut.UpdateDeck("DeckName", null!);
-            Assert.That(result2.Result, Is.TypeOf<BadRequestResult>());
+            Assert.That(result2.Result, Is.TypeOf<NotFoundResult>());
         }
 
         [Test]
@@ -450,7 +461,7 @@ namespace UnitTests.Backend
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
 
-            var updateDto = createDeckDto(
+            var updateDto = UpdateDeckDto(
                 deckName: "DeckToUpdateCards",
                 commander: "Test Commander",
                 cardList: "1 ValidCard\n2 MissingCard\n"
@@ -483,7 +494,7 @@ namespace UnitTests.Backend
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
 
-            var updateDto = createDeckDto(
+            var updateDto = UpdateDeckDto(
                 deckName: "DeckEmptyCards",
                 commander: "Test Commander",
                 cardList: ""
@@ -492,7 +503,7 @@ namespace UnitTests.Backend
             var result = await uut.UpdateDeck("DeckEmptyCards", updateDto);
             Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
 
-            var updatedDeck = (result.Result as OkObjectResult)?.Value as DeckDto;
+            var updatedDeck = (result.Result as OkObjectResult)?.Value as DeckDTO;
             Assert.That(updatedDeck.Cards.Count, Is.EqualTo(0));
 
             var dbDeck = await context.Decks.Include(d => d.Cards)
@@ -516,7 +527,7 @@ namespace UnitTests.Backend
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
 
-            var updateDto = createDeckDto(
+            var updateDto = UpdateDeckDto(
                 deckName: "DeckWithBadLine",
                 commander: "Test Commander",
                 cardList: "InvalidLineWithoutSpace"
@@ -542,7 +553,7 @@ namespace UnitTests.Backend
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
 
-            var updateDto = createDeckDto(
+            var updateDto = UpdateDeckDto(
                 deckName: "DeckWithBadQuantity",
                 commander: "Test Commander",
                 cardList: "X Card1"
@@ -585,13 +596,13 @@ namespace UnitTests.Backend
             return card;
         }
 
-        private CreateDeckDto createDeckDto(
+        private CreateDeckDTO createDeckDto(
             string playerName = "Test player",
             string deckName = "Test deck",
             string commander = "Test commander",
             string cardList = "1 Test card\n2 Test card2\n")
         {
-            return new CreateDeckDto
+            return new CreateDeckDTO
             {
                 PlayerName = playerName,
                 DeckName = deckName,
@@ -600,14 +611,14 @@ namespace UnitTests.Backend
             };
         }
 
-        private DeckDto extractCreatedDto(ActionResult<DeckDto> result)
+        private DeckDTO extractCreatedDto(ActionResult<DeckDTO> result)
         {
             Assert.That(result.Result, Is.TypeOf<CreatedAtActionResult>());
 
             var created = result.Result as CreatedAtActionResult;
-            Assert.That(created?.Value, Is.TypeOf<DeckDto>());
+            Assert.That(created?.Value, Is.TypeOf<DeckDTO>());
 
-            return created.Value as DeckDto;
+            return created.Value as DeckDTO;
         }
     }
 }

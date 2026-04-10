@@ -17,14 +17,14 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpGet("{tokenName}")]
-        public async Task<ActionResult<RelatedCardDto>> GetTokenByName(string tokenName)
+        public async Task<ActionResult<RelatedCardDTO>> GetTokenByName(string tokenName)
         {
             var token = await _context.RelatedCards
                 .FirstOrDefaultAsync(t => t.Name == tokenName);
 
             if (token == null) return NotFound();
 
-            return Ok(new RelatedCardDto
+            return Ok(new RelatedCardDTO
             {
                 RelatedCardId = token.RelatedCardId,
                 Name = token.Name,

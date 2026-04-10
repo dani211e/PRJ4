@@ -62,7 +62,7 @@ namespace UnitTests.Backend
         {
             var resultEmpty = await uut.GetCardByName("");
 
-            Assert.That(resultEmpty.Result, Is.TypeOf<BadRequestResult>());
+            Assert.That(resultEmpty.Result, Is.TypeOf<NotFoundResult>());
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace UnitTests.Backend
         {
             var resultNull = await uut.GetCardByName(null);
 
-            Assert.That(resultNull.Result, Is.TypeOf<BadRequestResult>());
+            Assert.That(resultNull.Result, Is.TypeOf<NotFoundResult>());
         }
 
 
