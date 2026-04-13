@@ -58,19 +58,19 @@ namespace UnitTests.Backend
         }
 
         [Test]
-        public async Task GetCardByName_EmptyName_ReturnsNotFound()
+        public async Task GetCardByName_EmptyName_ReturnsBadrequest()
         {
             var resultEmpty = await uut.GetCardByName("");
 
-            Assert.That(resultEmpty.Result, Is.TypeOf<NotFoundResult>());
+            Assert.That(resultEmpty.Result, Is.TypeOf<BadRequestResult>());
         }
 
         [Test]
-        public async Task GetCardByName_NullName_ReturnsNotFound()
+        public async Task GetCardByName_NullName_ReturnsBadRequest()
         {
             var resultNull = await uut.GetCardByName(null);
 
-            Assert.That(resultNull.Result, Is.TypeOf<NotFoundResult>());
+            Assert.That(resultNull.Result, Is.TypeOf<BadRequestResult>());
         }
 
 

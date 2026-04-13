@@ -24,14 +24,19 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<DeckDTO>> CreateDeck([FromBody] CreateDeckDTO deckDTO)
+        public async Task<ActionResult<DeckDTO>> CreateDeck([FromBody] CreateDeckDTO deckDto)
         {
+            if (string.IsNullOrWhiteSpace(deckDto.DeckName) ||
+                string.IsNullOrWhiteSpace(deckDto.PlayerName) ||
+                string.IsNullOrWhiteSpace(deckDto.CardList))
+                return BadRequest("Invalid deck data");
+
             // Map cards from names
             var cards = new List<Card>();
             var invalidCardnames = new List<string>();
-            if (!string.IsNullOrWhiteSpace(deckDTO.CardList))
+            if (!string.IsNullOrWhiteSpace(deckDto.CardList))
             {
-                string[] lines = deckDTO.CardList.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                string[] lines = deckDto.CardList.Split('\n', StringSplitOptions.RemoveEmptyEntries);
                 foreach (string line in lines)
                 {
                     int firstSpace = line.IndexOf(' ');
@@ -60,15 +65,15 @@ namespace MTG_Emulator.Backend.Controllers
                 });
 
             var player = await context.Players
-                .FirstOrDefaultAsync(p => p.Username == deckDTO.PlayerName);
+                .FirstOrDefaultAsync(p => p.Username == deckDto.PlayerName);
 
             if (player == null)
-                return BadRequest(new { error = $"Player '{deckDTO.PlayerName}' not found." });
+                return BadRequest(new { error = $"Player '{deckDto.PlayerName}' not found." });
 
             var deck = new Deck
             {
-                DeckName = deckDTO.DeckName,
-                DeckCommander = deckDTO.Commander,
+                DeckName = deckDto.DeckName,
+                DeckCommander = deckDto.Commander,
                 Cards = cards,
                 Player = player
             };
@@ -77,7 +82,7 @@ namespace MTG_Emulator.Backend.Controllers
             await context.SaveChangesAsync();
 
             // Map to DTO for return
-            var resultDTO = new DeckDTO
+            var resultDto = new DeckDTO
             {
                 DeckName = deck.DeckName,
                 DeckCommander = deck.DeckCommander,
@@ -90,7 +95,7 @@ namespace MTG_Emulator.Backend.Controllers
                 }).ToList()
             };
 
-            return CreatedAtAction(nameof(GetDeckByName), new { deck.DeckName }, resultDTO);
+            return CreatedAtAction(nameof(GetDeckByName), new { deck.DeckName }, resultDto);
         }
 
         [HttpGet("{DeckName}")]
@@ -123,6 +128,8 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpDelete("{DeckName}")]
         public async Task<IActionResult> DeleteDeckByName(string deckName)
         {
+            if (string.IsNullOrWhiteSpace(deckName)) return BadRequest();
+
             var deck = await context.Decks
                 .Include(d => d.Cards)
                 .FirstOrDefaultAsync(d => d.DeckName == deckName);
@@ -136,8 +143,10 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpPut("{DeckName}")]
-        public async Task<ActionResult<DeckDTO>> UpdateDeck(string deckName, [FromBody] UpdateDeckDTO deckDTO)
+        public async Task<ActionResult<DeckDTO>> UpdateDeck(string deckName, [FromBody] CreateDeckDTO deckDto)
         {
+            if (string.IsNullOrWhiteSpace(deckName) || deckDto == null) return BadRequest();
+
             var deck = await context.Decks
                 .Include(d => d.Cards)
                 .FirstOrDefaultAsync(d => d.DeckName == deckName);
@@ -145,15 +154,15 @@ namespace MTG_Emulator.Backend.Controllers
             if (deck == null) return NotFound();
 
             // Update deck properties
-            deck.DeckName = deckDTO.DeckName;
-            deck.DeckCommander = deckDTO.Commander;
+            deck.DeckName = deckDto.DeckName;
+            deck.DeckCommander = deckDto.Commander;
 
             // Handle cards
             var invalidCardnames = new List<string>();
             deck.Cards.Clear();
-            if (!string.IsNullOrWhiteSpace(deckDTO.CardList))
+            if (!string.IsNullOrWhiteSpace(deckDto.CardList))
             {
-                string[] lines = deckDTO.CardList.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                string[] lines = deckDto.CardList.Split('\n', StringSplitOptions.RemoveEmptyEntries);
                 foreach (string line in lines)
                 {
                     int firstSpace = line.IndexOf(' ');
@@ -181,7 +190,7 @@ namespace MTG_Emulator.Backend.Controllers
 
             await context.SaveChangesAsync();
 
-            var resultDTO = new DeckDTO
+            var resultDto = new DeckDTO
             {
                 DeckName = deck.DeckName,
                 DeckCommander = deck.DeckCommander,
@@ -194,7 +203,7 @@ namespace MTG_Emulator.Backend.Controllers
                 }).ToList()
             };
 
-            return Ok(resultDTO);
+            return Ok(resultDto);
         }
     }
 }

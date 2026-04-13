@@ -113,7 +113,7 @@ namespace UnitTests.Backend
         {
             var resultNull = await uut.GetProfile(null);
 
-            Assert.That(resultNull.Result, Is.TypeOf<NotFoundResult>());
+            Assert.That(resultNull.Result, Is.TypeOf<BadRequestResult>());
         }
 
         [Test]
@@ -121,7 +121,7 @@ namespace UnitTests.Backend
         {
             var resultEmpty = await uut.GetProfile("");
 
-            Assert.That(resultEmpty.Result, Is.TypeOf<NotFoundResult>());
+            Assert.That(resultEmpty.Result, Is.TypeOf<BadRequestResult>());
         }
 
         [Test]
@@ -149,14 +149,14 @@ namespace UnitTests.Backend
         public async Task DeleteProfile_EmptyUsername_ReturnNotFound()
         {
             var result = await uut.DeleteProfile("");
-            Assert.That(result, Is.TypeOf<NotFoundResult>());
+            Assert.That(result, Is.TypeOf<BadRequestResult>());
         }
 
         [Test]
         public async Task DeleteProfile_NullUsername_ReturnNotFound()
         {
             var result = await uut.DeleteProfile(null);
-            Assert.That(result, Is.TypeOf<NotFoundResult>());
+            Assert.That(result, Is.TypeOf<BadRequestResult>());
         }
 
         [TestCase(1)]

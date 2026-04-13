@@ -362,26 +362,15 @@ namespace UnitTests.Backend
 
         [TestCase("")]
         [TestCase(" ")]
-        public async Task DeleteDeckByName_InvalidDeckName_ReturnsNotFound(string deckName)
+        public async Task DeleteDeckByName_InvalidDeckName_ReturnsBadRequest(string deckName)
         {
             var result = await uut.DeleteDeckByName(deckName ?? string.Empty);
-            Assert.That(result, Is.TypeOf<NotFoundResult>());
+            Assert.That(result, Is.TypeOf<BadRequestResult>());
         }
 
-        private UpdateDeckDTO UpdateDeckDto(
-            string deckName = "Test deck",
-            string commander = "Test commander",
-            string cardList = "1 Test card\n2 Test card2\n")
-        {
-            return new UpdateDeckDTO
-            {
-                DeckName = deckName,
-                Commander = commander,
-                CardList = cardList
-            };
-        }
 
         // Test Update deck
+
         [Test]
         public async Task UpdateDeck_ExistingDeck_UpdatesDeckAndCards()
         {
@@ -399,7 +388,7 @@ namespace UnitTests.Backend
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
 
-            var updateDto = UpdateDeckDto(
+            var updateDto = createDeckDto(
                 deckName: "DeckToUpdate",
                 commander: "NewCommander",
                 cardList: "2 Test Card2\n"
@@ -428,7 +417,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task UpdateDeck_DeckDoesNotExist_ReturnsNotFound()
         {
-            var updateDto = UpdateDeckDto();
+            var updateDto = createDeckDto();
             var result = await uut.UpdateDeck("NonExistingDeck", updateDto);
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
         }
@@ -436,13 +425,13 @@ namespace UnitTests.Backend
         [Test]
         public async Task UpdateDeck_InvalidDeckNameOrDto_ReturnsBadRequest()
         {
-            var updateDto = UpdateDeckDto();
+            var updateDto = createDeckDto();
 
             var result1 = await uut.UpdateDeck(null!, updateDto);
-            Assert.That(result1.Result, Is.TypeOf<NotFoundResult>());
+            Assert.That(result1.Result, Is.TypeOf<BadRequestResult>());
 
             var result2 = await uut.UpdateDeck("DeckName", null!);
-            Assert.That(result2.Result, Is.TypeOf<NotFoundResult>());
+            Assert.That(result2.Result, Is.TypeOf<BadRequestResult>());
         }
 
         [Test]
@@ -461,7 +450,7 @@ namespace UnitTests.Backend
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
 
-            var updateDto = UpdateDeckDto(
+            var updateDto = createDeckDto(
                 deckName: "DeckToUpdateCards",
                 commander: "Test Commander",
                 cardList: "1 ValidCard\n2 MissingCard\n"
@@ -494,7 +483,7 @@ namespace UnitTests.Backend
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
 
-            var updateDto = UpdateDeckDto(
+            var updateDto = createDeckDto(
                 deckName: "DeckEmptyCards",
                 commander: "Test Commander",
                 cardList: ""
@@ -527,7 +516,7 @@ namespace UnitTests.Backend
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
 
-            var updateDto = UpdateDeckDto(
+            var updateDto = createDeckDto(
                 deckName: "DeckWithBadLine",
                 commander: "Test Commander",
                 cardList: "InvalidLineWithoutSpace"
@@ -553,7 +542,7 @@ namespace UnitTests.Backend
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
 
-            var updateDto = UpdateDeckDto(
+            var updateDto = createDeckDto(
                 deckName: "DeckWithBadQuantity",
                 commander: "Test Commander",
                 cardList: "X Card1"
