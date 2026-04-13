@@ -47,6 +47,8 @@ namespace MTG_Emulator.Backend
 
             var app = builder.Build();
 
+            app.UseSerilogRequestLogging();
+
             app.UseHttpLogging();
 
             using (var scope = app.Services.CreateScope())

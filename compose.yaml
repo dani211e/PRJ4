@@ -12,8 +12,11 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__DefaultConnection=Server=mtg-sql;Database=MTGDB;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
+      - ConnectionStrings__MongoConnection=mongodb://mtg-mongo:27017/MTGLogs
     depends_on:
       mtg-sql:
+        condition: service_healthy
+      mtg-mongo:
         condition: service_healthy
     volumes:
       - ./logs:/app/logs
@@ -37,6 +40,21 @@ services:
       retries: 10
       start_period: 20s
 
+  mtg-mongo:
+    image: mongo:7
+    container_name: mtg_game_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
 volumes:
   sql_data:
+  mongo_data:
   scryfall_cache:
