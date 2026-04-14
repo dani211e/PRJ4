@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.Extensions.FileProviders;
 using MTG_Emulator.Backend.DB;
 using Scalar.AspNetCore;
 using Serilog;
@@ -46,6 +47,19 @@ namespace MTG_Emulator.Backend
             });
 
             var app = builder.Build();
+
+            var imagesPath = Path.Combine(AppContext.BaseDirectory, "images");
+            Directory.CreateDirectory(imagesPath);
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(imagesPath),
+                RequestPath = "/cards",
+                OnPrepareResponse = ctx =>
+                {
+                    ctx.Context.Response.Headers.CacheControl = "public,max-age=31536000,immutable";
+                }
+            });
 
             app.UseSerilogRequestLogging();
 
