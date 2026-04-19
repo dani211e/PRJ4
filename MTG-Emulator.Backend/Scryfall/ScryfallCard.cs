@@ -8,8 +8,8 @@ namespace MTG_Emulator.Backend.Scryfall
         //[JsonPropertyName("arena_id")]
         //public int? ArenaId { get; set; }
 
-        //[JsonPropertyName("id")]
-        //public Guid Id { get; set; }
+        [JsonPropertyName("id")]
+        public Guid Id { get; set; }
 
         //[JsonPropertyName("lang")]
         //public string Lang { get; set; }

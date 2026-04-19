@@ -26,6 +26,7 @@ namespace MTG_Emulator.Backend.Scryfall
 
             return new Card
             {
+                ScryfallId = card.Id,
                 Name = card.Name,
                 ImageUri = card.ImageUris?.Png ?? string.Empty,
                 OracleText = card.OracleText ?? string.Empty,
