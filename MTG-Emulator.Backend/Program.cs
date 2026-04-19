@@ -8,6 +8,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using MTG_Emulator.Backend.Controllers.Hubs;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Backend.Scalar;
@@ -46,6 +47,7 @@ namespace MTG_Emulator.Backend
 
             if (builder.Environment.IsDevelopment())
                 builder.Configuration.AddUserSecrets<Program>();
+            builder.Services.AddSignalR();
 
             builder.Services.AddDbContext<MTGContext>(options =>
                 options.UseSqlServer(
@@ -166,6 +168,7 @@ namespace MTG_Emulator.Backend
             }
 
             app.MapControllers();
+            app.MapHub<GameStateSyncHub>("/GameState");
             app.MapOpenApi();
             app.MapScalarApiReference();
 

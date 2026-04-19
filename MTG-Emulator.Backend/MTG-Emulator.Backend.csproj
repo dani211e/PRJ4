@@ -37,14 +37,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DB\DTO\CardDTO\" />
-    <Folder Include="DB\DTO\CardFace\" />
-    <Folder Include="DB\DTO\DeckDTO\" />
-    <Folder Include="DB\DTO\PlayerDTO\" />
-    <Folder Include="DB\DTO\RelatedCardsDTO\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="..\.dockerignore">
       <Link>.dockerignore</Link>
     </Content>
