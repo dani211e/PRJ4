@@ -7,12 +7,13 @@ services:
       dockerfile: MTG-Emulator.Backend/Dockerfile
     container_name: mtg_game_api
     ports:
-      - "8080:8080"
+      - "5042:5042"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:8080
-      - ConnectionStrings__DefaultConnection=Server=mtg-sql;Database=MTGDB;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
+      - ASPNETCORE_URLS=http://+:5042
+      - ConnectionStrings__DefaultConnection=Server=mtg-sql;Database=MTGDB;User Id=sa;Password=${MTG_PASSWORD};TrustServerCertificate=True;
       - ConnectionStrings__MongoConnection=mongodb://mtg-mongo:27017/MTGLogs
+      - SCRYFALL_DATA_PATH=/data/scryfall-data
     depends_on:
       mtg-sql:
         condition: service_healthy
@@ -20,7 +21,7 @@ services:
         condition: service_healthy
     volumes:
       - ./logs:/app/logs
-      - ./images:/app/images
+      - ./scryfall-data:/data/scryfall-data
 
   mtg-sql:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -29,12 +30,12 @@ services:
       - "1433:1433"
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=${SA_PASSWORD}
+      - SA_PASSWORD=${MTG_PASSWORD}
       - MSSQL_PID=Developer
     volumes:
       - sql_data:/var/opt/mssql
     healthcheck:
-      test: [ "CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${SA_PASSWORD}", "-Q", "SELECT 1", "-No" ]
+      test: [ "CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${MTG_PASSWORD}", "-Q", "SELECT 1", "-No" ]
       interval: 10s
       timeout: 5s
       retries: 10

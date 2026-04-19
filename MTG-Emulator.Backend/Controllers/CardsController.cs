@@ -29,6 +29,7 @@ namespace MTG_Emulator.Backend.Controllers
             return new CardDTO
             {
                 CardId = card.CardId,
+                ScryfallId = card.ScryfallId,
                 Name = card.Name,
                 OracleText = card.OracleText,
                 ImageUri = card.ImageUri

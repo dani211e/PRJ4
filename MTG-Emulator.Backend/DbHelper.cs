@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.IdentityModel.Tokens;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Backend.Scryfall;
@@ -9,22 +8,31 @@ namespace MTG_Emulator.Backend
 {
     public static class DbHelper
     {
-        private const string download_file_name = "ScryfallBulkCards.json";
-        private static readonly string downloadPath = Path.Combine(Path.GetTempPath(), download_file_name);
+        private static readonly string bulkDataPath = Path.Combine(
+            Environment.GetEnvironmentVariable("SCRYFALL_DATA_PATH")
+            ?? Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "scryfall-data"),
+            "oracle-cards.json");
 
-        public static async Task SeedDb(MTGContext db, HttpClient client, int? count = null, bool forceSeed = false)
+        private static readonly HashSet<string> ExcludedLayouts = new()
         {
-            //Only reseed if file is stale
-            if (!forceSeed &&
-                File.Exists(downloadPath) && File.GetCreationTime(downloadPath).Date == DateTime.Today.Date)
+            "art_series",
+            "reversible_card",
+            "planar",
+            "scheme",
+            "vanguard",
+            "conspiracy"
+        };
+
+        public static async Task SeedDb(MTGContext db, int? count = null, bool forceSeed = false)
+        {
+            if (!forceSeed && db.Cards.Any())
                 return;
 
-            if (downloadPath.IsNullOrEmpty())
-                throw new FileNotFoundException($@"File not found at: {downloadPath}");
+            if (!File.Exists(bulkDataPath))
+                throw new FileNotFoundException($"Bulk card data not found at: {bulkDataPath}. Ensure the downloader has run first.");
 
-            await downloadBulkCardsAsync(client);
-
-            var cardsEnum = readScryfallCards(downloadPath!);
+            var cardsEnum = readScryfallCards(bulkDataPath)
+                .Where(c => !ExcludedLayouts.Contains(c.Layout));
 
             if (count.HasValue)
                 cardsEnum = cardsEnum.Take(count.Value);
@@ -56,22 +64,6 @@ namespace MTG_Emulator.Backend
                 db.Add(deck1);
 
             await db.SaveChangesAsync();
-        }
-
-        private static async Task downloadBulkCardsAsync(HttpClient client)
-        {
-            string baseUrl = @"https://api.scryfall.com/bulk-data";
-            // We need to make an initial request that tells us where the actual download url is located
-            var s1 = await client.GetStreamAsync(baseUrl);
-            var r = await JsonSerializer.DeserializeAsync<ScryfallBulkResponse>(s1);
-
-            string? downloadUrl = r.Data.First(x => x.Type == "oracle_cards").DownloadUri.ToString();
-            if (downloadUrl.IsNullOrEmpty())
-                return;
-
-            var s2 = await client.GetStreamAsync(downloadUrl);
-            using var fs = new FileStream(downloadPath, FileMode.Create, FileAccess.Write);
-            await s2.CopyToAsync(fs);
         }
 
         private static async IAsyncEnumerable<ScryfallCard> readScryfallCards(string path)

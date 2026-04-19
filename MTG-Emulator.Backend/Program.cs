@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.FileProviders;
 using MTG_Emulator.Backend.DB;
@@ -48,12 +47,15 @@ namespace MTG_Emulator.Backend
 
             var app = builder.Build();
 
-            var imagesPath = Path.Combine(AppContext.BaseDirectory, "images");
+            var dataRoot = Environment.GetEnvironmentVariable("SCRYFALL_DATA_PATH")
+                ?? Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "scryfall-data");
+
+            var imagesPath = Path.Combine(dataRoot, "images");
             Directory.CreateDirectory(imagesPath);
 
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = new PhysicalFileProvider(imagesPath),
+                FileProvider = new PhysicalFileProvider(Path.GetFullPath(imagesPath)),
                 RequestPath = "/cards",
                 OnPrepareResponse = ctx =>
                 {
@@ -62,7 +64,6 @@ namespace MTG_Emulator.Backend
             });
 
             app.UseSerilogRequestLogging();
-
             app.UseHttpLogging();
 
             using (var scope = app.Services.CreateScope())
@@ -71,12 +72,9 @@ namespace MTG_Emulator.Backend
 
                 await db.Database.MigrateAsync();
 
-                using var httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClient.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
+                await ScryfallImageDownloader.RunAsync(testMode: false);
 
-                await DbHelper.SeedDb(db, httpClient);
+                await DbHelper.SeedDb(db);
             }
 
             app.MapControllers();

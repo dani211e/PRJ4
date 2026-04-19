@@ -15,7 +15,7 @@ namespace MTG_Emulator.Backend.Scryfall
                 var apiFace = card.CardFaces[1];
                 altFace = new AltFace
                 {
-                    ImageURI = apiFace.ImageUris?.Png ?? string.Empty,
+                    ImageURI = $"/cards/{card.OracleId}_face1.jpg",
                     OracleText = apiFace.FlavorText ?? string.Empty
                 };
             }
@@ -26,9 +26,9 @@ namespace MTG_Emulator.Backend.Scryfall
 
             return new Card
             {
-                ScryfallId = card.Id,
+                ScryfallId = card.OracleId,
                 Name = card.Name,
-                ImageUri = card.ImageUris?.Png ?? string.Empty,
+                ImageUri = $"/cards/{card.OracleId}.jpg",
                 OracleText = card.OracleText ?? string.Empty,
                 AltFace = altFace,
                 RelatedCard = relatedCards
