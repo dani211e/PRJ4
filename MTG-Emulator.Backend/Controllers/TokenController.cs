@@ -10,17 +10,17 @@ namespace MTG_Emulator.Backend.Controllers
     [ApiController]
     public class TokenController : ControllerBase
     {
-        private readonly MTGContext _context;
+        private readonly MTGContext context;
 
         public TokenController(MTGContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         [HttpGet("{tokenName}")]
         public async Task<ActionResult<RelatedCardDto>> GetTokenByName(string tokenName)
         {
-            var token = await _context.RelatedCards
+            var token = await context.RelatedCards
                 .FirstOrDefaultAsync(t => t.Name == tokenName);
 
             if (token == null)
