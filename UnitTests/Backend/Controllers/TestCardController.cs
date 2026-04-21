@@ -29,9 +29,13 @@ namespace UnitTests.Backend.Controllers
 
             Assert.That(result.Value, Is.Not.Null, "Expected a card, but got null");
             var resultCard = result.Value;
-            Assert.That(resultCard.Name, Is.EqualTo("Test"));
-            Assert.That(resultCard.OracleText, Is.EqualTo("Test text"));
-            Assert.That(resultCard.ImageUri, Is.EqualTo("http://Test.com"));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(resultCard.Name, Is.EqualTo("Test"));
+                Assert.That(resultCard.OracleText, Is.EqualTo("Test text"));
+                Assert.That(resultCard.ImageUri, Is.EqualTo("http://Test.com"));
+            });
         }
 
         [Test]
