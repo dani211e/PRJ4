@@ -50,27 +50,14 @@ namespace UnitTests.Backend
             Assert.That(resultToken.Uri, Is.EqualTo("http://Test.com"));
         }
 
-        [Test]
-        public async Task GetTokenByName_NonExistingToken_ReturnsNull()
+        [TestCase("DoesNotExist")]
+        [TestCase(null)]
+        [TestCase("")]
+        public async Task GetTokenByName_InvalidInput_ReturnNotFound(string? tokenName)
         {
-            var result = await uut.GetTokenByName("DoesNotExist");
-            Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
-        }
-
-        [Test]
-        public async Task GetTokenByName_NullToken_ReturnsToken()
-        {
-            var result = await uut.GetTokenByName(null!);
+            var result = await uut.GetTokenByName(tokenName);
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
         }
-
-        [Test]
-        public async Task GetTokenByName_EmptyToken_ReturnsToken()
-        {
-            var result = await uut.GetTokenByName("");
-            Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
-        }
-
 
         private static RelatedCard createTestToken()
         {

@@ -58,33 +58,16 @@ namespace UnitTests.Backend
             Assert.That(result.Result, Is.TypeOf<ConflictObjectResult>());
         }
 
-        [Test]
-        public async Task CreateProfile_NullUserName_ReturnNotFound()
+        [TestCase(null, "testPassword")]
+        [TestCase("", "testPassword")]
+        [TestCase("testPlayer", null)]
+        [TestCase("testPlayer", "")]
+        public async Task CreateProfile_InvalidInput_ReturnBadRequest(string? playerName, string? password)
         {
-            var result = await uut.CreateProfile(null, "testPassword");
+            var result = await uut.CreateProfile(playerName, password);
             Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
         }
 
-        [Test]
-        public async Task CreateProfile_EmptyUserName_ReturnNotFound()
-        {
-            var result = await uut.CreateProfile("", "testPassword");
-            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
-        }
-
-        [Test]
-        public async Task CreateProfile_NullPassword_ReturnNotFound()
-        {
-            var result = await uut.CreateProfile("testPlayer", null);
-            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
-        }
-
-        [Test]
-        public async Task CreateProfile_EmptyPassword_ReturnNotFound()
-        {
-            var result = await uut.CreateProfile("testPlayer", "");
-            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
-        }
 
         [Test]
         public async Task GetProfile_ExistingProfile_ReturnPlayer()
@@ -110,20 +93,12 @@ namespace UnitTests.Backend
             Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
         }
 
-        [Test]
-        public async Task GetProfile_NullUsername_ReturnNotFound()
+        [TestCase(null)]
+        [TestCase("")]
+        public async Task GetProfile_InvalidInput_ReturnBadRequest(string? playerName)
         {
-            var resultNull = await uut.GetProfile(null);
-
-            Assert.That(resultNull.Result, Is.TypeOf<BadRequestResult>());
-        }
-
-        [Test]
-        public async Task GetProfile_EmptyUsername_ReturnNotFound()
-        {
-            var resultEmpty = await uut.GetProfile("");
-
-            Assert.That(resultEmpty.Result, Is.TypeOf<BadRequestResult>());
+            var result = await uut.GetProfile(playerName);
+            Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
         }
 
         [Test]
@@ -146,17 +121,11 @@ namespace UnitTests.Backend
             Assert.That(result, Is.TypeOf<NotFoundResult>());
         }
 
-        [Test]
-        public async Task DeleteProfile_EmptyUsername_ReturnNotFound()
+        [TestCase(null)]
+        [TestCase("")]
+        public async Task DeleteProfile_InvalidInput_ReturnBadRequest(string? playerName)
         {
-            var result = await uut.DeleteProfile("");
-            Assert.That(result, Is.TypeOf<BadRequestResult>());
-        }
-
-        [Test]
-        public async Task DeleteProfile_NullUsername_ReturnNotFound()
-        {
-            var result = await uut.DeleteProfile(null);
+            var result = await uut.DeleteProfile(playerName);
             Assert.That(result, Is.TypeOf<BadRequestResult>());
         }
 
