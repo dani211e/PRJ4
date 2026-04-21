@@ -23,7 +23,8 @@ namespace MTG_Emulator.Backend.Controllers
             var token = await _context.RelatedCards
                 .FirstOrDefaultAsync(t => t.Name == tokenName);
 
-            if (token == null) return NotFound();
+            if (token == null)
+                return NotFound();
 
             return Ok(new RelatedCardDto
             {

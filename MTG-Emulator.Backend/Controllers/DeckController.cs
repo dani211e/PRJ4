@@ -41,7 +41,8 @@ namespace MTG_Emulator.Backend.Controllers
                 foreach (string line in lines)
                 {
                     int firstSpace = line.IndexOf(' ');
-                    if (firstSpace == -1) return BadRequest(new { error = $"Wrong line in card list: '{line}'" });
+                    if (firstSpace == -1)
+                        return BadRequest(new { error = $"Wrong line in card list: '{line}'" });
                     if (!int.TryParse(line.Substring(0, firstSpace), out int num))
                         return BadRequest(new { error = $"Invalid quantity in line: '{line}'" });
                     int amount = int.Parse(line.Substring(0, firstSpace));
@@ -58,7 +59,7 @@ namespace MTG_Emulator.Backend.Controllers
                 }
             }
 
-            if (invalidCardnames.Any())
+            if (invalidCardnames.Count != 0)
                 return BadRequest(new InvalidCardsResponse
                 {
                     Error = "The following cards does not exist",
@@ -106,7 +107,8 @@ namespace MTG_Emulator.Backend.Controllers
                 .Include(d => d.Cards)
                 .FirstOrDefaultAsync(d => d.DeckName == deckName);
 
-            if (deck == null) return NotFound();
+            if (deck == null)
+                return NotFound();
 
             var deckDto = new DeckDto
             {
@@ -129,13 +131,15 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpDelete("{DeckName}")]
         public async Task<IActionResult> DeleteDeckByName(string deckName)
         {
-            if (string.IsNullOrWhiteSpace(deckName)) return BadRequest();
+            if (string.IsNullOrWhiteSpace(deckName))
+                return BadRequest();
 
             var deck = await context.Decks
                 .Include(d => d.Cards)
                 .FirstOrDefaultAsync(d => d.DeckName == deckName);
 
-            if (deck == null) return NotFound();
+            if (deck == null)
+                return NotFound();
 
             context.Decks.Remove(deck);
             await context.SaveChangesAsync();
@@ -146,13 +150,15 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpPut("{DeckName}")]
         public async Task<ActionResult<DeckDto>> UpdateDeck(string deckName, [FromBody] CreateDeckDto deckDto)
         {
-            if (string.IsNullOrWhiteSpace(deckName) || deckDto == null) return BadRequest();
+            if (string.IsNullOrWhiteSpace(deckName) || deckDto == null)
+                return BadRequest();
 
             var deck = await context.Decks
                 .Include(d => d.Cards)
                 .FirstOrDefaultAsync(d => d.DeckName == deckName);
 
-            if (deck == null) return NotFound();
+            if (deck == null)
+                return NotFound();
 
             // Update deck properties
             deck.DeckName = deckDto.DeckName;
@@ -167,7 +173,8 @@ namespace MTG_Emulator.Backend.Controllers
                 foreach (string line in lines)
                 {
                     int firstSpace = line.IndexOf(' ');
-                    if (firstSpace == -1) return BadRequest(new { error = $"Wrong line in card list: '{line}'" });
+                    if (firstSpace == -1)
+                        return BadRequest(new { error = $"Wrong line in card list: '{line}'" });
                     if (!int.TryParse(line.Substring(0, firstSpace), out int num))
                         return BadRequest(new { error = $"Invalid quantity in line: '{line}'" });
 
