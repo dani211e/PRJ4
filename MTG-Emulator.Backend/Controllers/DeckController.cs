@@ -27,36 +27,36 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<DeckDto>> CreateDeck([FromBody] CreateDeckDto deckDto)
         {
-            if (string.IsNullOrWhiteSpace(deckDto.DeckName) ||
-                string.IsNullOrWhiteSpace(deckDto.PlayerName) ||
-                string.IsNullOrWhiteSpace(deckDto.CardList))
-                return BadRequest("Invalid deck data");
+            if (string.IsNullOrWhiteSpace(deckDto.DeckName))
+                return BadRequest("Invalid deck name");
+            if (string.IsNullOrWhiteSpace(deckDto.PlayerName))
+                return BadRequest("Invalid player data");
+            if (string.IsNullOrWhiteSpace(deckDto.CardList))
+                return BadRequest("Invalid card data");
 
             // Map cards from names
             var cards = new List<Card>();
             var invalidCardnames = new List<string>();
-            if (!string.IsNullOrWhiteSpace(deckDto.CardList))
+            string[] lines = deckDto.CardList.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string line in lines)
             {
-                string[] lines = deckDto.CardList.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-                foreach (string line in lines)
-                {
-                    int firstSpace = line.IndexOf(' ');
-                    if (firstSpace == -1)
-                        return BadRequest(new { error = $"Wrong line in card list: '{line}'" });
-                    if (!int.TryParse(line.Substring(0, firstSpace), out int num))
-                        return BadRequest(new { error = $"Invalid quantity in line: '{line}'" });
-                    int amount = int.Parse(line.Substring(0, firstSpace));
-                    string name = line.Substring(firstSpace + 1);
+                int firstSpace = line.IndexOf(' ');
+                if (firstSpace == -1)
+                    return BadRequest(new { error = $"Wrong line in card list: '{line}'" });
+                if (!int.TryParse(line.Substring(0, firstSpace), out int num))
+                    return BadRequest(new { error = $"Invalid quantity in line: '{line}'" });
+                int amount = int.Parse(line.Substring(0, firstSpace));
+                string name = line.Substring(firstSpace + 1);
 
-                    var cardEntity = await context.Cards
-                        .FirstOrDefaultAsync(c => c.Name == name);
+                var cardEntity = await context.Cards
+                    .FirstOrDefaultAsync(c => c.Name == name);
 
-                    if (cardEntity != null)
-                        for (int i = 0; i < amount; i++)
-                            cards.Add(cardEntity);
-                    else
-                        invalidCardnames.Add(name);
-                }
+                if (cardEntity != null)
+                    for (int i = 0; i < amount; i++)
+                        cards.Add(cardEntity);
+                else
+                    invalidCardnames.Add(name);
             }
 
             if (invalidCardnames.Count != 0)
