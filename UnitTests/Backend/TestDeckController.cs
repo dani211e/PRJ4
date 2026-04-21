@@ -17,7 +17,6 @@ namespace UnitTests.Backend
         private MTGContext context;
         private DeckController uut;
 
-        //Creates a test server
         [SetUp]
         public void Setup()
         {
@@ -29,7 +28,6 @@ namespace UnitTests.Backend
             uut = new DeckController(context);
         }
 
-        //Tears down test database
         [TearDown]
         public void TearDown()
         {
@@ -235,8 +233,6 @@ namespace UnitTests.Backend
         }
 
 
-        // Test GetByName
-
         [Test]
         public async Task GetDeckByName_ExistingDeck_ReturnsCorrectDeck()
         {
@@ -335,8 +331,6 @@ namespace UnitTests.Backend
         }
 
 
-        // Test DeleteDeckByName
-
         [Test]
         public async Task DeleteDeckByName_ExistingDeck_DeletesDeck()
         {
@@ -373,8 +367,6 @@ namespace UnitTests.Backend
             Assert.That(result, Is.TypeOf<BadRequestResult>());
         }
 
-
-        // Test Update deck
 
         [Test]
         public async Task UpdateDeck_ExistingDeck_UpdatesDeckAndCards()
@@ -557,8 +549,6 @@ namespace UnitTests.Backend
             Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
         }
 
-
-        // Helper functions
 
         private async Task<Player> insertPlayerAsync(string username = "Test player")
         {

@@ -14,7 +14,6 @@ namespace UnitTests.Backend
         private MTGContext context;
         private TokenController uut;
 
-        //Creates a test server
         [SetUp]
         public void Setup()
         {
@@ -26,7 +25,6 @@ namespace UnitTests.Backend
             uut = new TokenController(context);
         }
 
-        //Tears down test database
         [TearDown]
         public void TearDown()
         {
