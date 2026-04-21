@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
-using MTG_Emulator.Backend.DB.DTO;
+using MTG_Emulator.Backend.DB.DTO.PlayerDTO;
 using MTG_Emulator.Backend.DB.Models;
 
 namespace MTG_Emulator.Backend.Controllers
@@ -45,15 +45,17 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpGet("{PlayerName}")]
-        public async Task<ActionResult<PlayerDTO>> GetProfile(string playerName)
+        public async Task<ActionResult<PlayerDto>> GetProfile(string playerName)
         {
-            if (string.IsNullOrEmpty(playerName)) return BadRequest();
+            if (string.IsNullOrEmpty(playerName))
+                return BadRequest();
             var player = await _context.Players
                 .FirstOrDefaultAsync(p => p.Username == playerName);
 
-            if (player == null) return NotFound();
+            if (player == null)
+                return NotFound();
 
-            var dto = new PlayerDTO
+            var dto = new PlayerDto
             {
                 Username = player.Username,
                 GamesWon = player.GamesWon,
@@ -67,12 +69,14 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpDelete("{PlayerName}")]
         public async Task<ActionResult> DeleteProfile(string playerName)
         {
-            if (string.IsNullOrWhiteSpace(playerName)) return BadRequest();
+            if (string.IsNullOrWhiteSpace(playerName))
+                return BadRequest();
 
             var player = await _context.Players
                 .FirstOrDefaultAsync(p => p.Username == playerName);
 
-            if (player == null) return NotFound();
+            if (player == null)
+                return NotFound();
 
             _context.Players.Remove(player);
             await _context.SaveChangesAsync();
@@ -84,12 +88,14 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpPut("{PlayerName}")]
         public async Task<ActionResult<Player>> UpdatePlayerStats(string playerName, GameResults result)
         {
-            if (string.IsNullOrEmpty(playerName)) return NotFound();
+            if (string.IsNullOrEmpty(playerName))
+                return NotFound();
 
             var player = await _context.Players
                 .FirstOrDefaultAsync(p => p.Username == playerName);
 
-            if (player == null) return NotFound();
+            if (player == null)
+                return NotFound();
 
             switch (result)
             {
@@ -120,7 +126,8 @@ namespace MTG_Emulator.Backend.Controllers
             var player = await _context.Players
                 .FirstOrDefaultAsync(p => p.Username == playerName);
 
-            if (player == null) return NotFound();
+            if (player == null)
+                return NotFound();
 
             player.Password = password;
             await _context.SaveChangesAsync();

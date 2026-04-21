@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.DTO;
+using MTG_Emulator.Backend.DB.DTO.RelatedCardsDTO;
 
 namespace MTG_Emulator.Backend.Controllers
 {
@@ -17,14 +18,14 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpGet("{tokenName}")]
-        public async Task<ActionResult<RelatedCardDTO>> GetTokenByName(string tokenName)
+        public async Task<ActionResult<RelatedCardDto>> GetTokenByName(string tokenName)
         {
             var token = await _context.RelatedCards
                 .FirstOrDefaultAsync(t => t.Name == tokenName);
 
             if (token == null) return NotFound();
 
-            return Ok(new RelatedCardDTO
+            return Ok(new RelatedCardDto
             {
                 RelatedCardId = token.RelatedCardId,
                 Name = token.Name,

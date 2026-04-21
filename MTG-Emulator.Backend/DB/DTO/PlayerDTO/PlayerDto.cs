@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MTG_Emulator.Backend.DB.DTO
+namespace MTG_Emulator.Backend.DB.DTO.PlayerDTO
 {
-    public class PlayerDTO
+    public class PlayerDto
     {
         [Required]
         public string Username { get; set; } = string.Empty;
@@ -14,5 +14,8 @@ namespace MTG_Emulator.Backend.DB.DTO
         public int GamesDrawed { get; set; }
         [Required]
         public List<string> DeckNames { get; set; } = new();
+    }
+}
+;
     }
 }

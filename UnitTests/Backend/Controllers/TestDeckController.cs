@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.Controllers;
-using MTG_Emulator.Backend.DB.DTO;
+using MTG_Emulator.Backend.DB.DTO.DeckDTO;
 using MTG_Emulator.Backend.DB.Models;
 using NUnit.Framework;
 
@@ -93,7 +93,7 @@ namespace UnitTests.Backend.Controllers
             string? playerName,
             string? cardList)
         {
-            var dto = new CreateDeckDTO
+            var dto = new CreateDeckDto
             {
                 DeckName = deckName,
                 PlayerName = playerName,
@@ -240,7 +240,7 @@ namespace UnitTests.Backend.Controllers
 
             Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
             var ok = result.Result as OkObjectResult;
-            var deckDto = ok?.Value as DeckDTO;
+            var deckDto = ok?.Value as DeckDto;
 
             Assert.Multiple(() =>
             {
@@ -286,7 +286,7 @@ namespace UnitTests.Backend.Controllers
             await Context.SaveChangesAsync();
 
             var result = await uut.GetDeckByName("MultiCardDeck");
-            var deckDto = (result.Result as OkObjectResult)?.Value as DeckDTO;
+            var deckDto = (result.Result as OkObjectResult)?.Value as DeckDto;
 
             Assert.Multiple(() =>
             {
@@ -381,7 +381,7 @@ namespace UnitTests.Backend.Controllers
             Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
 
             var ok = result.Result as OkObjectResult;
-            var updatedDeck = ok?.Value as DeckDTO;
+            var updatedDeck = ok?.Value as DeckDto;
 
             Assert.Multiple(() =>
             {
@@ -475,7 +475,7 @@ namespace UnitTests.Backend.Controllers
             var result = await uut.UpdateDeck("DeckEmptyCards", updateDto);
             Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
 
-            var updatedDeck = (result.Result as OkObjectResult)?.Value as DeckDTO;
+            var updatedDeck = (result.Result as OkObjectResult)?.Value as DeckDto;
             Assert.That(updatedDeck!.Cards.Count, Is.EqualTo(0));
 
             var dbDeck = await Context.Decks.Include(d => d.Cards)
@@ -566,13 +566,13 @@ namespace UnitTests.Backend.Controllers
             return card;
         }
 
-        private static CreateDeckDTO createDeckDto(
+        private static CreateDeckDto createDeckDto(
             string playerName = "Test player",
             string deckName = "Test deck",
             string commander = "Test commander",
             string cardList = "1 Test card\n2 Test card2\n")
         {
-            return new CreateDeckDTO
+            return new CreateDeckDto
             {
                 PlayerName = playerName,
                 DeckName = deckName,
@@ -581,14 +581,14 @@ namespace UnitTests.Backend.Controllers
             };
         }
 
-        private static DeckDTO extractCreatedDto(ActionResult<DeckDTO> result)
+        private static DeckDto extractCreatedDto(ActionResult<DeckDto> result)
         {
             Assert.That(result.Result, Is.TypeOf<CreatedAtActionResult>());
 
             var created = result.Result as CreatedAtActionResult;
-            Assert.That(created?.Value, Is.TypeOf<DeckDTO>());
+            Assert.That(created?.Value, Is.TypeOf<DeckDto>());
 
-            return created.Value as DeckDTO;
+            return created.Value as DeckDto;
         }
     }
 }

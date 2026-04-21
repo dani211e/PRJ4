@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MTG_Emulator.Backend.Controllers;
-using MTG_Emulator.Backend.DB.DTO;
+using MTG_Emulator.Backend.DB.DTO.RelatedCardsDTO;
 using MTG_Emulator.Backend.DB.Models;
 using NUnit.Framework;
 
@@ -30,7 +30,7 @@ namespace UnitTests.Backend.Controllers
             var okResult = result.Result as OkObjectResult;
             Assert.That(okResult, Is.Not.Null);
 
-            var resultToken = okResult.Value as RelatedCardDTO;
+            var resultToken = okResult.Value as RelatedCardDto;
             Assert.That(resultToken!.Name, Is.EqualTo("Germ"));
             Assert.That(resultToken.Uri, Is.EqualTo("http://Test.com"));
         }

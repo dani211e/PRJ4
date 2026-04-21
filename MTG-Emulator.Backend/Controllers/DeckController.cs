@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
-using MTG_Emulator.Backend.DB.DTO;
+using MTG_Emulator.Backend.DB.DTO.CardDTO;
+using MTG_Emulator.Backend.DB.DTO.DeckDTO;
 using MTG_Emulator.Backend.DB.Models;
 
 namespace MTG_Emulator.Backend.Controllers
@@ -24,7 +25,7 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<DeckDTO>> CreateDeck([FromBody] CreateDeckDTO deckDto)
+        public async Task<ActionResult<DeckDto>> CreateDeck([FromBody] CreateDeckDto deckDto)
         {
             if (string.IsNullOrWhiteSpace(deckDto.DeckName) ||
                 string.IsNullOrWhiteSpace(deckDto.PlayerName) ||
@@ -82,11 +83,11 @@ namespace MTG_Emulator.Backend.Controllers
             await context.SaveChangesAsync();
 
             // Map to DTO for return
-            var resultDto = new DeckDTO
+            var resultDto = new DeckDto
             {
                 DeckName = deck.DeckName,
                 DeckCommander = deck.DeckCommander,
-                Cards = deck.Cards.Select(c => new CardDTO
+                Cards = deck.Cards.Select(c => new CardDto
                 {
                     CardId = c.CardId,
                     Name = c.Name,
@@ -99,7 +100,7 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpGet("{DeckName}")]
-        public async Task<ActionResult<DeckDTO>> GetDeckByName(string deckName)
+        public async Task<ActionResult<DeckDto>> GetDeckByName(string deckName)
         {
             var deck = await context.Decks
                 .Include(d => d.Cards)
@@ -107,12 +108,12 @@ namespace MTG_Emulator.Backend.Controllers
 
             if (deck == null) return NotFound();
 
-            var deckDto = new DeckDTO
+            var deckDto = new DeckDto
             {
                 DeckName = deck.DeckName,
                 DeckCommander = deck.DeckCommander,
                 Cards = deck.Cards?
-                    .Select(c => new CardDTO
+                    .Select(c => new CardDto
                     {
                         CardId = c.CardId,
                         Name = c.Name,
@@ -143,7 +144,7 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpPut("{DeckName}")]
-        public async Task<ActionResult<DeckDTO>> UpdateDeck(string deckName, [FromBody] CreateDeckDTO deckDto)
+        public async Task<ActionResult<DeckDto>> UpdateDeck(string deckName, [FromBody] CreateDeckDto deckDto)
         {
             if (string.IsNullOrWhiteSpace(deckName) || deckDto == null) return BadRequest();
 
@@ -190,11 +191,11 @@ namespace MTG_Emulator.Backend.Controllers
 
             await context.SaveChangesAsync();
 
-            var resultDto = new DeckDTO
+            var resultDto = new DeckDto
             {
                 DeckName = deck.DeckName,
                 DeckCommander = deck.DeckCommander,
-                Cards = deck.Cards.Select(c => new CardDTO
+                Cards = deck.Cards.Select(c => new CardDto
                 {
                     CardId = c.CardId,
                     Name = c.Name,
