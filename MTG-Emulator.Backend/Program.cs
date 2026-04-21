@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.FileProviders;
 using MTG_Emulator.Backend.DB;
 using Scalar.AspNetCore;
@@ -69,11 +71,29 @@ namespace MTG_Emulator.Backend
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<MTGContext>();
+                var dbCreator = db.Database.GetService<IRelationalDatabaseCreator>();
 
-                await db.Database.MigrateAsync();
+                try
+                {
+                    await dbCreator.CreateAsync();
+                    Log.Information("Database created.");
+                }
+                catch (Microsoft.Data.SqlClient.SqlException ex) when (ex.Number == 1801)
+                {
+                    Log.Information("Database already exists, continuing.");
+                }
+
+                var strategy = db.Database.CreateExecutionStrategy();
+                await strategy.ExecuteAsync(async () =>
+                {
+                    var pendingMigrations = await db.Database.GetPendingMigrationsAsync();
+                    if (pendingMigrations.Any())
+                    {
+                        await db.Database.MigrateAsync();
+                    }
+                });
 
                 await ScryfallImageDownloader.RunAsync(testMode: false);
-
                 await DbHelper.SeedDb(db);
             }
 
