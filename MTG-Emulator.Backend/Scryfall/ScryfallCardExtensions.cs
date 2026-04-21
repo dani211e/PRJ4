@@ -28,7 +28,9 @@ namespace MTG_Emulator.Backend.Scryfall
             {
                 ScryfallId = card.OracleId,
                 Name = card.Name,
-                ImageUri = $"/cards/{card.OracleId}.jpg",
+                ImageUri = card.CardFaces != null
+                    ? $"/cards/{card.OracleId}_face0.jpg"
+                    : $"/cards/{card.OracleId}.jpg",
                 OracleText = card.OracleText ?? string.Empty,
                 AltFace = altFace,
                 RelatedCard = relatedCards
