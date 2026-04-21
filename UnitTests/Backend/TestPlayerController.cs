@@ -51,7 +51,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateProfile_ExistingProfile_ReturnPlayer()
         {
-            var testPlayer = this.testPlayer();
+            var testPlayer = createTestPlayer();
             context.Players.Add(testPlayer);
             await context.SaveChangesAsync();
             var result = await uut.CreateProfile("testPlayer", "testPassword");
@@ -90,7 +90,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task GetProfile_ExistingProfile_ReturnPlayer()
         {
-            var testPlayer = this.testPlayer();
+            var testPlayer = createTestPlayer();
 
             context.Players.Add(testPlayer);
             await context.SaveChangesAsync();
@@ -130,8 +130,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task DeleteProfile_ExistingProfile_ReturnPlayer()
         {
-            var testPlayer = this.testPlayer();
-
+            var testPlayer = createTestPlayer();
             context.Players.Add(testPlayer);
             await context.SaveChangesAsync();
 
@@ -168,7 +167,7 @@ namespace UnitTests.Backend
         public async Task UpdateProfile_ExistingProfileInt_ReturnPlayer(int input)
         {
             var endGameResult = (PlayerController.GameResults)input;
-            await AssertUpdateStats(endGameResult);
+            await verifyStatsUpdated(endGameResult);
         }
 
         [TestCase("Win")]
@@ -177,7 +176,7 @@ namespace UnitTests.Backend
         public async Task UpdateProfile_ExistingProfilestring_ReturnPlayer(string input)
         {
             Enum.TryParse(input, out PlayerController.GameResults endGameResult);
-            await AssertUpdateStats(endGameResult);
+            await verifyStatsUpdated(endGameResult);
         }
 
         [TestCase(PlayerController.GameResults.Win)]
@@ -209,7 +208,7 @@ namespace UnitTests.Backend
         [TestCase(3)]
         public async Task UpdateProfile_invalidGameResult_ReturnBadRequest(int input)
         {
-            var testPlayer = this.testPlayer();
+            var testPlayer = createTestPlayer();
             context.Players.Add(testPlayer);
             await context.SaveChangesAsync();
 
@@ -221,7 +220,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task ResetPlayerPassword_NewPassword_ReturnPlayer()
         {
-            var testPlayer = this.testPlayer();
+            var testPlayer = createTestPlayer();
             context.Players.Add(testPlayer);
             await context.SaveChangesAsync();
 
@@ -234,7 +233,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task ResetPlayerPassword_NullPassword_ReturnNull()
         {
-            var testPlayer = this.testPlayer();
+            var testPlayer = createTestPlayer();
             context.Players.Add(testPlayer);
             await context.SaveChangesAsync();
 
@@ -245,7 +244,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task ResetPlayerPassword_EmptyPassword_ReturnNull()
         {
-            var testPlayer = this.testPlayer();
+            var testPlayer = createTestPlayer();
             context.Players.Add(testPlayer);
             await context.SaveChangesAsync();
 
@@ -256,7 +255,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task ResetPlayerPassword_WhiteSpacePassword_ReturnBadRequest()
         {
-            var testPlayer = this.testPlayer();
+            var testPlayer = createTestPlayer();
             context.Players.Add(testPlayer);
             await context.SaveChangesAsync();
 
@@ -264,9 +263,9 @@ namespace UnitTests.Backend
             Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
         }
 
-        private async Task AssertUpdateStats(PlayerController.GameResults endGameResult)
+        private async Task verifyStatsUpdated(GameResults endGameResult)
         {
-            var testPlayer = this.testPlayer();
+            var testPlayer = createTestPlayer();
             context.Players.Add(testPlayer);
             await context.SaveChangesAsync();
 
@@ -274,17 +273,16 @@ namespace UnitTests.Backend
             Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
         }
 
-        public Player testPlayer()
+        private static Player createTestPlayer()
         {
-            var testPlayer = new Player
+            return new Player
             {
                 Username = "testPlayer",
                 Password = "testPassword",
                 GamesWon = 5,
                 GamesLost = 5,
-                GamesDrawed = 5
+                GamesDrawed = 5,
             };
-            return testPlayer;
         }
     }
 }

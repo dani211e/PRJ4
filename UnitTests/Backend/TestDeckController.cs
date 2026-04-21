@@ -40,9 +40,9 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_ValidInput_CreatesDeckWithCorrectCards()
         {
-            createPlayerAsync();
-            createCardAsync("Test card");
-            createCardAsync("Test card2");
+            await insertPlayerAsync();
+            await insertCardAsync("Test card");
+            await insertCardAsync("Test card2");
 
             var dto = createDeckDto();
 
@@ -63,7 +63,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_PlayerDoesNotExist_ReturnsBadRequest()
         {
-            createCardAsync("Test card");
+            await insertCardAsync("Test card");
             var dto = createDeckDto();
 
             var result = await uut.CreateDeck(dto);
@@ -74,7 +74,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_CardDoesNotExist_ReturnsBadRequest()
         {
-            createPlayerAsync();
+            await insertPlayerAsync();
             var dto = createDeckDto();
 
             var result = await uut.CreateDeck(dto);
@@ -87,8 +87,8 @@ namespace UnitTests.Backend
         [TestCase("3 Test card\n", 3)]
         public async Task CreateDeck_ParsesCardQuantitiesCorrectly(string cardList, int expectedCount)
         {
-            createPlayerAsync();
-            createCardAsync("Test card");
+            await insertPlayerAsync();
+            await insertCardAsync("Test card");
 
             var dto = createDeckDto(cardList: cardList);
 
@@ -124,7 +124,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_InvalidCardLineFormat_ReturnsBadRequest()
         {
-            createPlayerAsync();
+            await insertPlayerAsync();
             var dto = createDeckDto(cardList: "InvalidLineWithoutSpace");
 
             var result = await uut.CreateDeck(dto);
@@ -135,7 +135,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_InvalidQuantity_ReturnsBadRequest()
         {
-            createPlayerAsync();
+            await insertPlayerAsync();
             var dto = createDeckDto(cardList: "X Test card");
 
             var result = await uut.CreateDeck(dto);
@@ -146,7 +146,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_MultipleInvalidCards_ReturnsAllInvalidNames()
         {
-            createPlayerAsync();
+            await insertPlayerAsync();
             var dto = createDeckDto(cardList: "1 Test card\n2 Test card2\n");
 
             var result = await uut.CreateDeck(dto);
@@ -163,8 +163,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_AddsInvalidCardNames_WhenSomeCardsDoNotExist()
         {
-            await createPlayerAsync();
-            await createCardAsync("Valid Card");
+            await insertPlayerAsync();
+            await insertCardAsync("Valid Card");
 
             var dto = createDeckDto(cardList: "1 Valid Card\n2 Missing Card\n");
 
@@ -180,8 +180,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_DuplicateCardLines_AreSummedCorrectly()
         {
-            createPlayerAsync();
-            createCardAsync("Test card");
+            await insertPlayerAsync();
+            await insertCardAsync("Test card");
 
             var dto = createDeckDto(cardList: "1 Test card\n2 Test card\n");
 
@@ -194,8 +194,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_HandlesEmptyLinesInCardList()
         {
-            createPlayerAsync();
-            createCardAsync("Test card");
+            await insertPlayerAsync();
+            await insertCardAsync("Test card");
 
             var dto = createDeckDto(cardList: "\n1 Test card\n\n");
 
@@ -208,8 +208,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_CaseMismatch_ReturnsBadRequest()
         {
-            createPlayerAsync();
-            createCardAsync("Test card");
+            await insertPlayerAsync();
+            await insertCardAsync("Test card");
 
             var dto = createDeckDto(cardList: "1 test card");
 
@@ -221,8 +221,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_PersistsDeckInDatabase()
         {
-            createPlayerAsync();
-            createCardAsync("Test card");
+            await insertPlayerAsync();
+            await insertCardAsync("Test card");
 
             var dto = createDeckDto(cardList: "1 Test card\n");
 
@@ -240,8 +240,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task GetDeckByName_ExistingDeck_ReturnsCorrectDeck()
         {
-            var player = await createPlayerAsync();
-            var card = await createCardAsync("Test card");
+            var player = await insertPlayerAsync();
+            var card = await insertCardAsync("Test card");
 
             var deck = new Deck
             {
@@ -288,9 +288,9 @@ namespace UnitTests.Backend
         [Test]
         public async Task GetDeckByName_DeckWithMultipleCards_ReturnsAllCards()
         {
-            var player = await createPlayerAsync();
-            var card1 = await createCardAsync("Test Card1");
-            var card2 = await createCardAsync("Test Card2");
+            var player = await insertPlayerAsync();
+            var card1 = await insertCardAsync("Test Card1");
+            var card2 = await insertCardAsync("Test Card2");
 
             var deck = new Deck
             {
@@ -320,7 +320,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task GetDeckByName_CaseSensitiveDeckName_ReturnsNotFound()
         {
-            var player = await createPlayerAsync();
+            var player = await insertPlayerAsync();
             var deck = new Deck
             {
                 DeckName = "ExactCaseDeck",
@@ -340,7 +340,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task DeleteDeckByName_ExistingDeck_DeletesDeck()
         {
-            var player = await createPlayerAsync();
+            var player = await insertPlayerAsync();
             var deck = new Deck
             {
                 DeckName = "DeckToDelete",
@@ -379,9 +379,9 @@ namespace UnitTests.Backend
         [Test]
         public async Task UpdateDeck_ExistingDeck_UpdatesDeckAndCards()
         {
-            var player = await createPlayerAsync();
-            var card1 = await createCardAsync("Test Card1");
-            var card2 = await createCardAsync("Test Card2");
+            var player = await insertPlayerAsync();
+            var card1 = await insertCardAsync("Test Card1");
+            var card2 = await insertCardAsync("Test Card2");
 
             var deck = new Deck
             {
@@ -442,8 +442,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task UpdateDeck_InvalidCardNames_ReturnsBadRequestWithInvalidCards()
         {
-            var player = await createPlayerAsync();
-            var card1 = await createCardAsync("ValidCard");
+            var player = await insertPlayerAsync();
+            var card1 = await insertCardAsync("ValidCard");
 
             var deck = new Deck
             {
@@ -475,8 +475,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task UpdateDeck_EmptyCardList_ClearsCards()
         {
-            var player = await createPlayerAsync();
-            var card = await createCardAsync("Test Card");
+            var player = await insertPlayerAsync();
+            var card = await insertCardAsync("Test Card");
 
             var deck = new Deck
             {
@@ -508,14 +508,14 @@ namespace UnitTests.Backend
         [Test]
         public async Task UpdateDeck_InvalidCardLineFormat_ReturnsBadRequest()
         {
-            await createPlayerAsync();
-            var card = await createCardAsync("Test Card");
+            await insertPlayerAsync();
+            var card = await insertCardAsync("Test Card");
 
             var deck = new Deck
             {
                 DeckName = "DeckWithBadLine",
                 DeckCommander = "Test Commander",
-                Player = await createPlayerAsync(),
+                Player = await insertPlayerAsync(),
                 Cards = new List<Card> { card }
             };
             context.Decks.Add(deck);
@@ -534,14 +534,14 @@ namespace UnitTests.Backend
         [Test]
         public async Task UpdateDeck_InvalidQuantityInCardList_ReturnsBadRequest()
         {
-            await createPlayerAsync();
-            var card = await createCardAsync("Test Card");
+            await insertPlayerAsync();
+            var card = await insertCardAsync("Test Card");
 
             var deck = new Deck
             {
                 DeckName = "DeckWithBadQuantity",
                 DeckCommander = "Test Commander",
-                Player = await createPlayerAsync(),
+                Player = await insertPlayerAsync(),
                 Cards = new List<Card> { card }
             };
             context.Decks.Add(deck);
@@ -560,7 +560,7 @@ namespace UnitTests.Backend
 
         // Helper functions
 
-        private async Task<Player> createPlayerAsync(string username = "Test player")
+        private async Task<Player> insertPlayerAsync(string username = "Test player")
         {
             var player = new Player
             {
@@ -576,7 +576,7 @@ namespace UnitTests.Backend
             return player;
         }
 
-        private async Task<Card> createCardAsync(string name)
+        private async Task<Card> insertCardAsync(string name)
         {
             var card = new Card
             {

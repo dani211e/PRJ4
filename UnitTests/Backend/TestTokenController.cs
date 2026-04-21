@@ -38,7 +38,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task GetTokenByName_ExistingToken_ReturnsToken()
         {
-            var testToken = this.testToken();
+            var testToken = createTestToken();
             context.RelatedCards.Add(testToken);
             await context.SaveChangesAsync();
 
@@ -74,7 +74,7 @@ namespace UnitTests.Backend
         }
 
 
-        private RelatedCard testToken()
+        private static RelatedCard createTestToken()
         {
             var testCard = new Card
             {
@@ -83,13 +83,12 @@ namespace UnitTests.Backend
                 ImageUri = "http://Test.com"
             };
 
-            var testToken = new RelatedCard
+            return new RelatedCard
             {
                 Name = "Germ",
                 URI = "http://Test.com",
                 Card = testCard
             };
-            return testToken;
         }
     }
 }
