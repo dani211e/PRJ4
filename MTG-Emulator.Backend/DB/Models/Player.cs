@@ -14,6 +14,6 @@ namespace MTG_Emulator.Backend.DB.Models
 
         public int GamesWon { get; set; }
         public int GamesLost { get; set; }
-        public int GamesDrawed { get; set; }
+        public int GamesDrawn { get; set; }
     }
 }

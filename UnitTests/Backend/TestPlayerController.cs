@@ -249,7 +249,7 @@ namespace UnitTests.Backend
                 Password = "testPassword",
                 GamesWon = 5,
                 GamesLost = 5,
-                GamesDrawed = 5,
+                GamesDrawn = 5,
             };
         }
     }

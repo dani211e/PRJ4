@@ -104,7 +104,7 @@ namespace MTG_Emulator.Backend.Controllers
                     player.GamesWon++;
                     break;
                 case GameResults.Draw:
-                    player.GamesDrawed++;
+                    player.GamesDrawn++;
                     break;
                 case GameResults.Loss:
                     player.GamesLost++;

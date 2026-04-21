@@ -557,7 +557,7 @@ namespace UnitTests.Backend
                 Username = username,
                 GamesWon = 0,
                 GamesLost = 0,
-                GamesDrawed = 0,
+                GamesDrawn = 0,
                 Password = "Test",
             };
 
