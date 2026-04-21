@@ -28,7 +28,7 @@ namespace MTG_Emulator.Backend.Controllers
             {
                 RelatedCardId = token.RelatedCardId,
                 Name = token.Name,
-                Uri = token.URI
+                Uri = token.URI,
             });
         }
     }

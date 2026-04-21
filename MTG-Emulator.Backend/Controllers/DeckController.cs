@@ -61,7 +61,7 @@ namespace MTG_Emulator.Backend.Controllers
                 return BadRequest(new InvalidCardsResponse
                 {
                     Error = "The following cards does not exist",
-                    InvalidCards = invalidCardnames
+                    InvalidCards = invalidCardnames,
                 });
 
             var player = await context.Players
@@ -75,7 +75,7 @@ namespace MTG_Emulator.Backend.Controllers
                 DeckName = deckDto.DeckName,
                 DeckCommander = deckDto.Commander,
                 Cards = cards,
-                Player = player
+                Player = player,
             };
 
             context.Decks.Add(deck);
@@ -91,8 +91,8 @@ namespace MTG_Emulator.Backend.Controllers
                     CardId = c.CardId,
                     Name = c.Name,
                     OracleText = c.OracleText,
-                    ImageUri = c.ImageUri
-                }).ToList()
+                    ImageUri = c.ImageUri,
+                }).ToList(),
             };
 
             return CreatedAtAction(nameof(GetDeckByName), new { deck.DeckName }, resultDto);
@@ -117,9 +117,9 @@ namespace MTG_Emulator.Backend.Controllers
                         CardId = c.CardId,
                         Name = c.Name,
                         OracleText = c.OracleText,
-                        ImageUri = c.ImageUri
+                        ImageUri = c.ImageUri,
                     })
-                    .ToList() ?? new List<CardDTO>()
+                    .ToList() ?? [],
             };
 
             return Ok(deckDto);
@@ -185,7 +185,7 @@ namespace MTG_Emulator.Backend.Controllers
                 return BadRequest(new InvalidCardsResponse
                 {
                     Error = "The following cards do not exist",
-                    InvalidCards = invalidCardnames
+                    InvalidCards = invalidCardnames,
                 });
 
             await context.SaveChangesAsync();
@@ -199,8 +199,8 @@ namespace MTG_Emulator.Backend.Controllers
                     CardId = c.CardId,
                     Name = c.Name,
                     OracleText = c.OracleText,
-                    ImageUri = c.ImageUri
-                }).ToList()
+                    ImageUri = c.ImageUri,
+                }).ToList(),
             };
 
             return Ok(resultDto);

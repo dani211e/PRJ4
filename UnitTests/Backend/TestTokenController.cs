@@ -78,14 +78,14 @@ namespace UnitTests.Backend
             {
                 Name = "Test",
                 OracleText = "Test text",
-                ImageUri = "http://Test.com"
+                ImageUri = "http://Test.com",
             };
 
             return new RelatedCard
             {
                 Name = "Germ",
                 URI = "http://Test.com",
-                Card = testCard
+                Card = testCard,
             };
         }
     }

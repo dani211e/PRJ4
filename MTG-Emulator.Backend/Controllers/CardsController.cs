@@ -32,7 +32,7 @@ namespace MTG_Emulator.Backend.Controllers
                 ScryfallId = card.ScryfallId,
                 Name = card.Name,
                 OracleText = card.OracleText,
-                ImageUri = card.ImageUri
+                ImageUri = card.ImageUri,
             };
         }
     }

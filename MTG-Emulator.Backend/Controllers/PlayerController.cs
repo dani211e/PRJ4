@@ -42,7 +42,7 @@ namespace MTG_Emulator.Backend.Controllers
                 Password = password,
                 GamesWon = 0,
                 GamesLost = 0,
-                GamesDrawed = 0
+                GamesDrawn = 0,
             };
 
             _context.Players.Add(player);
@@ -65,7 +65,7 @@ namespace MTG_Emulator.Backend.Controllers
                 Username = player.Username,
                 GamesWon = player.GamesWon,
                 GamesLost = player.GamesLost,
-                GamesDrawed = player.GamesDrawed
+                GamesDrawed = player.GamesDrawn,
             };
 
             return Ok(dto);

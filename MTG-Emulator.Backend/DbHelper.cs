@@ -20,8 +20,8 @@ namespace MTG_Emulator.Backend
             "planar",
             "scheme",
             "vanguard",
-            "conspiracy"
         };
+            "conspiracy",
 
         public static async Task SeedDb(MTGContext db, int? count = null, bool forceSeed = false)
         {
@@ -45,7 +45,7 @@ namespace MTG_Emulator.Backend
                 Password = "Loser",
                 GamesWon = 0,
                 GamesLost = 1242,
-                GamesDrawed = 2
+                GamesDrawn = 2,
             };
 
             var deck1 = new Deck
@@ -53,7 +53,7 @@ namespace MTG_Emulator.Backend
                 DeckName = "Best deck ever",
                 Cards = cards,
                 DeckCommander = cards[0].Name,
-                Player = player1
+                Player = player1,
             };
 
             if (!db.Cards.Any())

@@ -145,7 +145,7 @@ namespace UnitTests.Backend
         public async Task CreateDeck_MultipleInvalidCards_ReturnsAllInvalidNames()
         {
             await insertPlayerAsync();
-            var dto = createDeckDto(cardList: "1 Test card\n2 Test card2\n");
+            var dto = createDeckDto();
 
             var result = await uut.CreateDeck(dto);
 
@@ -244,7 +244,7 @@ namespace UnitTests.Backend
                 DeckName = "Test deck",
                 DeckCommander = "Test commander",
                 Player = player,
-                Cards = new List<Card> { card }
+                Cards = [card],
             };
 
             context.Decks.Add(deck);
@@ -293,7 +293,7 @@ namespace UnitTests.Backend
                 DeckName = "MultiCardDeck",
                 DeckCommander = "Test Commander",
                 Player = player,
-                Cards = new List<Card> { card1, card1, card2 }
+                Cards = [card1, card1, card2],
             };
 
             context.Decks.Add(deck);
@@ -321,7 +321,7 @@ namespace UnitTests.Backend
             {
                 DeckName = "ExactCaseDeck",
                 DeckCommander = "Test Commander",
-                Player = player
+                Player = player,
             };
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
@@ -380,7 +380,7 @@ namespace UnitTests.Backend
                 DeckName = "DeckToUpdate",
                 DeckCommander = "OldCommander",
                 Player = player,
-                Cards = new List<Card> { card1 }
+                Cards = [card1],
             };
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
@@ -442,7 +442,7 @@ namespace UnitTests.Backend
                 DeckName = "DeckToUpdateCards",
                 DeckCommander = "Test Commander",
                 Player = player,
-                Cards = new List<Card> { card1 }
+                Cards = [card1],
             };
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
@@ -475,7 +475,7 @@ namespace UnitTests.Backend
                 DeckName = "DeckEmptyCards",
                 DeckCommander = "Test Commander",
                 Player = player,
-                Cards = new List<Card> { card }
+                Cards = [card],
             };
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
@@ -508,7 +508,7 @@ namespace UnitTests.Backend
                 DeckName = "DeckWithBadLine",
                 DeckCommander = "Test Commander",
                 Player = await insertPlayerAsync(),
-                Cards = new List<Card> { card }
+                Cards = [card],
             };
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
@@ -534,7 +534,7 @@ namespace UnitTests.Backend
                 DeckName = "DeckWithBadQuantity",
                 DeckCommander = "Test Commander",
                 Player = await insertPlayerAsync(),
-                Cards = new List<Card> { card }
+                Cards = new List<Card> { card },
             };
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
@@ -558,7 +558,7 @@ namespace UnitTests.Backend
                 GamesWon = 0,
                 GamesLost = 0,
                 GamesDrawed = 0,
-                Password = "Test"
+                Password = "Test",
             };
 
             context.Players.Add(player);
@@ -572,7 +572,7 @@ namespace UnitTests.Backend
             {
                 Name = name,
                 OracleText = "Test text",
-                ImageUri = "http://Test.com"
+                ImageUri = "http://Test.com",
             };
 
             context.Cards.Add(card);
@@ -591,7 +591,7 @@ namespace UnitTests.Backend
                 PlayerName = playerName,
                 DeckName = deckName,
                 Commander = commander,
-                CardList = cardList
+                CardList = cardList,
             };
         }
 

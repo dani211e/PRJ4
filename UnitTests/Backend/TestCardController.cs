@@ -82,7 +82,7 @@ namespace UnitTests.Backend
             {
                 Name = "Test",
                 OracleText = "Test text",
-                ImageUri = "http://Test.com"
+                ImageUri = "http://Test.com",
             };
         }
     }
