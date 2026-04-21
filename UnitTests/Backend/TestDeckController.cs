@@ -259,7 +259,7 @@ namespace UnitTests.Backend
             Assert.Multiple(() =>
             {
                 Assert.That(deckDto, Is.Not.Null);
-                Assert.That(deckDto.DeckName, Is.EqualTo("Test deck"));
+                Assert.That(deckDto!.DeckName, Is.EqualTo("Test deck"));
                 Assert.That(deckDto.DeckCommander, Is.EqualTo("Test commander"));
                 Assert.That(deckDto.Cards.Count, Is.EqualTo(1));
                 Assert.That(deckDto.Cards[0].Name, Is.EqualTo("Test card"));
@@ -305,7 +305,7 @@ namespace UnitTests.Backend
             Assert.Multiple(() =>
             {
                 Assert.That(deckDto, Is.Not.Null);
-                Assert.That(deckDto.DeckName, Is.EqualTo("MultiCardDeck"));
+                Assert.That(deckDto!.DeckName, Is.EqualTo("MultiCardDeck"));
                 Assert.That(deckDto.DeckCommander, Is.EqualTo("Test Commander"));
                 Assert.That(deckDto.Cards.Count, Is.EqualTo(3));
                 Assert.That(deckDto.Cards.Count(c => c.Name == "Test Card1"), Is.EqualTo(2));
@@ -400,14 +400,14 @@ namespace UnitTests.Backend
             Assert.Multiple(() =>
             {
                 Assert.That(updatedDeck, Is.Not.Null);
-                Assert.That(updatedDeck.DeckCommander, Is.EqualTo("NewCommander"));
+                Assert.That(updatedDeck!.DeckCommander, Is.EqualTo("NewCommander"));
                 Assert.That(updatedDeck.Cards.Count, Is.EqualTo(2));
                 Assert.That(updatedDeck.Cards.All(c => c.Name == "Test Card2"), Is.True);
             });
 
             var dbDeck = await context.Decks.Include(d => d.Cards)
                 .FirstOrDefaultAsync(d => d.DeckName == "DeckToUpdate");
-            Assert.That(dbDeck.Cards.Count, Is.EqualTo(2));
+            Assert.That(dbDeck!.Cards.Count, Is.EqualTo(2));
             Assert.That(dbDeck.DeckCommander, Is.EqualTo("NewCommander"));
         }
 
@@ -490,11 +490,11 @@ namespace UnitTests.Backend
             Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
 
             var updatedDeck = (result.Result as OkObjectResult)?.Value as DeckDTO;
-            Assert.That(updatedDeck.Cards.Count, Is.EqualTo(0));
+            Assert.That(updatedDeck!.Cards.Count, Is.EqualTo(0));
 
             var dbDeck = await context.Decks.Include(d => d.Cards)
                 .FirstOrDefaultAsync(d => d.DeckName == "DeckEmptyCards");
-            Assert.That(dbDeck.Cards.Count, Is.EqualTo(0));
+            Assert.That(dbDeck!.Cards.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -580,7 +580,7 @@ namespace UnitTests.Backend
             return card;
         }
 
-        private CreateDeckDTO createDeckDto(
+        private static CreateDeckDTO createDeckDto(
             string playerName = "Test player",
             string deckName = "Test deck",
             string commander = "Test commander",
@@ -595,7 +595,7 @@ namespace UnitTests.Backend
             };
         }
 
-        private DeckDTO extractCreatedDto(ActionResult<DeckDTO> result)
+        private static DeckDTO extractCreatedDto(ActionResult<DeckDTO> result)
         {
             Assert.That(result.Result, Is.TypeOf<CreatedAtActionResult>());
 

@@ -40,8 +40,7 @@ namespace UnitTests.Backend
             var result = await uut.CreateProfile("testPlayer", "testPassword");
 
             var createdResult = result.Result as CreatedAtActionResult;
-
-            var player = createdResult.Value as Player;
+            var player = createdResult!.Value as Player;
 
             Assert.That(player, Is.Not.Null);
             Assert.That(player.Username, Is.EqualTo("testPlayer"));
@@ -101,7 +100,7 @@ namespace UnitTests.Backend
             Assert.That(okResult, Is.Not.Null);
 
             var resultPlayer = okResult.Value as PlayerDTO;
-            Assert.That(resultPlayer.Username, Is.EqualTo("testPlayer"));
+            Assert.That(resultPlayer!.Username, Is.EqualTo("testPlayer"));
         }
 
         [Test]
@@ -191,7 +190,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task UpdateProfile_NullProfile_ReturnNull()
         {
-            var result = await uut.UpdatePlayerStats(null, PlayerController.GameResults.Win);
+            var result = await uut.UpdatePlayerStats(null!, PlayerController.GameResults.Win);
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
         }
 
@@ -237,7 +236,7 @@ namespace UnitTests.Backend
             context.Players.Add(testPlayer);
             await context.SaveChangesAsync();
 
-            var result = await uut.ResetPlayerPassword(testPlayer.Username, null);
+            var result = await uut.ResetPlayerPassword(testPlayer.Username, null!);
             Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
         }
 

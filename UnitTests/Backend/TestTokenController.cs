@@ -46,7 +46,7 @@ namespace UnitTests.Backend
             Assert.That(okResult, Is.Not.Null);
 
             var resultToken = okResult.Value as RelatedCardDTO;
-            Assert.That(resultToken.Name, Is.EqualTo("Germ"));
+            Assert.That(resultToken!.Name, Is.EqualTo("Germ"));
             Assert.That(resultToken.Uri, Is.EqualTo("http://Test.com"));
         }
 
@@ -60,7 +60,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task GetTokenByName_NullToken_ReturnsToken()
         {
-            var result = await uut.GetTokenByName(null);
+            var result = await uut.GetTokenByName(null!);
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
         }
 

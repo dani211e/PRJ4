@@ -70,7 +70,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task GetCardByName_NullName_ReturnsBadRequest()
         {
-            var resultNull = await uut.GetCardByName(null);
+            var resultNull = await uut.GetCardByName(null!);
 
             Assert.That(resultNull.Result, Is.TypeOf<BadRequestResult>());
         }
