@@ -378,23 +378,18 @@ namespace UnitTests.Backend.Controllers
             );
 
             var result = await uut.UpdateDeck("DeckToUpdate", updateDto);
-            Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
+            Assert.That(result.Result, Is.TypeOf<NoContentResult>());
 
-            var ok = result.Result as OkObjectResult;
-            var updatedDeck = ok?.Value as DeckDto;
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(updatedDeck, Is.Not.Null);
-                Assert.That(updatedDeck!.DeckCommander, Is.EqualTo("NewCommander"));
-                Assert.That(updatedDeck.Cards.Count, Is.EqualTo(2));
-                Assert.That(updatedDeck.Cards.All(c => c.Name == "Test Card2"), Is.True);
-            });
 
             var dbDeck = await Context.Decks.Include(d => d.Cards)
                 .FirstOrDefaultAsync(d => d.DeckName == "DeckToUpdate");
-            Assert.That(dbDeck!.Cards.Count, Is.EqualTo(2));
-            Assert.That(dbDeck.DeckCommander, Is.EqualTo("NewCommander"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(dbDeck, Is.Not.Null);
+                Assert.That(dbDeck!.DeckCommander, Is.EqualTo("NewCommander"));
+                Assert.That(dbDeck.Cards.Count, Is.EqualTo(2));
+                Assert.That(dbDeck.Cards.All(c => c.Name == "Test Card2"), Is.True);
+            });
         }
 
         [Test]
@@ -473,14 +468,11 @@ namespace UnitTests.Backend.Controllers
             );
 
             var result = await uut.UpdateDeck("DeckEmptyCards", updateDto);
-            Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
-
-            var updatedDeck = (result.Result as OkObjectResult)?.Value as DeckDto;
-            Assert.That(updatedDeck!.Cards.Count, Is.EqualTo(0));
+            Assert.That(result.Result, Is.TypeOf<NoContentResult>());
 
             var dbDeck = await Context.Decks.Include(d => d.Cards)
                 .FirstOrDefaultAsync(d => d.DeckName == "DeckEmptyCards");
-            Assert.That(dbDeck!.Cards.Count, Is.EqualTo(0));
+            Assert.That(dbDeck!.Cards, Is.Empty);
         }
 
         [Test]

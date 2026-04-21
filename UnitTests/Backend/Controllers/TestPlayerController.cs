@@ -180,7 +180,7 @@ namespace UnitTests.Backend.Controllers
             var result = await uut.ResetPlayerPassword(testPlayer.Username, "testPassword");
             await Context.SaveChangesAsync();
 
-            Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
+            Assert.That(result.Result, Is.TypeOf<NoContentResult>());
         }
 
         [Test]
@@ -223,7 +223,7 @@ namespace UnitTests.Backend.Controllers
             await Context.SaveChangesAsync();
 
             var result = await uut.UpdatePlayerStats(testPlayer.Username, endGameResult);
-            Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
+            Assert.That(result.Result, Is.InstanceOf<NoContentResult>());
         }
 
         private static Player createTestPlayer()
