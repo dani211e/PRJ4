@@ -11,6 +11,7 @@ namespace MTG_Emulator.Backend.DB.Models
         [StringLength(256)]
         public string Name { get; set; } = string.Empty;
 
+        // Length constraint is based on the max length found in a card at commit time
         [StringLength(2048)]
         public string OracleText { get; set; } = string.Empty;
 
