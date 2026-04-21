@@ -37,7 +37,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task GetCardByName_ExistingCard_ReturnsCard()
         {
-            var testCard = CreateTestCard();
+            var testCard = createTestCard();
 
             context.Cards.Add(testCard);
             await context.SaveChangesAsync();
@@ -76,16 +76,14 @@ namespace UnitTests.Backend
         }
 
 
-        public Card CreateTestCard()
+        private static Card createTestCard()
         {
-            var testCard = new Card
+            return new Card
             {
                 Name = "Test",
                 OracleText = "Test text",
                 ImageUri = "http://Test.com"
             };
-
-            return testCard;
         }
     }
 }
