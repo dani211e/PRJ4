@@ -10,13 +10,6 @@ namespace MTG_Emulator.Backend.Controllers
     [ApiController]
     public class PlayerController : ControllerBase
     {
-        public enum GameResults
-        {
-            Win = 1,
-            Draw = 0,
-            Loss = -1
-        }
-
         private readonly MTGContext _context;
 
         public PlayerController(MTGContext context)
@@ -134,5 +127,12 @@ namespace MTG_Emulator.Backend.Controllers
 
             return Ok(player);
         }
+    }
+
+    public enum GameResults
+    {
+        Win = 1,
+        Draw = 0,
+        Loss = -1,
     }
 }

@@ -134,7 +134,7 @@ namespace UnitTests.Backend
         [TestCase(-1)]
         public async Task UpdateProfile_ExistingProfileInt_ReturnPlayer(int input)
         {
-            var endGameResult = (PlayerController.GameResults)input;
+            var endGameResult = (GameResults)input;
             await verifyStatsUpdated(endGameResult);
         }
 
@@ -143,14 +143,14 @@ namespace UnitTests.Backend
         [TestCase("Loss")]
         public async Task UpdateProfile_ExistingProfilestring_ReturnPlayer(string input)
         {
-            Enum.TryParse(input, out PlayerController.GameResults endGameResult);
+            Enum.TryParse(input, out GameResults endGameResult);
             await verifyStatsUpdated(endGameResult);
         }
 
-        [TestCase(PlayerController.GameResults.Win)]
-        [TestCase(PlayerController.GameResults.Draw)]
-        [TestCase(PlayerController.GameResults.Loss)]
-        public async Task UpdateProfile_NonExistingProfile_ReturnNull(PlayerController.GameResults endGameResult)
+        [TestCase(GameResults.Win)]
+        [TestCase(GameResults.Draw)]
+        [TestCase(GameResults.Loss)]
+        public async Task UpdateProfile_NonExistingProfile_ReturnNull(GameResults endGameResult)
         {
             var result = await uut.UpdatePlayerStats("DoesNotExist", endGameResult);
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
@@ -159,14 +159,14 @@ namespace UnitTests.Backend
         [Test]
         public async Task UpdateProfile_NullProfile_ReturnNull()
         {
-            var result = await uut.UpdatePlayerStats(null!, PlayerController.GameResults.Win);
+            var result = await uut.UpdatePlayerStats(null!, GameResults.Win);
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
         }
 
         [Test]
         public async Task UpdateProfile_EmptyProfile_ReturnNull()
         {
-            var result = await uut.UpdatePlayerStats("", PlayerController.GameResults.Win);
+            var result = await uut.UpdatePlayerStats("", GameResults.Win);
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
         }
 
@@ -180,7 +180,7 @@ namespace UnitTests.Backend
             context.Players.Add(testPlayer);
             await context.SaveChangesAsync();
 
-            var endGameResult = (PlayerController.GameResults)input;
+            var endGameResult = (GameResults)input;
             var result = await uut.UpdatePlayerStats(testPlayer.Username, endGameResult);
             Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
         }
