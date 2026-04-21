@@ -43,9 +43,9 @@ namespace MTG_Emulator.Backend.Controllers
             {
                 int firstSpace = line.IndexOf(' ');
                 if (firstSpace == -1)
-                    return BadRequest(new { error = $"Wrong line in card list: '{line}'" });
+                    return BadRequest($"Wrong line in card list: '{line}'");
                 if (!int.TryParse(line.Substring(0, firstSpace), out int num))
-                    return BadRequest(new { error = $"Invalid quantity in line: '{line}'" });
+                    return BadRequest($"Invalid quantity in line: '{line}'");
                 int amount = int.Parse(line.Substring(0, firstSpace));
                 string name = line.Substring(firstSpace + 1);
 
@@ -70,7 +70,7 @@ namespace MTG_Emulator.Backend.Controllers
                 .FirstOrDefaultAsync(p => p.Username == deckDto.PlayerName);
 
             if (player == null)
-                return BadRequest(new { error = $"Player '{deckDto.PlayerName}' not found." });
+                return BadRequest($"Player '{deckDto.PlayerName}' not found.");
 
             var deck = new Deck
             {
@@ -174,9 +174,9 @@ namespace MTG_Emulator.Backend.Controllers
                 {
                     int firstSpace = line.IndexOf(' ');
                     if (firstSpace == -1)
-                        return BadRequest(new { error = $"Wrong line in card list: '{line}'" });
+                        return BadRequest($"Wrong line in card list: '{line}'");
                     if (!int.TryParse(line.Substring(0, firstSpace), out int num))
-                        return BadRequest(new { error = $"Invalid quantity in line: '{line}'" });
+                        return BadRequest($"Invalid quantity in line: '{line}'");
 
                     string name = line.Substring(firstSpace + 1);
                     var cardEntity = await context.Cards.FirstOrDefaultAsync(c => c.Name == name);
