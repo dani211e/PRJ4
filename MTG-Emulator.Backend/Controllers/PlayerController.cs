@@ -112,8 +112,8 @@ namespace MTG_Emulator.Backend.Controllers
                     return BadRequest("Invalid game result.");
             }
 
-            return Ok(player);
             await context.SaveChangesAsync();
+            return NoContent();
         }
 
         // Reset player password
@@ -132,7 +132,7 @@ namespace MTG_Emulator.Backend.Controllers
             player.Password = password;
             await context.SaveChangesAsync();
 
-            return Ok(player);
+            return NoContent();
         }
     }
 

@@ -197,21 +197,7 @@ namespace MTG_Emulator.Backend.Controllers
                 });
 
             await context.SaveChangesAsync();
-
-            var resultDto = new DeckDto
-            {
-                DeckName = deck.DeckName,
-                DeckCommander = deck.DeckCommander,
-                Cards = deck.Cards.Select(c => new CardDto
-                {
-                    CardId = c.CardId,
-                    Name = c.Name,
-                    OracleText = c.OracleText,
-                    ImageUri = c.ImageUri,
-                }).ToList(),
-            };
-
-            return Ok(resultDto);
+            return NoContent();
         }
     }
 }
