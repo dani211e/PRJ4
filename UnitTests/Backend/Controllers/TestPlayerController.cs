@@ -1,37 +1,22 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.Controllers;
-using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.DTO;
 using MTG_Emulator.Backend.DB.Models;
 using NUnit.Framework;
 
-namespace UnitTests.Backend
+namespace UnitTests.Backend.Controllers
 {
-    public class TestPlayerController
+    public class TestPlayerController : TestControllerBase
     {
-        private MTGContext context;
         private PlayerController uut;
 
         [SetUp]
-        public void Setup()
+        public override void Setup()
         {
-            var options = new DbContextOptionsBuilder<MTGContext>()
-                .UseInMemoryDatabase("TestDb")
-                .Options;
-
-            context = new MTGContext(options);
-            uut = new PlayerController(context);
-        }
-
-        //Tears down test database
-        [TearDown]
-        public void TearDown()
-        {
-            context.Database.EnsureDeleted();
-            context.Dispose();
+            base.Setup();
+            uut = new PlayerController(Context);
         }
 
         [Test]
@@ -51,8 +36,8 @@ namespace UnitTests.Backend
         public async Task CreateProfile_ExistingProfile_ReturnPlayer()
         {
             var testPlayer = createTestPlayer();
-            context.Players.Add(testPlayer);
-            await context.SaveChangesAsync();
+            Context.Players.Add(testPlayer);
+            await Context.SaveChangesAsync();
             var result = await uut.CreateProfile("testPlayer", "testPassword");
 
             Assert.That(result.Result, Is.TypeOf<ConflictObjectResult>());
@@ -74,8 +59,8 @@ namespace UnitTests.Backend
         {
             var testPlayer = createTestPlayer();
 
-            context.Players.Add(testPlayer);
-            await context.SaveChangesAsync();
+            Context.Players.Add(testPlayer);
+            await Context.SaveChangesAsync();
 
             var result = await uut.GetProfile("testPlayer");
 
@@ -105,11 +90,11 @@ namespace UnitTests.Backend
         public async Task DeleteProfile_ExistingProfile_ReturnPlayer()
         {
             var testPlayer = createTestPlayer();
-            context.Players.Add(testPlayer);
-            await context.SaveChangesAsync();
+            Context.Players.Add(testPlayer);
+            await Context.SaveChangesAsync();
 
             var result = await uut.DeleteProfile("testPlayer");
-            await context.SaveChangesAsync();
+            await Context.SaveChangesAsync();
 
             Assert.That(result, Is.TypeOf<NoContentResult>());
         }
@@ -177,8 +162,8 @@ namespace UnitTests.Backend
         public async Task UpdateProfile_invalidGameResult_ReturnBadRequest(int input)
         {
             var testPlayer = createTestPlayer();
-            context.Players.Add(testPlayer);
-            await context.SaveChangesAsync();
+            Context.Players.Add(testPlayer);
+            await Context.SaveChangesAsync();
 
             var endGameResult = (GameResults)input;
             var result = await uut.UpdatePlayerStats(testPlayer.Username, endGameResult);
@@ -189,11 +174,11 @@ namespace UnitTests.Backend
         public async Task ResetPlayerPassword_NewPassword_ReturnPlayer()
         {
             var testPlayer = createTestPlayer();
-            context.Players.Add(testPlayer);
-            await context.SaveChangesAsync();
+            Context.Players.Add(testPlayer);
+            await Context.SaveChangesAsync();
 
             var result = await uut.ResetPlayerPassword(testPlayer.Username, "testPassword");
-            await context.SaveChangesAsync();
+            await Context.SaveChangesAsync();
 
             Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
         }
@@ -202,8 +187,8 @@ namespace UnitTests.Backend
         public async Task ResetPlayerPassword_NullPassword_ReturnNull()
         {
             var testPlayer = createTestPlayer();
-            context.Players.Add(testPlayer);
-            await context.SaveChangesAsync();
+            Context.Players.Add(testPlayer);
+            await Context.SaveChangesAsync();
 
             var result = await uut.ResetPlayerPassword(testPlayer.Username, null!);
             Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
@@ -213,8 +198,8 @@ namespace UnitTests.Backend
         public async Task ResetPlayerPassword_EmptyPassword_ReturnNull()
         {
             var testPlayer = createTestPlayer();
-            context.Players.Add(testPlayer);
-            await context.SaveChangesAsync();
+            Context.Players.Add(testPlayer);
+            await Context.SaveChangesAsync();
 
             var result = await uut.ResetPlayerPassword(testPlayer.Username, "");
             Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
@@ -224,8 +209,8 @@ namespace UnitTests.Backend
         public async Task ResetPlayerPassword_WhiteSpacePassword_ReturnBadRequest()
         {
             var testPlayer = createTestPlayer();
-            context.Players.Add(testPlayer);
-            await context.SaveChangesAsync();
+            Context.Players.Add(testPlayer);
+            await Context.SaveChangesAsync();
 
             var result = await uut.ResetPlayerPassword(testPlayer.Username, " ");
             Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
@@ -234,8 +219,8 @@ namespace UnitTests.Backend
         private async Task verifyStatsUpdated(GameResults endGameResult)
         {
             var testPlayer = createTestPlayer();
-            context.Players.Add(testPlayer);
-            await context.SaveChangesAsync();
+            Context.Players.Add(testPlayer);
+            await Context.SaveChangesAsync();
 
             var result = await uut.UpdatePlayerStats(testPlayer.Username, endGameResult);
             Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());

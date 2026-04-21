@@ -1,44 +1,29 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.Controllers;
-using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.DTO;
 using MTG_Emulator.Backend.DB.Models;
 using NUnit.Framework;
 
-namespace UnitTests.Backend
+namespace UnitTests.Backend.Controllers
 {
-    public class TestTokenController
+    public class TestTokenController : TestControllerBase
     {
-        private MTGContext context;
         private TokenController uut;
 
         [SetUp]
-        public void Setup()
+        public override void Setup()
         {
-            var options = new DbContextOptionsBuilder<MTGContext>()
-                .UseInMemoryDatabase("TestDb")
-                .Options;
-
-            context = new MTGContext(options);
-            uut = new TokenController(context);
+            base.Setup();
+            uut = new TokenController(Context);
         }
-
-        [TearDown]
-        public void TearDown()
-        {
-            context.Database.EnsureDeleted();
-            context.Dispose();
-        }
-
 
         [Test]
         public async Task GetTokenByName_ExistingToken_ReturnsToken()
         {
             var testToken = createTestToken();
-            context.RelatedCards.Add(testToken);
-            await context.SaveChangesAsync();
+            Context.RelatedCards.Add(testToken);
+            await Context.SaveChangesAsync();
 
             var result = await uut.GetTokenByName("Germ");
 

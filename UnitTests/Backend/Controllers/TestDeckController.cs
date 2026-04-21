@@ -1,38 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.Controllers;
-using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.DTO;
 using MTG_Emulator.Backend.DB.Models;
 using NUnit.Framework;
 
-namespace UnitTests.Backend
+namespace UnitTests.Backend.Controllers
 {
-    public class TestDeckController
+    public class TestDeckController : TestControllerBase
     {
-        private MTGContext context;
         private DeckController uut;
 
         [SetUp]
-        public void Setup()
+        public override void Setup()
         {
-            var options = new DbContextOptionsBuilder<MTGContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
-
-            context = new MTGContext(options);
-            uut = new DeckController(context);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            context.Database.EnsureDeleted();
-            context.Dispose();
+            base.Setup();
+            uut = new DeckController(Context);
         }
 
         [Test]
@@ -226,7 +212,7 @@ namespace UnitTests.Backend
 
             await uut.CreateDeck(dto);
 
-            var deck = context.Decks.Include(d => d.Cards).FirstOrDefault();
+            var deck = Context.Decks.Include(d => d.Cards).FirstOrDefault();
 
             Assert.That(deck, Is.Not.Null);
             Assert.That(deck.Cards.Count, Is.EqualTo(1));
@@ -247,8 +233,8 @@ namespace UnitTests.Backend
                 Cards = [card],
             };
 
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var result = await uut.GetDeckByName("Test deck");
 
@@ -296,8 +282,8 @@ namespace UnitTests.Backend
                 Cards = [card1, card1, card2],
             };
 
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var result = await uut.GetDeckByName("MultiCardDeck");
             var deckDto = (result.Result as OkObjectResult)?.Value as DeckDTO;
@@ -323,8 +309,8 @@ namespace UnitTests.Backend
                 DeckCommander = "Test Commander",
                 Player = player,
             };
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var result = await uut.GetDeckByName("exactcasedeck");
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
@@ -342,13 +328,13 @@ namespace UnitTests.Backend
                 Player = player
             };
 
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var result = await uut.DeleteDeckByName("DeckToDelete");
             Assert.That(result, Is.TypeOf<NoContentResult>());
 
-            var deleted = await context.Decks.FirstOrDefaultAsync(d => d.DeckName == "DeckToDelete");
+            var deleted = await Context.Decks.FirstOrDefaultAsync(d => d.DeckName == "DeckToDelete");
             Assert.That(deleted, Is.Null);
         }
 
@@ -382,8 +368,8 @@ namespace UnitTests.Backend
                 Player = player,
                 Cards = [card1],
             };
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var updateDto = createDeckDto(
                 deckName: "DeckToUpdate",
@@ -405,7 +391,7 @@ namespace UnitTests.Backend
                 Assert.That(updatedDeck.Cards.All(c => c.Name == "Test Card2"), Is.True);
             });
 
-            var dbDeck = await context.Decks.Include(d => d.Cards)
+            var dbDeck = await Context.Decks.Include(d => d.Cards)
                 .FirstOrDefaultAsync(d => d.DeckName == "DeckToUpdate");
             Assert.That(dbDeck!.Cards.Count, Is.EqualTo(2));
             Assert.That(dbDeck.DeckCommander, Is.EqualTo("NewCommander"));
@@ -444,8 +430,8 @@ namespace UnitTests.Backend
                 Player = player,
                 Cards = [card1],
             };
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var updateDto = createDeckDto(
                 deckName: "DeckToUpdateCards",
@@ -477,8 +463,8 @@ namespace UnitTests.Backend
                 Player = player,
                 Cards = [card],
             };
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var updateDto = createDeckDto(
                 deckName: "DeckEmptyCards",
@@ -492,7 +478,7 @@ namespace UnitTests.Backend
             var updatedDeck = (result.Result as OkObjectResult)?.Value as DeckDTO;
             Assert.That(updatedDeck!.Cards.Count, Is.EqualTo(0));
 
-            var dbDeck = await context.Decks.Include(d => d.Cards)
+            var dbDeck = await Context.Decks.Include(d => d.Cards)
                 .FirstOrDefaultAsync(d => d.DeckName == "DeckEmptyCards");
             Assert.That(dbDeck!.Cards.Count, Is.EqualTo(0));
         }
@@ -510,8 +496,8 @@ namespace UnitTests.Backend
                 Player = await insertPlayerAsync(),
                 Cards = [card],
             };
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var updateDto = createDeckDto(
                 deckName: "DeckWithBadLine",
@@ -536,8 +522,8 @@ namespace UnitTests.Backend
                 Player = await insertPlayerAsync(),
                 Cards = new List<Card> { card },
             };
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var updateDto = createDeckDto(
                 deckName: "DeckWithBadQuantity",
@@ -561,8 +547,8 @@ namespace UnitTests.Backend
                 Password = "Test",
             };
 
-            context.Players.Add(player);
-            await context.SaveChangesAsync();
+            Context.Players.Add(player);
+            await Context.SaveChangesAsync();
             return player;
         }
 
@@ -575,8 +561,8 @@ namespace UnitTests.Backend
                 ImageUri = "http://Test.com",
             };
 
-            context.Cards.Add(card);
-            await context.SaveChangesAsync();
+            Context.Cards.Add(card);
+            await Context.SaveChangesAsync();
             return card;
         }
 

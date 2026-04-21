@@ -1,37 +1,20 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.Controllers;
-using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.Models;
 using NUnit.Framework;
 
-namespace UnitTests.Backend
+namespace UnitTests.Backend.Controllers
 {
-    public class TestCardController
+    public class TestCardController : TestControllerBase
     {
-        private MTGContext context;
         private CardsController uut;
 
-
-        //Creates a test server
         [SetUp]
-        public void Setup()
+        public override void Setup()
         {
-            var options = new DbContextOptionsBuilder<MTGContext>()
-                .UseInMemoryDatabase("TestDb")
-                .Options;
-
-            context = new MTGContext(options);
-            uut = new CardsController(context);
-        }
-
-        //Tears down test database
-        [TearDown]
-        public void TearDown()
-        {
-            context.Database.EnsureDeleted();
-            context.Dispose();
+            base.Setup();
+            uut = new CardsController(Context);
         }
 
         [Test]
@@ -39,8 +22,8 @@ namespace UnitTests.Backend
         {
             var testCard = createTestCard();
 
-            context.Cards.Add(testCard);
-            await context.SaveChangesAsync();
+            Context.Cards.Add(testCard);
+            await Context.SaveChangesAsync();
 
             var result = await uut.GetCardByName("Test");
 
