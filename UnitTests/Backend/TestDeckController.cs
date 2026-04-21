@@ -99,10 +99,10 @@ namespace UnitTests.Backend
         }
 
         [TestCase(null, "Test player", "1 Test card\n")]
-        [TestCase("", "Test player", "1 Test card\n")]
         [TestCase("Test deck", null, "1 Test card\n")]
-        [TestCase("Test deck", "", "1 Test card\n")]
         [TestCase("Test deck", "Test player", null)]
+        [TestCase("", "Test player", "1 Test card\n")]
+        [TestCase("Test deck", "", "1 Test card\n")]
         [TestCase("Test deck", "Test player", "")]
         public async Task CreateDeck_InvalidInput_ReturnsBadRequest(
             string? deckName,
