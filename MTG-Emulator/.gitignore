@@ -100,3 +100,5 @@ InitTestScene*.unity*
 
 #Jetbrains rider
 .idea/
+
+Assets/Packages/**
