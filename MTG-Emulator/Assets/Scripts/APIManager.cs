@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -16,24 +17,24 @@ public class CreateDeckDto
 [Serializable]
 public class CardDto
 {
-    public int CardId;
-    public string Name;
-    public string OracleText;
-    public string ImageUri;
+    public int cardId;
+    public string name;
+    public string oracleText;
+    public string imageUri;
 }
 
 [Serializable]
 public class DeckDto
 {
-    public string DeckName;
-    public string DeckCommander;
-    public System.Collections.Generic.List<CardDto> Cards;
+    public string deckName;
+    public string deckCommander;
+    public List<CardDto> cards;
 }
 
 public class APIManager : MonoBehaviour
 {
     public static APIManager Instance;
-    private string baseUrl = "http://localhost:5000/api/";
+    private string baseUrl = "http://localhost:5042/api/";
 
     private void Awake()
     {
@@ -68,6 +69,7 @@ public class APIManager : MonoBehaviour
             DeckDto result = JsonUtility.FromJson<DeckDto>(request.downloadHandler.text);
             onSuccess?.Invoke(result);
         }
+        Debug.Log(baseUrl + "Deck");
     }
 
     public IEnumerator UpdateDeckCommander(string deckName, string commanderName, Action<DeckDto> onSuccess, Action<string> onError)
@@ -87,5 +89,52 @@ public class APIManager : MonoBehaviour
             onError?.Invoke(request.downloadHandler.text);
         else
             onSuccess?.Invoke(JsonUtility.FromJson<DeckDto>(request.downloadHandler.text));
+    }
+
+    public IEnumerator CreateProfile(string playerName, string password, Action<string> onSuccess, Action<string> onError)
+    {
+        string url = baseUrl + "Player?playerName=" +
+                     UnityWebRequest.EscapeURL(playerName) +
+                     "&password=" +
+                     UnityWebRequest.EscapeURL(password);
+
+        UnityWebRequest request = new UnityWebRequest(url, "POST");
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        yield return request.SendWebRequest();
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            onError?.Invoke(request.downloadHandler.text);
+        }
+        else
+        {
+            onSuccess?.Invoke(request.downloadHandler.text);
+        }
+    }
+
+
+
+    public IEnumerator GetDeckByName(string deckname, Action<DeckDto> onSuccess, Action<string> onError)
+    {
+        string uri = baseUrl + "Deck/" + UnityWebRequest.EscapeURL(deckname);
+        UnityWebRequest request = new UnityWebRequest(uri, "GET");
+        request.downloadHandler = new DownloadHandlerBuffer();
+        yield return request.SendWebRequest();
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            onError?.Invoke(request.downloadHandler.text);
+        }
+        else
+        {
+            Debug.Log("RAW GET RESPONSE: " + request.downloadHandler.text);
+
+            DeckDto result = JsonUtility.FromJson<DeckDto>(request.downloadHandler.text);
+
+            Debug.Log("Parsed deck name: " + result.deckName);
+            Debug.Log("Parsed commander: " + result.deckCommander);
+            Debug.Log("Parsed cards count: " + (result.cards == null ? -1 : result.cards.Count));
+
+            onSuccess?.Invoke(result);
+        }
     }
 }

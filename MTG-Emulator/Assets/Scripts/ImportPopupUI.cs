@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using TMPro;
@@ -6,22 +7,43 @@ using UnityEngine.SceneManagement;
 public class ImportPopupUI : MonoBehaviour
 {
     [Header("Popup Settings")]
-    public GameObject popupRoot;
+    [SerializeField] private GameObject importPopup;
+    [SerializeField] private GameObject deckListPopup;
+    [SerializeField] private GameObject deckCardsPopup;
     public TMP_InputField importField;
     public TMP_InputField deckNameField;
 
     // Make sure method is public, has no parameters, and is in a MonoBehaviour attached to a GameObject
-    public void OpenPopup()
+    public void OpenImportPopup()
     {
-        if (popupRoot != null)
-            popupRoot.SetActive(true);
+        if ( importPopup != null)
+            importPopup.SetActive(true);
+    }
+
+    public void OpenDeckListPopup()
+    {
+        if ( deckListPopup != null)
+            deckListPopup.SetActive(true);
+    }
+
+    public void OpenDeckCardsPopup()
+    {
+        if ( deckCardsPopup != null)
+            deckCardsPopup.SetActive(true);
     }
 
     public void ClosePopup()
     {
-        if (popupRoot != null)
-            popupRoot.SetActive(false);
+        if (importPopup != null)
+            importPopup.SetActive(false);
+
+        if (deckListPopup != null)
+            deckListPopup.SetActive(false);
+
+        if (deckCardsPopup != null)
+            deckCardsPopup.SetActive(false);
     }
+
 
     public void SubmitDeck()
     {
@@ -32,11 +54,26 @@ public class ImportPopupUI : MonoBehaviour
         }
 
         string deckName = deckNameField.text.Trim();
-        string importText = importField.text.Trim();
+        string importText = importField.text
+            .Replace("\r\n", "\n")
+            .Replace("\r", "\n")
+            .Trim();
+
+        string[] lines = importText.Split("\n", StringSplitOptions.RemoveEmptyEntries);
+
+        for (int i = 0; i < lines.Length; i++)
+        {
+            lines[i] = lines[i].Trim();
+        }
+
+        importText = string.Join("\n", lines);
+
+        Debug.Log("Deck name: "  + deckName);
+        Debug.Log("Card list:\n " + importText);
 
         if (string.IsNullOrEmpty(deckName) || string.IsNullOrEmpty(importText))
         {
-            Debug.LogError("Deck name or import is empty!");
+            Debug.LogError("Deck name or import is empty");
             return;
         }
 
@@ -44,7 +81,7 @@ public class ImportPopupUI : MonoBehaviour
         CreateDeckDto dto = new CreateDeckDto
         {
             DeckName = deckName,
-            PlayerName = "TestUser", // placeholder
+            PlayerName = "Kasper", // placeholder
             CardList = importText,
             Commander = ""
         };
@@ -68,7 +105,7 @@ public class ImportPopupUI : MonoBehaviour
     private IEnumerator LoadDeckScene(DeckDto deck)
     {
         // Make sure the scene is included in build settings
-        AsyncOperation op = SceneManager.LoadSceneAsync("DeckViewer");
+        AsyncOperation op = SceneManager.LoadSceneAsync("Deck_Viewer");
         while (!op.isDone)
             yield return null;
 

@@ -1,28 +1,56 @@
+
+using System;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
+using System.Collections;
+using UnityEngine.Networking;
 
 public class Card : MonoBehaviour
 {
-    [SerializeField] private Image image;
-    [SerializeField] private Sprite backImg;
+    [Header("Visible UI")]
+    [SerializeField] private TMP_Text cardName;
+    [SerializeField] private Image cardImage;
 
-    private Sprite frontUp;
-    private bool faceDown = true;
+    private CardDto cardData;
+    private Button button;
 
-    void Awake()
+    public void Setup(CardDto card, Action<CardDto> onClick)
     {
-        if(image == null) image = GetComponent<Image>();
+        cardData = card;
+
+        if (cardName != null)
+        {
+            cardName.text = card.name;
+        }
+
+        button = GetComponent<Button>();
+        if (button == null)
+        {
+            button = gameObject.AddComponent<Button>();
+        }
+
+        button.onClick.RemoveAllListeners();
+        button.onClick.AddListener(() => onClick?.Invoke(cardData));
+
+        if (!string.IsNullOrEmpty(card.imageUri))
+        {
+            StartCoroutine(LoadCardImage(card.imageUri));
+        }
     }
 
-    public void Init(Sprite front, bool startFaceDown)
+    private IEnumerator LoadCardImage(string url)
     {
-        frontUp = front;
-        faceDown = startFaceDown;
-        Refresh();
-    }
+        UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
+        yield return request.SendWebRequest();
 
-    public void Refresh()
-    {
-        image.sprite = faceDown ? backImg : frontUp;
+        if (request.result != UnityWebRequest.Result.Success)
+            Debug.LogError("Failed to load card image: " + url);
+        else
+        {
+            Texture2D tex = DownloadHandlerTexture.GetContent(request);
+            cardImage.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+        }
     }
 }
+

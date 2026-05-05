@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 8823582741496359860}
   - component: {fileID: 6258329826618296613}
   - component: {fileID: 6704243696595236801}
-  - component: {fileID: 1263194219458248327}
   m_Layer: 5
   m_Name: Card
   m_TagString: Untagged
@@ -86,20 +85,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 7015738966440023518}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad26666fa23a2c048999e0af7a4eb4fe, type: 3}
+  m_Script: {fileID: 11500000, guid: 79d1451aa5e387b4ba5d0d003bdac235, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Drag
---- !u!114 &1263194219458248327
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7015738966440023518}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eef494da5d83c164d80c1301a1e3f450, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Card
-  image: {fileID: 0}
-  backImg: {fileID: -6488111450889185985, guid: 034325f30f3a5f6459a4c210e6af0514, type: 3}
