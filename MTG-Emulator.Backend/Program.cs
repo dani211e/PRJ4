@@ -1,41 +1,87 @@
-var builder = WebApplication.CreateBuilder(args);
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.Extensions.FileProviders;
+using MTG_Emulator.Backend.DB;
+using Scalar.AspNetCore;
+using Serilog;
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+namespace MTG_Emulator.Backend
 {
-    app.MapOpenApi();
-}
+    internal abstract class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
 
-app.UseHttpsRedirection();
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(builder.Configuration)
+                .Enrich.FromLogContext()
+                .CreateLogger();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+            builder.Host.UseSerilog();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+            builder.Services.AddControllers();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddOpenApi();
 
-app.Run();
+            builder.Services.AddDbContext<MTGContext>(options =>
+                options.UseSqlServer(
+                    builder.Configuration.GetConnectionString("DefaultConnection"),
+                    sqlOptions => sqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 10,
+                        maxRetryDelay: TimeSpan.FromSeconds(5),
+                        errorNumbersToAdd: null))
+                       .EnableSensitiveDataLogging()
+                       .EnableDetailedErrors()
+                       .LogTo(Log.Information, Microsoft.Extensions.Logging.LogLevel.Warning));
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+            builder.Services.AddHttpLogging(logging =>
+            {
+                logging.LoggingFields = HttpLoggingFields.All;
+                logging.RequestHeaders.Add("User-Agent");
+                logging.ResponseHeaders.Add("MyResponseHeader");
+                logging.RequestBodyLogLimit = 4096;
+                logging.ResponseBodyLogLimit = 4096;
+                logging.CombineLogs = true;
+            });
+
+            var app = builder.Build();
+
+            var dataRoot = Environment.GetEnvironmentVariable("SCRYFALL_DATA_PATH")
+                ?? Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "scryfall-data");
+
+            var imagesPath = Path.Combine(dataRoot, "images");
+            Directory.CreateDirectory(imagesPath);
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.GetFullPath(imagesPath)),
+                RequestPath = "/cards",
+                OnPrepareResponse = ctx =>
+                {
+                    ctx.Context.Response.Headers.CacheControl = "public,max-age=31536000,immutable";
+                }
+            });
+
+            app.UseSerilogRequestLogging();
+            app.UseHttpLogging();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<MTGContext>();
+
+                await db.Database.MigrateAsync();
+
+                await ScryfallImageDownloader.RunAsync(testMode: false);
+
+                await DbHelper.SeedDb(db);
+            }
+
+            app.MapControllers();
+            app.MapOpenApi();
+            app.MapScalarApiReference();
+
+            app.Run();
+        }
+    }
 }
