@@ -7,7 +7,15 @@
     <RootNamespace>MTG_Emulator.Backend</RootNamespace>
     <UserSecretsId>073482c6-666d-4883-a597-fbc03c3e7a9d</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
+
+	<Target Name="CopyToUnity" AfterTargets="Build">
+		<Copy
+			SourceFiles="$(TargetDir)$(ProjectName).dll;$(TargetDir)$(ProjectName).pdb"
+			DestinationFolder="$(TargetDir)..\..\..\..\MTG-Emulator\Assets\"
+		/>
+	</Target>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2"/>
