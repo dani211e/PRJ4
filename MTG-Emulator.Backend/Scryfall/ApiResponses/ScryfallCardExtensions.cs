@@ -22,7 +22,7 @@ namespace MTG_Emulator.Backend.Scryfall
 
             var relatedCards = new List<RelatedCard>();
             if (card.AllParts != null)
-                relatedCards.AddRange(card.AllParts.Select(r => new RelatedCard { Name = r.Name, URI = r.Uri }));
+                relatedCards.AddRange(card.AllParts.Select(r => new RelatedCard { Name = r.Name, ImageUri = r.Uri }));
 
             return new Card
             {

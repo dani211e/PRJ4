@@ -56,7 +56,7 @@ namespace UnitTests.Backend.Controllers
             return new RelatedCard
             {
                 Name = "Germ",
-                URI = "http://Test.com",
+                ImageUri = "http://Test.com",
                 Card = testCard,
             };
         }
