@@ -4,6 +4,7 @@ using MTG_Emulator.Backend.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MTG_Emulator.Backend.Migrations
 {
     [DbContext(typeof(MTGContext))]
-    partial class MTGContextModelSnapshot : ModelSnapshot
+    [Migration("20260505143759_NameChanges")]
+    partial class NameChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,11 +83,6 @@ namespace MTG_Emulator.Backend.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ImageUri")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");

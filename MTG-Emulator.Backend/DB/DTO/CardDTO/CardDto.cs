@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using MTG_Emulator.Backend.DB.DTO.CardFace;
+using MTG_Emulator.Backend.DB.DTO.RelatedCardsDTO;
 
 namespace MTG_Emulator.Backend.DB.DTO.CardDTO
 {
@@ -14,5 +16,9 @@ namespace MTG_Emulator.Backend.DB.DTO.CardDTO
         public string OracleText { get; set; } = string.Empty;
         [Required]
         public string ImageUri { get; set; } = string.Empty;
+
+        public CardFaceDto? AltFace { get; set; }
+        [Required]
+        public List<RelatedCardDto>  RelatedCards { get; set; } = [];
     }
 }

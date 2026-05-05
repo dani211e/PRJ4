@@ -7,16 +7,21 @@ namespace MTG_Emulator.Backend.Scryfall
         public static Card ToCard(this ScryfallCard card)
         {
             CardFace? altFace = null;
+            bool hasTwoImages = card.ImageUris == null && card.CardFaces != null;
             if (card.CardFaces != null)
             {
                 // Scryfall returns multiface cards' names in a "FRONT // BACK" format
                 // so we want to replace the name with the proper one
                 card.Name = card.CardFaces[0].Name;
+                card.OracleText = card.CardFaces[0].OracleText;
                 var apiFace = card.CardFaces[1];
                 altFace = new CardFace
                 {
-                    ImageUri = $"/cards/{card.OracleId}_face1.jpg",
-                    OracleText = apiFace.FlavorText ?? string.Empty
+                    Name = apiFace.Name,
+                    ImageUri = hasTwoImages
+                        ? $"/cards/{card.OracleId}_face1.jpg"
+                        : $"/cards/{card.OracleId}.jpg",
+                    OracleText = apiFace.OracleText ?? string.Empty
                 };
             }
 
@@ -28,12 +33,12 @@ namespace MTG_Emulator.Backend.Scryfall
             {
                 ScryfallId = card.OracleId,
                 Name = card.Name,
-                ImageUri = card.CardFaces != null
+                ImageUri = hasTwoImages
                     ? $"/cards/{card.OracleId}_face0.jpg"
                     : $"/cards/{card.OracleId}.jpg",
                 OracleText = card.OracleText ?? string.Empty,
                 AltFace = altFace,
-                RelatedCard = relatedCards
+                RelatedCards = relatedCards
             };
         }
     }

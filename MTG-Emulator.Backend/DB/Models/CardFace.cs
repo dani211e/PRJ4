@@ -6,6 +6,9 @@ namespace MTG_Emulator.Backend.DB.Models
     {
         public int CardFaceId { get; set; }
 
+        [StringLength(256)]
+        public string Name { get; set; } = string.Empty;
+
         // Same as Card.OracleText
         [StringLength(2048)]
         public string OracleText { get; set; } = string.Empty;

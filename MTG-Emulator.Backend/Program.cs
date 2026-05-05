@@ -70,18 +70,10 @@ namespace MTG_Emulator.Backend
 
             using (var scope = app.Services.CreateScope())
             {
-                var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-
-                var migrationOptions = new DbContextOptionsBuilder<MTGContext>()
-                    .UseSqlServer(config.GetConnectionString("DefaultConnection"))
-                    .Options;
-
-                using (var migrationContext = new MTGContext(migrationOptions))
-                {
-                    await migrationContext.Database.MigrateAsync();
-                }
-
                 var db = scope.ServiceProvider.GetRequiredService<MTGContext>();
+
+                await db.Database.MigrateAsync();
+
                 await ScryfallImageDownloader.RunAsync(testMode: false);
                 await DbHelper.SeedDb(db);
             }

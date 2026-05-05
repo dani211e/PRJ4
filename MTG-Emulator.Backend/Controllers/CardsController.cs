@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.DTO;
 using MTG_Emulator.Backend.DB.DTO.CardDTO;
+using MTG_Emulator.Backend.DB.DTO.CardFace;
+using MTG_Emulator.Backend.DB.DTO.RelatedCardsDTO;
 
 namespace MTG_Emulator.Backend.Controllers
 {
@@ -25,7 +27,9 @@ namespace MTG_Emulator.Backend.Controllers
                 return BadRequest();
 
             var card = await context.Cards
-                .FirstOrDefaultAsync(card => card.Name == cardName);
+                .Include(c => c.AltFace)
+                .Include(c => c.RelatedCards)
+                .FirstOrDefaultAsync(c => c.Name == cardName);
 
             if (card == null)
                 return NotFound();
@@ -37,6 +41,18 @@ namespace MTG_Emulator.Backend.Controllers
                 Name = card.Name,
                 OracleText = card.OracleText,
                 ImageUri = card.ImageUri,
+                AltFace = card.AltFace == null ? null : new CardFaceDto
+                {
+                    Name = card.AltFace.Name,
+                    OracleText = card.AltFace.OracleText,
+                    ImageUri = card.AltFace.ImageUri,
+                },
+                RelatedCards = card.RelatedCards.Select(rc => new RelatedCardDto
+                {
+                    RelatedCardId = rc.RelatedCardId,
+                    Name = rc.Name,
+                    ImageUri = rc.ImageUri,
+                }).ToList()
             };
         }
     }
