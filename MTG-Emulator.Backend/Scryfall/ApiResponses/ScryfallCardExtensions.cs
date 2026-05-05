@@ -4,7 +4,7 @@ namespace MTG_Emulator.Backend.Scryfall
 {
     public static class ScryfallCardExtensions
     {
-        public static Card ToCard(this ScryfallCard card)
+        public static Card ToCard(this ScryfallCard card, Dictionary<Guid, Guid> idToOracleId)
         {
             CardFace? altFace = null;
             bool hasTwoImages = card.ImageUris == null && card.CardFaces != null;
@@ -27,7 +27,23 @@ namespace MTG_Emulator.Backend.Scryfall
 
             var relatedCards = new List<RelatedCard>();
             if (card.AllParts != null)
-                relatedCards.AddRange(card.AllParts.Select(r => new RelatedCard { Name = r.Name, ImageUri = r.Uri }));
+            {
+                var gameComponents = new HashSet<string> { "token", "emblem" };
+                relatedCards.AddRange(
+                    card.AllParts
+                        .Where(r => gameComponents.Contains(r.Component))
+                        .Select(r =>
+                        {
+                            var scryfallId = r.Id;
+                            idToOracleId.TryGetValue(r.Id, out var oracleId);
+                            return new RelatedCard
+                            {
+                                Name = r.Name,
+                                ImageUri = oracleId != default ? $"/cards/{oracleId}.jpg" : string.Empty
+                            };
+                        })
+                );
+            }
 
             return new Card
             {
