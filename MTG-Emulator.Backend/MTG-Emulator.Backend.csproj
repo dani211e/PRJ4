@@ -5,7 +5,6 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>MTG_Emulator.Backend</RootNamespace>
-    <UserSecretsId>073482c6-666d-4883-a597-fbc03c3e7a9d</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <OutputType>Library</OutputType>
   </PropertyGroup>
