@@ -4,7 +4,7 @@ namespace MTG_Emulator.Backend.DB.Models
 {
     public class CardFace
     {
-        public int AltFaceId { get; set; }
+        public int CardFaceId { get; set; }
 
         // Same as Card.OracleText
         [StringLength(2048)]
