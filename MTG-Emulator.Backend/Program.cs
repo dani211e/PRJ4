@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.FileProviders;
 using MTG_Emulator.Backend.DB;
+using MTG_Emulator.Backend.Scryfall;
 using Scalar.AspNetCore;
 using Serilog;
 

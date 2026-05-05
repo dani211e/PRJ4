@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Backend.Scryfall;
+using MTG_Emulator.Backend.Scryfall.ApiResponses;
 
 namespace MTG_Emulator.Backend
 {

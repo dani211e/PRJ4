@@ -1,6 +1,6 @@
 ﻿using MTG_Emulator.Backend.DB.Models;
 
-namespace MTG_Emulator.Backend.Scryfall
+namespace MTG_Emulator.Backend.Scryfall.ApiResponses
 {
     public static class ScryfallCardExtensions
     {
