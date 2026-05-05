@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MTG_Emulator.Backend.DB.DTO
+namespace MTG_Emulator.Backend.DB.DTO.DeckDTO
 {
-    public class UpdateDeckDTO
+    public class UpdateDeckDto
     {
         [Required]
         public string PlayerName { get; set; } = string.Empty;

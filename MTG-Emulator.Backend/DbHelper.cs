@@ -13,15 +13,15 @@ namespace MTG_Emulator.Backend
             ?? Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "scryfall-data"),
             "oracle-cards.json");
 
-        private static readonly HashSet<string> ExcludedLayouts = new()
-        {
+        private static readonly HashSet<string> excludedLayouts =
+        [
             "art_series",
             "reversible_card",
             "planar",
             "scheme",
             "vanguard",
-            "conspiracy"
-        };
+            "conspiracy",
+        ];
 
         public static async Task SeedDb(MTGContext db, int? count = null, bool forceSeed = false)
         {
@@ -31,8 +31,8 @@ namespace MTG_Emulator.Backend
             if (!File.Exists(bulkDataPath))
                 throw new FileNotFoundException($"Bulk card data not found at: {bulkDataPath}. Ensure the downloader has run first.");
 
-            var cardsEnum = readScryfallCards(bulkDataPath)
-                .Where(c => !ExcludedLayouts.Contains(c.Layout));
+            var cardsEnum = readScryfallCardsAsync(bulkDataPath)
+                .Where(c => !excludedLayouts.Contains(c.Layout));
 
             if (count.HasValue)
                 cardsEnum = cardsEnum.Take(count.Value);
@@ -45,7 +45,7 @@ namespace MTG_Emulator.Backend
                 Password = "Loser",
                 GamesWon = 0,
                 GamesLost = 1242,
-                GamesDrawed = 2
+                GamesDrawn = 2,
             };
 
             var deck1 = new Deck
@@ -53,7 +53,7 @@ namespace MTG_Emulator.Backend
                 DeckName = "Best deck ever",
                 Cards = cards,
                 DeckCommander = cards[0].Name,
-                Player = player1
+                Player = player1,
             };
 
             if (!db.Cards.Any())
@@ -66,7 +66,7 @@ namespace MTG_Emulator.Backend
             await db.SaveChangesAsync();
         }
 
-        private static async IAsyncEnumerable<ScryfallCard> readScryfallCards(string path)
+        private static async IAsyncEnumerable<ScryfallCard> readScryfallCardsAsync(string path)
         {
             if (!File.Exists(path))
                 throw new FileNotFoundException($"File not found at path: {path}");

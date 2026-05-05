@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MTG_Emulator.Backend.DB.DTO
+namespace MTG_Emulator.Backend.DB.DTO.RelatedCardsDTO
 {
-    public class RelatedCardDTO
+    public class RelatedCardDto
     {
         [Required]
         public int RelatedCardId { get; set; }

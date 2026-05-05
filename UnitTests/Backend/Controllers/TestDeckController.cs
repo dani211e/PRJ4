@@ -1,43 +1,32 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.Controllers;
-using MTG_Emulator.Backend.DB;
-using MTG_Emulator.Backend.DB.DTO;
+using MTG_Emulator.Backend.DB.DTO.DeckDTO;
 using MTG_Emulator.Backend.DB.Models;
+using NUnit.Framework;
 
-namespace UnitTests.Backend
+namespace UnitTests.Backend.Controllers
 {
-    public class TestDeckController
+    public class TestDeckController : TestControllerBase
     {
-        private MTGContext context;
         private DeckController uut;
 
-        //Creates a test server
         [SetUp]
-        public void Setup()
+        public override void Setup()
         {
-            var options = new DbContextOptionsBuilder<MTGContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
-
-            context = new MTGContext(options);
-            uut = new DeckController(context);
-        }
-
-        //Tears down test database
-        [TearDown]
-        public void TearDown()
-        {
-            context.Database.EnsureDeleted();
-            context.Dispose();
+            base.Setup();
+            uut = new DeckController(Context);
         }
 
         [Test]
         public async Task CreateDeck_ValidInput_CreatesDeckWithCorrectCards()
         {
-            createPlayerAsync();
-            createCardAsync("Test card");
-            createCardAsync("Test card2");
+            await insertPlayerAsync();
+            await insertCardAsync("Test card");
+            await insertCardAsync("Test card2");
 
             var dto = createDeckDto();
 
@@ -58,7 +47,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_PlayerDoesNotExist_ReturnsBadRequest()
         {
-            createCardAsync("Test card");
+            await insertCardAsync("Test card");
             var dto = createDeckDto();
 
             var result = await uut.CreateDeck(dto);
@@ -69,7 +58,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_CardDoesNotExist_ReturnsBadRequest()
         {
-            createPlayerAsync();
+            await insertPlayerAsync();
             var dto = createDeckDto();
 
             var result = await uut.CreateDeck(dto);
@@ -82,8 +71,8 @@ namespace UnitTests.Backend
         [TestCase("3 Test card\n", 3)]
         public async Task CreateDeck_ParsesCardQuantitiesCorrectly(string cardList, int expectedCount)
         {
-            createPlayerAsync();
-            createCardAsync("Test card");
+            await insertPlayerAsync();
+            await insertCardAsync("Test card");
 
             var dto = createDeckDto(cardList: cardList);
 
@@ -94,17 +83,17 @@ namespace UnitTests.Backend
         }
 
         [TestCase(null, "Test player", "1 Test card\n")]
-        [TestCase("", "Test player", "1 Test card\n")]
         [TestCase("Test deck", null, "1 Test card\n")]
-        [TestCase("Test deck", "", "1 Test card\n")]
         [TestCase("Test deck", "Test player", null)]
+        [TestCase("", "Test player", "1 Test card\n")]
+        [TestCase("Test deck", "", "1 Test card\n")]
         [TestCase("Test deck", "Test player", "")]
         public async Task CreateDeck_InvalidInput_ReturnsBadRequest(
             string? deckName,
             string? playerName,
             string? cardList)
         {
-            var dto = new CreateDeckDTO
+            var dto = new CreateDeckDto
             {
                 DeckName = deckName,
                 PlayerName = playerName,
@@ -119,7 +108,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_InvalidCardLineFormat_ReturnsBadRequest()
         {
-            createPlayerAsync();
+            await insertPlayerAsync();
             var dto = createDeckDto(cardList: "InvalidLineWithoutSpace");
 
             var result = await uut.CreateDeck(dto);
@@ -130,7 +119,7 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_InvalidQuantity_ReturnsBadRequest()
         {
-            createPlayerAsync();
+            await insertPlayerAsync();
             var dto = createDeckDto(cardList: "X Test card");
 
             var result = await uut.CreateDeck(dto);
@@ -141,8 +130,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_MultipleInvalidCards_ReturnsAllInvalidNames()
         {
-            createPlayerAsync();
-            var dto = createDeckDto(cardList: "1 Test card\n2 Test card2\n");
+            await insertPlayerAsync();
+            var dto = createDeckDto();
 
             var result = await uut.CreateDeck(dto);
 
@@ -158,8 +147,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_AddsInvalidCardNames_WhenSomeCardsDoNotExist()
         {
-            await createPlayerAsync();
-            await createCardAsync("Valid Card");
+            await insertPlayerAsync();
+            await insertCardAsync("Valid Card");
 
             var dto = createDeckDto(cardList: "1 Valid Card\n2 Missing Card\n");
 
@@ -175,8 +164,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_DuplicateCardLines_AreSummedCorrectly()
         {
-            createPlayerAsync();
-            createCardAsync("Test card");
+            await insertPlayerAsync();
+            await insertCardAsync("Test card");
 
             var dto = createDeckDto(cardList: "1 Test card\n2 Test card\n");
 
@@ -189,8 +178,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_HandlesEmptyLinesInCardList()
         {
-            createPlayerAsync();
-            createCardAsync("Test card");
+            await insertPlayerAsync();
+            await insertCardAsync("Test card");
 
             var dto = createDeckDto(cardList: "\n1 Test card\n\n");
 
@@ -203,8 +192,8 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_CaseMismatch_ReturnsBadRequest()
         {
-            createPlayerAsync();
-            createCardAsync("Test card");
+            await insertPlayerAsync();
+            await insertCardAsync("Test card");
 
             var dto = createDeckDto(cardList: "1 test card");
 
@@ -216,49 +205,47 @@ namespace UnitTests.Backend
         [Test]
         public async Task CreateDeck_PersistsDeckInDatabase()
         {
-            createPlayerAsync();
-            createCardAsync("Test card");
+            await insertPlayerAsync();
+            await insertCardAsync("Test card");
 
             var dto = createDeckDto(cardList: "1 Test card\n");
 
             await uut.CreateDeck(dto);
 
-            var deck = context.Decks.Include(d => d.Cards).FirstOrDefault();
+            var deck = Context.Decks.Include(d => d.Cards).FirstOrDefault();
 
             Assert.That(deck, Is.Not.Null);
             Assert.That(deck.Cards.Count, Is.EqualTo(1));
         }
 
 
-        // Test GetByName
-
         [Test]
         public async Task GetDeckByName_ExistingDeck_ReturnsCorrectDeck()
         {
-            var player = await createPlayerAsync();
-            var card = await createCardAsync("Test card");
+            var player = await insertPlayerAsync();
+            var card = await insertCardAsync("Test card");
 
             var deck = new Deck
             {
                 DeckName = "Test deck",
                 DeckCommander = "Test commander",
                 Player = player,
-                Cards = new List<Card> { card }
+                Cards = [card],
             };
 
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var result = await uut.GetDeckByName("Test deck");
 
             Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
             var ok = result.Result as OkObjectResult;
-            var deckDto = ok?.Value as DeckDTO;
+            var deckDto = ok?.Value as DeckDto;
 
             Assert.Multiple(() =>
             {
                 Assert.That(deckDto, Is.Not.Null);
-                Assert.That(deckDto.DeckName, Is.EqualTo("Test deck"));
+                Assert.That(deckDto!.DeckName, Is.EqualTo("Test deck"));
                 Assert.That(deckDto.DeckCommander, Is.EqualTo("Test commander"));
                 Assert.That(deckDto.Cards.Count, Is.EqualTo(1));
                 Assert.That(deckDto.Cards[0].Name, Is.EqualTo("Test card"));
@@ -283,28 +270,28 @@ namespace UnitTests.Backend
         [Test]
         public async Task GetDeckByName_DeckWithMultipleCards_ReturnsAllCards()
         {
-            var player = await createPlayerAsync();
-            var card1 = await createCardAsync("Test Card1");
-            var card2 = await createCardAsync("Test Card2");
+            var player = await insertPlayerAsync();
+            var card1 = await insertCardAsync("Test Card1");
+            var card2 = await insertCardAsync("Test Card2");
 
             var deck = new Deck
             {
                 DeckName = "MultiCardDeck",
                 DeckCommander = "Test Commander",
                 Player = player,
-                Cards = new List<Card> { card1, card1, card2 }
+                Cards = [card1, card1, card2],
             };
 
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var result = await uut.GetDeckByName("MultiCardDeck");
-            var deckDto = (result.Result as OkObjectResult)?.Value as DeckDTO;
+            var deckDto = (result.Result as OkObjectResult)?.Value as DeckDto;
 
             Assert.Multiple(() =>
             {
                 Assert.That(deckDto, Is.Not.Null);
-                Assert.That(deckDto.DeckName, Is.EqualTo("MultiCardDeck"));
+                Assert.That(deckDto!.DeckName, Is.EqualTo("MultiCardDeck"));
                 Assert.That(deckDto.DeckCommander, Is.EqualTo("Test Commander"));
                 Assert.That(deckDto.Cards.Count, Is.EqualTo(3));
                 Assert.That(deckDto.Cards.Count(c => c.Name == "Test Card1"), Is.EqualTo(2));
@@ -315,27 +302,25 @@ namespace UnitTests.Backend
         [Test]
         public async Task GetDeckByName_CaseSensitiveDeckName_ReturnsNotFound()
         {
-            var player = await createPlayerAsync();
+            var player = await insertPlayerAsync();
             var deck = new Deck
             {
                 DeckName = "ExactCaseDeck",
                 DeckCommander = "Test Commander",
-                Player = player
+                Player = player,
             };
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var result = await uut.GetDeckByName("exactcasedeck");
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
         }
 
 
-        // Test DeleteDeckByName
-
         [Test]
         public async Task DeleteDeckByName_ExistingDeck_DeletesDeck()
         {
-            var player = await createPlayerAsync();
+            var player = await insertPlayerAsync();
             var deck = new Deck
             {
                 DeckName = "DeckToDelete",
@@ -343,13 +328,13 @@ namespace UnitTests.Backend
                 Player = player
             };
 
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var result = await uut.DeleteDeckByName("DeckToDelete");
             Assert.That(result, Is.TypeOf<NoContentResult>());
 
-            var deleted = await context.Decks.FirstOrDefaultAsync(d => d.DeckName == "DeckToDelete");
+            var deleted = await Context.Decks.FirstOrDefaultAsync(d => d.DeckName == "DeckToDelete");
             Assert.That(deleted, Is.Null);
         }
 
@@ -369,24 +354,22 @@ namespace UnitTests.Backend
         }
 
 
-        // Test Update deck
-
         [Test]
         public async Task UpdateDeck_ExistingDeck_UpdatesDeckAndCards()
         {
-            var player = await createPlayerAsync();
-            var card1 = await createCardAsync("Test Card1");
-            var card2 = await createCardAsync("Test Card2");
+            var player = await insertPlayerAsync();
+            var card1 = await insertCardAsync("Test Card1");
+            var card2 = await insertCardAsync("Test Card2");
 
             var deck = new Deck
             {
                 DeckName = "DeckToUpdate",
                 DeckCommander = "OldCommander",
                 Player = player,
-                Cards = new List<Card> { card1 }
+                Cards = [card1],
             };
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var updateDto = createDeckDto(
                 deckName: "DeckToUpdate",
@@ -395,23 +378,18 @@ namespace UnitTests.Backend
             );
 
             var result = await uut.UpdateDeck("DeckToUpdate", updateDto);
-            Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
+            Assert.That(result.Result, Is.TypeOf<NoContentResult>());
 
-            var ok = result.Result as OkObjectResult;
-            var updatedDeck = ok?.Value as DeckDTO;
 
+            var dbDeck = await Context.Decks.Include(d => d.Cards)
+                .FirstOrDefaultAsync(d => d.DeckName == "DeckToUpdate");
             Assert.Multiple(() =>
             {
-                Assert.That(updatedDeck, Is.Not.Null);
-                Assert.That(updatedDeck.DeckCommander, Is.EqualTo("NewCommander"));
-                Assert.That(updatedDeck.Cards.Count, Is.EqualTo(2));
-                Assert.That(updatedDeck.Cards.All(c => c.Name == "Test Card2"), Is.True);
+                Assert.That(dbDeck, Is.Not.Null);
+                Assert.That(dbDeck!.DeckCommander, Is.EqualTo("NewCommander"));
+                Assert.That(dbDeck.Cards.Count, Is.EqualTo(2));
+                Assert.That(dbDeck.Cards.All(c => c.Name == "Test Card2"), Is.True);
             });
-
-            var dbDeck = await context.Decks.Include(d => d.Cards)
-                .FirstOrDefaultAsync(d => d.DeckName == "DeckToUpdate");
-            Assert.That(dbDeck.Cards.Count, Is.EqualTo(2));
-            Assert.That(dbDeck.DeckCommander, Is.EqualTo("NewCommander"));
         }
 
         [Test]
@@ -437,18 +415,18 @@ namespace UnitTests.Backend
         [Test]
         public async Task UpdateDeck_InvalidCardNames_ReturnsBadRequestWithInvalidCards()
         {
-            var player = await createPlayerAsync();
-            var card1 = await createCardAsync("ValidCard");
+            var player = await insertPlayerAsync();
+            var card1 = await insertCardAsync("ValidCard");
 
             var deck = new Deck
             {
                 DeckName = "DeckToUpdateCards",
                 DeckCommander = "Test Commander",
                 Player = player,
-                Cards = new List<Card> { card1 }
+                Cards = [card1],
             };
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var updateDto = createDeckDto(
                 deckName: "DeckToUpdateCards",
@@ -470,18 +448,18 @@ namespace UnitTests.Backend
         [Test]
         public async Task UpdateDeck_EmptyCardList_ClearsCards()
         {
-            var player = await createPlayerAsync();
-            var card = await createCardAsync("Test Card");
+            var player = await insertPlayerAsync();
+            var card = await insertCardAsync("Test Card");
 
             var deck = new Deck
             {
                 DeckName = "DeckEmptyCards",
                 DeckCommander = "Test Commander",
                 Player = player,
-                Cards = new List<Card> { card }
+                Cards = [card],
             };
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var updateDto = createDeckDto(
                 deckName: "DeckEmptyCards",
@@ -490,31 +468,28 @@ namespace UnitTests.Backend
             );
 
             var result = await uut.UpdateDeck("DeckEmptyCards", updateDto);
-            Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
+            Assert.That(result.Result, Is.TypeOf<NoContentResult>());
 
-            var updatedDeck = (result.Result as OkObjectResult)?.Value as DeckDTO;
-            Assert.That(updatedDeck.Cards.Count, Is.EqualTo(0));
-
-            var dbDeck = await context.Decks.Include(d => d.Cards)
+            var dbDeck = await Context.Decks.Include(d => d.Cards)
                 .FirstOrDefaultAsync(d => d.DeckName == "DeckEmptyCards");
-            Assert.That(dbDeck.Cards.Count, Is.EqualTo(0));
+            Assert.That(dbDeck!.Cards, Is.Empty);
         }
 
         [Test]
         public async Task UpdateDeck_InvalidCardLineFormat_ReturnsBadRequest()
         {
-            await createPlayerAsync();
-            var card = await createCardAsync("Test Card");
+            await insertPlayerAsync();
+            var card = await insertCardAsync("Test Card");
 
             var deck = new Deck
             {
                 DeckName = "DeckWithBadLine",
                 DeckCommander = "Test Commander",
-                Player = await createPlayerAsync(),
-                Cards = new List<Card> { card }
+                Player = await insertPlayerAsync(),
+                Cards = [card],
             };
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var updateDto = createDeckDto(
                 deckName: "DeckWithBadLine",
@@ -529,18 +504,18 @@ namespace UnitTests.Backend
         [Test]
         public async Task UpdateDeck_InvalidQuantityInCardList_ReturnsBadRequest()
         {
-            await createPlayerAsync();
-            var card = await createCardAsync("Test Card");
+            await insertPlayerAsync();
+            var card = await insertCardAsync("Test Card");
 
             var deck = new Deck
             {
                 DeckName = "DeckWithBadQuantity",
                 DeckCommander = "Test Commander",
-                Player = await createPlayerAsync(),
-                Cards = new List<Card> { card }
+                Player = await insertPlayerAsync(),
+                Cards = new List<Card> { card },
             };
-            context.Decks.Add(deck);
-            await context.SaveChangesAsync();
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
 
             var updateDto = createDeckDto(
                 deckName: "DeckWithBadQuantity",
@@ -553,61 +528,59 @@ namespace UnitTests.Backend
         }
 
 
-        // Helper functions
-
-        private async Task<Player> createPlayerAsync(string username = "Test player")
+        private async Task<Player> insertPlayerAsync(string username = "Test player")
         {
             var player = new Player
             {
                 Username = username,
                 GamesWon = 0,
                 GamesLost = 0,
-                GamesDrawed = 0,
-                Password = "Test"
+                GamesDrawn = 0,
+                Password = "Test",
             };
 
-            context.Players.Add(player);
-            await context.SaveChangesAsync();
+            Context.Players.Add(player);
+            await Context.SaveChangesAsync();
             return player;
         }
 
-        private async Task<Card> createCardAsync(string name)
+        private async Task<Card> insertCardAsync(string name)
         {
             var card = new Card
             {
                 Name = name,
                 OracleText = "Test text",
-                ImageUri = "http://Test.com"
+                ImageUri = "http://Test.com",
             };
 
-            context.Cards.Add(card);
-            await context.SaveChangesAsync();
+            Context.Cards.Add(card);
+            await Context.SaveChangesAsync();
             return card;
         }
 
-        private CreateDeckDTO createDeckDto(
+        private static CreateDeckDto createDeckDto(
             string playerName = "Test player",
             string deckName = "Test deck",
             string commander = "Test commander",
             string cardList = "1 Test card\n2 Test card2\n")
         {
-            return new CreateDeckDTO
+            return new CreateDeckDto
             {
                 PlayerName = playerName,
                 DeckName = deckName,
                 Commander = commander,
-                CardList = cardList
+                CardList = cardList,
             };
         }
 
-        private DeckDTO extractCreatedDto(ActionResult<DeckDTO> result)
+        private static DeckDto extractCreatedDto(ActionResult<DeckDto> result)
         {
             Assert.That(result.Result, Is.TypeOf<CreatedAtActionResult>());
 
             var created = result.Result as CreatedAtActionResult;
-            Assert.That(created?.Value, Is.TypeOf<DeckDTO>());
+            Assert.That(created?.Value, Is.TypeOf<DeckDto>());
 
-            return created.Value as DeckDTO;
+            return created.Value as DeckDto;
         }
     }
 }

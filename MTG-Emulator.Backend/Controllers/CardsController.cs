@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.DTO;
+using MTG_Emulator.Backend.DB.DTO.CardDTO;
 
 namespace MTG_Emulator.Backend.Controllers
 {
@@ -17,22 +19,24 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpGet("{CardName}")]
-        public async Task<ActionResult<CardDTO>> GetCardByName(string cardName)
+        public async Task<ActionResult<CardDto>> GetCardByName(string cardName)
         {
-            if (string.IsNullOrEmpty(cardName)) return BadRequest();
+            if (string.IsNullOrEmpty(cardName))
+                return BadRequest();
 
             var card = await context.Cards
                 .FirstOrDefaultAsync(card => card.Name == cardName);
 
-            if (card == null) return NotFound();
+            if (card == null)
+                return NotFound();
 
-            return new CardDTO
+            return new CardDto
             {
                 CardId = card.CardId,
                 ScryfallId = card.ScryfallId,
                 Name = card.Name,
                 OracleText = card.OracleText,
-                ImageUri = card.ImageUri
+                ImageUri = card.ImageUri,
             };
         }
     }

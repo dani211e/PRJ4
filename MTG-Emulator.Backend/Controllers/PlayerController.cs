@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
-using MTG_Emulator.Backend.DB.DTO;
+using MTG_Emulator.Backend.DB.DTO.PlayerDTO;
 using MTG_Emulator.Backend.DB.Models;
 
 namespace MTG_Emulator.Backend.Controllers
@@ -10,18 +10,11 @@ namespace MTG_Emulator.Backend.Controllers
     [ApiController]
     public class PlayerController : ControllerBase
     {
-        public enum GameResults
-        {
-            Win = 1,
-            Draw = 0,
-            Loss = -1
-        }
-
-        private readonly MTGContext _context;
+        private readonly MTGContext context;
 
         public PlayerController(MTGContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         [HttpPost]
@@ -31,7 +24,7 @@ namespace MTG_Emulator.Backend.Controllers
                 return BadRequest("Username and password are required.");
 
             // Check if player already exists
-            var existingPlayer = await _context.Players
+            var existingPlayer = await context.Players
                 .FirstOrDefaultAsync(p => p.Username == playerName);
             if (existingPlayer != null)
                 return Conflict("Player with this username already exists.");
@@ -42,30 +35,32 @@ namespace MTG_Emulator.Backend.Controllers
                 Password = password,
                 GamesWon = 0,
                 GamesLost = 0,
-                GamesDrawed = 0
+                GamesDrawn = 0,
             };
 
-            _context.Players.Add(player);
-            await _context.SaveChangesAsync();
+            context.Players.Add(player);
+            await context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetProfile), new { PlayerName = player.Username }, player);
         }
 
         [HttpGet("{PlayerName}")]
-        public async Task<ActionResult<PlayerDTO>> GetProfile(string playerName)
+        public async Task<ActionResult<PlayerDto>> GetProfile(string playerName)
         {
-            if (string.IsNullOrEmpty(playerName)) return BadRequest();
-            var player = await _context.Players
+            if (string.IsNullOrEmpty(playerName))
+                return BadRequest();
+            var player = await context.Players
                 .FirstOrDefaultAsync(p => p.Username == playerName);
 
-            if (player == null) return NotFound();
+            if (player == null)
+                return NotFound();
 
-            var dto = new PlayerDTO
+            var dto = new PlayerDto
             {
                 Username = player.Username,
                 GamesWon = player.GamesWon,
                 GamesLost = player.GamesLost,
-                GamesDrawed = player.GamesDrawed
+                GamesDrawed = player.GamesDrawn,
             };
 
             return Ok(dto);
@@ -74,15 +69,17 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpDelete("{PlayerName}")]
         public async Task<ActionResult> DeleteProfile(string playerName)
         {
-            if (string.IsNullOrWhiteSpace(playerName)) return BadRequest();
+            if (string.IsNullOrWhiteSpace(playerName))
+                return BadRequest();
 
-            var player = await _context.Players
+            var player = await context.Players
                 .FirstOrDefaultAsync(p => p.Username == playerName);
 
-            if (player == null) return NotFound();
+            if (player == null)
+                return NotFound();
 
-            _context.Players.Remove(player);
-            await _context.SaveChangesAsync();
+            context.Players.Remove(player);
+            await context.SaveChangesAsync();
 
             return NoContent();
         }
@@ -91,12 +88,14 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpPut("{PlayerName}")]
         public async Task<ActionResult<Player>> UpdatePlayerStats(string playerName, GameResults result)
         {
-            if (string.IsNullOrEmpty(playerName)) return NotFound();
+            if (string.IsNullOrEmpty(playerName))
+                return NotFound();
 
-            var player = await _context.Players
+            var player = await context.Players
                 .FirstOrDefaultAsync(p => p.Username == playerName);
 
-            if (player == null) return NotFound();
+            if (player == null)
+                return NotFound();
 
             switch (result)
             {
@@ -104,7 +103,7 @@ namespace MTG_Emulator.Backend.Controllers
                     player.GamesWon++;
                     break;
                 case GameResults.Draw:
-                    player.GamesDrawed++;
+                    player.GamesDrawn++;
                     break;
                 case GameResults.Loss:
                     player.GamesLost++;
@@ -113,8 +112,8 @@ namespace MTG_Emulator.Backend.Controllers
                     return BadRequest("Invalid game result.");
             }
 
-            await _context.SaveChangesAsync();
-            return Ok(player);
+            await context.SaveChangesAsync();
+            return NoContent();
         }
 
         // Reset player password
@@ -124,15 +123,23 @@ namespace MTG_Emulator.Backend.Controllers
             if (string.IsNullOrWhiteSpace(password))
                 return BadRequest("Password cannot be empty.");
 
-            var player = await _context.Players
+            var player = await context.Players
                 .FirstOrDefaultAsync(p => p.Username == playerName);
 
-            if (player == null) return NotFound();
+            if (player == null)
+                return NotFound();
 
             player.Password = password;
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
-            return Ok(player);
+            return NoContent();
         }
+    }
+
+    public enum GameResults
+    {
+        Win = 1,
+        Draw = 0,
+        Loss = -1,
     }
 }

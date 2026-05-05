@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.DTO;
+using MTG_Emulator.Backend.DB.DTO.RelatedCardsDTO;
 
 namespace MTG_Emulator.Backend.Controllers
 {
@@ -9,26 +10,27 @@ namespace MTG_Emulator.Backend.Controllers
     [ApiController]
     public class TokenController : ControllerBase
     {
-        private readonly MTGContext _context;
+        private readonly MTGContext context;
 
         public TokenController(MTGContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         [HttpGet("{tokenName}")]
-        public async Task<ActionResult<RelatedCardDTO>> GetTokenByName(string tokenName)
+        public async Task<ActionResult<RelatedCardDto>> GetTokenByName(string tokenName)
         {
-            var token = await _context.RelatedCards
+            var token = await context.RelatedCards
                 .FirstOrDefaultAsync(t => t.Name == tokenName);
 
-            if (token == null) return NotFound();
+            if (token == null)
+                return NotFound();
 
-            return Ok(new RelatedCardDTO
+            return Ok(new RelatedCardDto
             {
                 RelatedCardId = token.RelatedCardId,
                 Name = token.Name,
-                Uri = token.URI
+                Uri = token.URI,
             });
         }
     }
