@@ -9,6 +9,6 @@ namespace MTG_Emulator.Backend.DB.DTO.RelatedCardsDTO
         [Required]
         public string Name { get; set; } = string.Empty;
         [Required]
-        public string Uri { get; set; } = string.Empty;
+        public string ImageUri { get; set; } = string.Empty;
     }
 }

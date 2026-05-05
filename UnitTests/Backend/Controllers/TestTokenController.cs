@@ -32,7 +32,7 @@ namespace UnitTests.Backend.Controllers
 
             var resultToken = okResult.Value as RelatedCardDto;
             Assert.That(resultToken!.Name, Is.EqualTo("Germ"));
-            Assert.That(resultToken.Uri, Is.EqualTo("http://Test.com"));
+            Assert.That(resultToken.ImageUri, Is.EqualTo("http://Test.com"));
         }
 
         [TestCase("DoesNotExist")]
