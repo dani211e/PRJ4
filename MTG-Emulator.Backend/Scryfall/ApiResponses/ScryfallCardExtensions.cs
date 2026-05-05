@@ -6,16 +6,16 @@ namespace MTG_Emulator.Backend.Scryfall
     {
         public static Card ToCard(this ScryfallCard card)
         {
-            AltFace? altFace = null;
+            CardFace? altFace = null;
             if (card.CardFaces != null)
             {
                 // Scryfall returns multiface cards' names in a "FRONT // BACK" format
                 // so we want to replace the name with the proper one
                 card.Name = card.CardFaces[0].Name;
                 var apiFace = card.CardFaces[1];
-                altFace = new AltFace
+                altFace = new CardFace
                 {
-                    ImageURI = $"/cards/{card.OracleId}_face1.jpg",
+                    ImageUri = $"/cards/{card.OracleId}_face1.jpg",
                     OracleText = apiFace.FlavorText ?? string.Empty
                 };
             }
