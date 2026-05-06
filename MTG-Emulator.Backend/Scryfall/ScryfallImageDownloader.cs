@@ -98,14 +98,20 @@ namespace MTG_Emulator.Backend.Scryfall
 
                     var result = await downloadCardImageAsync(outputFolder, normalProp.GetString()!, cardId, cardName);
 
-                    if (result == DownloadResult.Failed)
-                        failed++;
-                    else if (result == DownloadResult.AlreadyExists)
-                        skipped++;
-                    else
+                    switch (result)
                     {
-                        done++;
-                        await Task.Delay(delayMs);
+                        case DownloadResult.Failed:
+                            failed++;
+                            break;
+                        case DownloadResult.AlreadyExists:
+                            skipped++;
+                            break;
+                        case DownloadResult.Downloaded:
+                            done++;
+                            await Task.Delay(delayMs);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
                 }
                 else if (card.TryGetProperty("card_faces", out var faces))
