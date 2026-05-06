@@ -4,6 +4,7 @@ using MTG_Emulator.Backend.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MTG_Emulator.Backend.Migrations
 {
     [DbContext(typeof(MTGContext))]
-    partial class MTGContextModelSnapshot : ModelSnapshot
+    [Migration("20260505141150_RenameAltFaceToCardFace")]
+    partial class RenameAltFaceToCardFace
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,11 +83,6 @@ namespace MTG_Emulator.Backend.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ImageUri")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -230,7 +228,7 @@ namespace MTG_Emulator.Backend.Migrations
             modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.RelatedCard", b =>
                 {
                     b.HasOne("MTG_Emulator.Backend.DB.Models.Card", "Card")
-                        .WithMany("RelatedCards")
+                        .WithMany("RelatedCard")
                         .HasForeignKey("CardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -242,7 +240,7 @@ namespace MTG_Emulator.Backend.Migrations
                 {
                     b.Navigation("AltFace");
 
-                    b.Navigation("RelatedCards");
+                    b.Navigation("RelatedCard");
                 });
 #pragma warning restore 612, 618
         }

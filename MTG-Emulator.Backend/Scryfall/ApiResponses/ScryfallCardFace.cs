@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace MTG_Emulator.Backend.Scryfall
+namespace MTG_Emulator.Backend.Scryfall.ApiResponses
 {
     public struct ScryfallCardFace
     {
@@ -46,11 +46,11 @@ namespace MTG_Emulator.Backend.Scryfall
         //[JsonPropertyName("object")]
         //public string CardObject { get; set; }
 
-        //[JsonPropertyName("oracle_id")]
-        //public Guid? OracleId { get; set; }
+        [JsonPropertyName("oracle_id")]
+        public Guid? OracleId { get; set; }
 
-        //[JsonPropertyName("oracle_text")]
-        //public string? OracleText { get; set; }
+        [JsonPropertyName("oracle_text")]
+        public string? OracleText { get; set; }
 
         [JsonPropertyName("power")]
         public string? Power { get; set; }

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace MTG_Emulator.Backend.Scryfall
+namespace MTG_Emulator.Backend.Scryfall.ApiResponses
 {
     public struct ScryfallCardImages
     {

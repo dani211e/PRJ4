@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.HttpLogging;
+﻿using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using MTG_Emulator.Backend.DB;
+using MTG_Emulator.Backend.Scryfall;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -33,7 +34,7 @@ namespace MTG_Emulator.Backend
                         errorNumbersToAdd: null))
                        .EnableSensitiveDataLogging()
                        .EnableDetailedErrors()
-                       .LogTo(Log.Information, Microsoft.Extensions.Logging.LogLevel.Warning));
+                       .LogTo(Log.Information, LogLevel.Warning));
 
             builder.Services.AddHttpLogging(logging =>
             {
@@ -73,7 +74,6 @@ namespace MTG_Emulator.Backend
                 await db.Database.MigrateAsync();
 
                 await ScryfallImageDownloader.RunAsync(testMode: false);
-
                 await DbHelper.SeedDb(db);
             }
 

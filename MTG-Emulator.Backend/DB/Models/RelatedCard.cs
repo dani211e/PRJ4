@@ -10,7 +10,7 @@ namespace MTG_Emulator.Backend.DB.Models
         public string Name { get; set; } = string.Empty;
 
         [StringLength(256)]
-        public string URI { get; set; } = string.Empty;
+        public string ImageUri { get; set; } = string.Empty;
 
         public Card Card { get; set; } = new();
     }

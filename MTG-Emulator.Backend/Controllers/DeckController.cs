@@ -44,9 +44,9 @@ namespace MTG_Emulator.Backend.Controllers
                 int firstSpace = line.IndexOf(' ');
                 if (firstSpace == -1)
                     return BadRequest($"Wrong line in card list: '{line}'");
-                if (!int.TryParse(line.Substring(0, firstSpace), out int num))
+                if (!int.TryParse(line.Substring(0, firstSpace), out int amount))
                     return BadRequest($"Invalid quantity in line: '{line}'");
-                int amount = int.Parse(line.Substring(0, firstSpace));
+
                 string name = line.Substring(firstSpace + 1);
 
                 var cardEntity = await context.Cards
@@ -114,7 +114,7 @@ namespace MTG_Emulator.Backend.Controllers
             {
                 DeckName = deck.DeckName,
                 DeckCommander = deck.DeckCommander,
-                Cards = deck.Cards?
+                Cards = deck.Cards
                     .Select(c => new CardDto
                     {
                         CardId = c.CardId,
@@ -122,7 +122,7 @@ namespace MTG_Emulator.Backend.Controllers
                         OracleText = c.OracleText,
                         ImageUri = c.ImageUri,
                     })
-                    .ToList() ?? [],
+                    .ToList(),
             };
 
             return Ok(deckDto);
@@ -148,7 +148,7 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpPut("{DeckName}")]
-        public async Task<ActionResult<DeckDto>> UpdateDeck(string deckName, [FromBody] CreateDeckDto deckDto)
+        public async Task<ActionResult<DeckDto>> UpdateDeck(string deckName, [FromBody] CreateDeckDto? deckDto)
         {
             if (string.IsNullOrWhiteSpace(deckName) || deckDto == null)
                 return BadRequest();

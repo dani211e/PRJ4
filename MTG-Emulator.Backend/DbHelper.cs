@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.Models;
-using MTG_Emulator.Backend.Scryfall;
+using MTG_Emulator.Backend.Scryfall.ApiResponses;
 
 namespace MTG_Emulator.Backend
 {
@@ -31,13 +31,18 @@ namespace MTG_Emulator.Backend
             if (!File.Exists(bulkDataPath))
                 throw new FileNotFoundException($"Bulk card data not found at: {bulkDataPath}. Ensure the downloader has run first.");
 
+            var idToOracleId = await readScryfallCardsAsync(bulkDataPath)
+                .ToDictionaryAsync(c => c.Id, c => c.OracleId);
+
             var cardsEnum = readScryfallCardsAsync(bulkDataPath)
                 .Where(c => !excludedLayouts.Contains(c.Layout));
 
             if (count.HasValue)
                 cardsEnum = cardsEnum.Take(count.Value);
 
-            var cards = await cardsEnum.Select(c => c.ToCard()).ToListAsync();
+            var cards = await cardsEnum
+                .Select(c => c.ToCard(idToOracleId))
+                .ToListAsync();
 
             var player1 = new Player
             {

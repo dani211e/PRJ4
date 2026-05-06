@@ -18,8 +18,8 @@ namespace MTG_Emulator.Backend.DB.Models
         [StringLength(128)]
         public string ImageUri { get; set; } = string.Empty;
 
-        public List<RelatedCard> RelatedCard { get; set; } = [];
+        public List<RelatedCard> RelatedCards { get; set; } = [];
         public List<Deck> Decks { get; set; } = [];
-        public AltFace? AltFace { get; set; } = new();
+        public CardFace? AltFace { get; set; }
     }
 }
