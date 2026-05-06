@@ -1,7 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.HttpLogging;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.Scryfall;
@@ -36,7 +34,7 @@ namespace MTG_Emulator.Backend
                         errorNumbersToAdd: null))
                        .EnableSensitiveDataLogging()
                        .EnableDetailedErrors()
-                       .LogTo(Log.Information, Microsoft.Extensions.Logging.LogLevel.Warning));
+                       .LogTo(Log.Information, LogLevel.Warning));
 
             builder.Services.AddHttpLogging(logging =>
             {

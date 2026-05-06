@@ -1,11 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
-using MTG_Emulator.Backend.DB.DTO;
-using MTG_Emulator.Backend.DB.DTO.CardDTO;
-using MTG_Emulator.Backend.DB.DTO.CardFace;
-using MTG_Emulator.Backend.DB.DTO.RelatedCardsDTO;
+using MTG_Emulator.Unity.Db.DTO.CardDTO;
+using MTG_Emulator.Unity.Db.DTO.CardFace;
+using MTG_Emulator.Unity.Db.DTO.RelatedCardsDTO;
 
 namespace MTG_Emulator.Backend.Controllers
 {
