@@ -2,8 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
-using MTG_Emulator.Backend.DB.DTO;
-using MTG_Emulator.Backend.DB.DTO.CardDTO;
+using MTG_Emulator.Unity.Db.DTO.CardDTO;
 
 namespace MTG_Emulator.Backend.Controllers
 {
