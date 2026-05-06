@@ -114,7 +114,7 @@ namespace MTG_Emulator.Backend.Controllers
             {
                 DeckName = deck.DeckName,
                 DeckCommander = deck.DeckCommander,
-                Cards = deck.Cards?
+                Cards = deck.Cards
                     .Select(c => new CardDto
                     {
                         CardId = c.CardId,
@@ -122,7 +122,7 @@ namespace MTG_Emulator.Backend.Controllers
                         OracleText = c.OracleText,
                         ImageUri = c.ImageUri,
                     })
-                    .ToList() ?? [],
+                    .ToList(),
             };
 
             return Ok(deckDto);
@@ -148,7 +148,7 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpPut("{DeckName}")]
-        public async Task<ActionResult<DeckDto>> UpdateDeck(string deckName, [FromBody] CreateDeckDto deckDto)
+        public async Task<ActionResult<DeckDto>> UpdateDeck(string deckName, [FromBody] CreateDeckDto? deckDto)
         {
             if (string.IsNullOrWhiteSpace(deckName) || deckDto == null)
                 return BadRequest();
