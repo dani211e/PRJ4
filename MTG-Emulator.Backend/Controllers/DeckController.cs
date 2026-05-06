@@ -44,9 +44,9 @@ namespace MTG_Emulator.Backend.Controllers
                 int firstSpace = line.IndexOf(' ');
                 if (firstSpace == -1)
                     return BadRequest($"Wrong line in card list: '{line}'");
-                if (!int.TryParse(line.Substring(0, firstSpace), out int num))
+                if (!int.TryParse(line.Substring(0, firstSpace), out int amount))
                     return BadRequest($"Invalid quantity in line: '{line}'");
-                int amount = int.Parse(line.Substring(0, firstSpace));
+
                 string name = line.Substring(firstSpace + 1);
 
                 var cardEntity = await context.Cards

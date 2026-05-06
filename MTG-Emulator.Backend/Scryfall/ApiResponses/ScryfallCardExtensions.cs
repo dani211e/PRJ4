@@ -34,12 +34,11 @@ namespace MTG_Emulator.Backend.Scryfall.ApiResponses
                         .Where(r => gameComponents.Contains(r.Component))
                         .Select(r =>
                         {
-                            var scryfallId = r.Id;
                             idToOracleId.TryGetValue(r.Id, out var oracleId);
                             return new RelatedCard
                             {
                                 Name = r.Name,
-                                ImageUri = oracleId != default ? $"/cards/{oracleId}.jpg" : string.Empty
+                                ImageUri = oracleId != Guid.Empty ? $"/cards/{oracleId}.jpg" : string.Empty
                             };
                         })
                 );
