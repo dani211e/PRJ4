@@ -3,66 +3,54 @@ using UnityEngine;
 
 public class Deck : MonoBehaviour
 {
-    [SerializeField] private GameObject cardPrefab;
-    [SerializeField] private Transform deckVisualParent;
-    [SerializeField] private Transform handParent;
-    [SerializeField] private int deckSize = 100;
+    private DeckDto currentDeck;
+    private List<CardDto> drawPile = new();
 
-    private List<Sprite> cards = new();
-    private GameObject topVisual;
-
-    void Awake()
+    public void LoadDeck(DeckDto deck)
     {
-        if (deckVisualParent == null) deckVisualParent = transform;
-    }
-
-    void Start()
-    {
-        var fronts = Resources.LoadAll<Sprite>("FrontImage");
-        cards.Clear();
-
-        if (fronts.Length == 0)
+        if (deck == null)
         {
+            Debug.LogError("Tried to load a null deck.");
             return;
         }
 
-        for (int i = 0; i < deckSize; i++)
-        {
-            cards.Add(fronts[i % fronts.Length]);
-        }
+        currentDeck = deck;
+        drawPile.Clear();
 
-        ShowTopFaceDown();
+        if (deck.cards != null)
+            drawPile.AddRange(deck.cards);
+
+        Debug.Log("Loaded gameplay deck: " + currentDeck.deckName);
+        Debug.Log("Cards loaded: " + drawPile.Count);
+
+        ResetGameplayStateForNewDeck();
     }
-    
 
-    public void DrawToHand()
+    private void ResetGameplayStateForNewDeck()
     {
-        if (cards.Count == 0) return;
 
-        var front = cards[^1];
-        cards.RemoveAt(cards.Count - 1);
-
-        var go = Instantiate(cardPrefab, handParent, false);
-        go.GetComponent<Card>().Init(front, startFaceDown: false);
-        
-        
-        ShowTopFaceDown();
     }
-    
-    void ShowTopFaceDown()
+
+    public CardDto DrawTopCard()
     {
-        if (topVisual == null)
+        if (drawPile.Count == 0)
         {
-            topVisual = Instantiate(cardPrefab, deckVisualParent, false);
-        }
-        
-        var drag = topVisual.GetComponent<Drag>();
-        if (drag != null)
-        {
-            Destroy(drag);
+            Debug.LogWarning("No cards left in draw pile.");
+            return null;
         }
 
-        var c = topVisual.GetComponent<Card>();
-        c.Init(front: cards.Count > 0 ? cards[^1] : null, startFaceDown: true);
+        CardDto card = drawPile[0];
+        drawPile.RemoveAt(0);
+        return card;
+    }
+
+    public DeckDto GetCurrentDeck()
+    {
+        return currentDeck;
+    }
+
+    public int GetRemainingCardCount()
+    {
+        return drawPile.Count;
     }
 }

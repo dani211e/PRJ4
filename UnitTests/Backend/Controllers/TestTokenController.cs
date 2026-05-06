@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MTG_Emulator.Backend.Controllers;
-using MTG_Emulator.Backend.DB.DTO.RelatedCardsDTO;
 using MTG_Emulator.Backend.DB.Models;
+using MTG_Emulator.Unity.Db.DTO.RelatedCardsDTO;
 using NUnit.Framework;
 
 namespace UnitTests.Backend.Controllers
