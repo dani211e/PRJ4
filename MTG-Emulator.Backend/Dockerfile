@@ -8,6 +8,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["MTG-Emulator.Backend/MTG-Emulator.Backend.csproj", "MTG-Emulator.Backend/"]
+COPY ["MTG-Emulator.Unity/MTG-Emulator.Unity.csproj", "MTG-Emulator.Unity/"]
 RUN dotnet restore "MTG-Emulator.Backend/MTG-Emulator.Backend.csproj"
 COPY . .
 WORKDIR "/src/MTG-Emulator.Backend"
