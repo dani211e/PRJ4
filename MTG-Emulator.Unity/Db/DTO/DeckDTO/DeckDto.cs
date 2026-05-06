@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using MTG_Emulator.Backend.DB.DTO.CardDTO;
+using MTG_Emulator.Unity.Db.DTO.CardDTO;
 
-namespace MTG_Emulator.Backend.DB.DTO.DeckDTO
+namespace MTG_Emulator.Unity.Db.DTO.DeckDTO
 {
     public class DeckDto
     {

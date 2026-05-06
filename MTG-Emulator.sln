@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		compose.yaml = compose.yaml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTG-Emulator.Unity", "MTG-Emulator.Unity\MTG-Emulator.Unity.csproj", "{B19359DC-37CB-4032-ACE0-4B16F975DE1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,18 @@ Global
 		{D86CB929-618E-472E-AC87-D29543DB78D2}.Release|x64.Build.0 = Release|Any CPU
 		{D86CB929-618E-472E-AC87-D29543DB78D2}.Release|x86.ActiveCfg = Release|Any CPU
 		{D86CB929-618E-472E-AC87-D29543DB78D2}.Release|x86.Build.0 = Release|Any CPU
+		{B19359DC-37CB-4032-ACE0-4B16F975DE1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B19359DC-37CB-4032-ACE0-4B16F975DE1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B19359DC-37CB-4032-ACE0-4B16F975DE1D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B19359DC-37CB-4032-ACE0-4B16F975DE1D}.Debug|x64.Build.0 = Debug|Any CPU
+		{B19359DC-37CB-4032-ACE0-4B16F975DE1D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B19359DC-37CB-4032-ACE0-4B16F975DE1D}.Debug|x86.Build.0 = Debug|Any CPU
+		{B19359DC-37CB-4032-ACE0-4B16F975DE1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B19359DC-37CB-4032-ACE0-4B16F975DE1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B19359DC-37CB-4032-ACE0-4B16F975DE1D}.Release|x64.ActiveCfg = Release|Any CPU
+		{B19359DC-37CB-4032-ACE0-4B16F975DE1D}.Release|x64.Build.0 = Release|Any CPU
+		{B19359DC-37CB-4032-ACE0-4B16F975DE1D}.Release|x86.ActiveCfg = Release|Any CPU
+		{B19359DC-37CB-4032-ACE0-4B16F975DE1D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
