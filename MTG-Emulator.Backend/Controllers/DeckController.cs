@@ -100,6 +100,36 @@ namespace MTG_Emulator.Backend.Controllers
             return CreatedAtAction(nameof(GetDeckByName), new { deck.DeckName }, resultDto);
         }
 
+        [HttpGet("player/{playerId}")]
+        public async Task<ActionResult<List<DeckDto>>> GetAllDecksByPlayerId(int playerId)
+        {
+            var player = await context.Players
+                .FirstOrDefaultAsync(p => p.PlayerId == playerId);
+
+            if (player == null)
+                return NotFound($"Player '{playerId}' not found.");
+
+            var decks = await context.Decks
+                .Include(d => d.Cards)
+                .Where(d => d.Player.PlayerId == playerId)
+                .ToListAsync();
+            
+            var deckDtos = decks.Select(deck => new DeckDto
+            {
+                DeckName = deck.DeckName,
+                DeckCommander = deck.DeckCommander,
+                Cards = deck.Cards.Select(c => new CardDto
+                {
+                    CardId = c.CardId,
+                    Name = c.Name,
+                    OracleText = c.OracleText,
+                    ImageUri = c.ImageUri,
+                }).ToList(),
+            }).ToList();
+
+            return Ok(deckDtos);
+        }
+
         [HttpGet("{DeckName}")]
         public async Task<ActionResult<DeckDto>> GetDeckByName(string deckName)
         {
