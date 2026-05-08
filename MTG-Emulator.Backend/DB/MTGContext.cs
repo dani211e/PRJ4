@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB.Models;
 
 namespace MTG_Emulator.Backend.DB
 {
-    public class MTGContext : DbContext
+    public class MTGContext : IdentityDbContext<ApiUser>
     {
         public MTGContext() { }
 
