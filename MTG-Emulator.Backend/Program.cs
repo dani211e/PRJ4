@@ -130,7 +130,15 @@ namespace MTG_Emulator.Backend
             {
                 var db = scope.ServiceProvider.GetRequiredService<MTGContext>();
 
-                await db.Database.MigrateAsync();
+                try
+                {
+                    await db.Database.MigrateAsync();
+                }
+                catch (Microsoft.Data.SqlClient.SqlException ex) when (ex.Number == 1801)
+                {
+                    Log.Warning("Database already exists, skipping creation — applying pending migrations.");
+                    await db.Database.MigrateAsync();
+                }
 
                 await ScryfallImageDownloader.RunAsync(testMode: false);
                 await DbHelper.SeedDb(db);
