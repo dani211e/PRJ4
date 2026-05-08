@@ -6,6 +6,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.Models;
+using MTG_Emulator.Backend.Scalar;
 using MTG_Emulator.Backend.Scryfall;
 using Scalar.AspNetCore;
 using Serilog;
@@ -27,7 +28,10 @@ namespace MTG_Emulator.Backend
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddOpenApi();
+            builder.Services.AddOpenApi(options =>
+            {
+                options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+            });
 
             if (builder.Environment.IsDevelopment())
                 builder.Configuration.AddUserSecrets<Program>();
