@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
@@ -17,7 +18,7 @@ namespace MTG_Emulator.Backend.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Policy = "PlayerOrAdmin")]
-    public class DeckController : ControllerBase
+    public class DeckController : BaseController
     {
         private readonly MTGContext context;
 
@@ -31,14 +32,20 @@ namespace MTG_Emulator.Backend.Controllers
         {
             if (string.IsNullOrWhiteSpace(deckDto.DeckName))
                 return BadRequest("Invalid deck name");
-            if (string.IsNullOrWhiteSpace(deckDto.PlayerName))
-                return BadRequest("Invalid player data");
             if (string.IsNullOrWhiteSpace(deckDto.CardList))
                 return BadRequest("Invalid card data");
 
+            // Resolve player from JWT instead of trusting the request body
+            var callerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var player = await context.Players
+                .FirstOrDefaultAsync(p => p.ApiUserId == callerId);
+
+            if (player == null)
+                return NotFound("Player profile not found.");
+
             // Map cards from names
             var cards = new List<Card>();
-            var invalidCardnames = new List<string>();
+            var invalidCardNames = new List<string>();
             string[] lines = deckDto.CardList.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
             foreach (string line in lines)
@@ -50,7 +57,6 @@ namespace MTG_Emulator.Backend.Controllers
                     return BadRequest($"Invalid quantity in line: '{line}'");
 
                 string name = line.Substring(firstSpace + 1);
-
                 var cardEntity = await context.Cards
                     .FirstOrDefaultAsync(c => c.Name == name);
 
@@ -58,21 +64,15 @@ namespace MTG_Emulator.Backend.Controllers
                     for (int i = 0; i < amount; i++)
                         cards.Add(cardEntity);
                 else
-                    invalidCardnames.Add(name);
+                    invalidCardNames.Add(name);
             }
 
-            if (invalidCardnames.Count != 0)
+            if (invalidCardNames.Count != 0)
                 return BadRequest(new InvalidCardsResponse
                 {
-                    Error = "The following cards does not exist",
-                    InvalidCards = invalidCardnames,
+                    Error = "The following cards do not exist",
+                    InvalidCards = invalidCardNames,
                 });
-
-            var player = await context.Players
-                .FirstOrDefaultAsync(p => p.Username == deckDto.PlayerName);
-
-            if (player == null)
-                return BadRequest($"Player '{deckDto.PlayerName}' not found.");
 
             var deck = new Deck
             {
@@ -85,7 +85,6 @@ namespace MTG_Emulator.Backend.Controllers
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
 
-            // Map to DTO for return
             var resultDto = new DeckDto
             {
                 DeckName = deck.DeckName,
@@ -115,7 +114,7 @@ namespace MTG_Emulator.Backend.Controllers
                 .Include(d => d.Cards)
                 .Where(d => d.Player.PlayerId == playerId)
                 .ToListAsync();
-            
+
             var deckDtos = decks.Select(deck => new DeckDto
             {
                 DeckName = deck.DeckName,
@@ -167,11 +166,15 @@ namespace MTG_Emulator.Backend.Controllers
                 return BadRequest();
 
             var deck = await context.Decks
+                .Include(d => d.Player)
                 .Include(d => d.Cards)
                 .FirstOrDefaultAsync(d => d.DeckName == deckName);
 
             if (deck == null)
                 return NotFound();
+
+            if (!IsOwnerOrAdmin(deck.Player.ApiUserId))
+                return Forbid();
 
             context.Decks.Remove(deck);
             await context.SaveChangesAsync();
@@ -180,24 +183,26 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpPut("{DeckName}")]
-        public async Task<ActionResult<DeckDto>> UpdateDeck(string deckName, [FromBody] CreateDeckDto? deckDto)
+        public async Task<ActionResult<DeckDto>> UpdateDeck(string deckName, [FromBody] UpdateDeckDto? deckDto)
         {
             if (string.IsNullOrWhiteSpace(deckName) || deckDto == null)
                 return BadRequest();
 
             var deck = await context.Decks
+                .Include(d => d.Player)
                 .Include(d => d.Cards)
                 .FirstOrDefaultAsync(d => d.DeckName == deckName);
 
             if (deck == null)
                 return NotFound();
 
-            // Update deck properties
+            if (!IsOwnerOrAdmin(deck.Player.ApiUserId))
+                return Forbid();
+
             deck.DeckName = deckDto.DeckName;
             deck.DeckCommander = deckDto.Commander;
 
-            // Handle cards
-            var invalidCardnames = new List<string>();
+            var invalidCardNames = new List<string>();
             deck.Cards.Clear();
             if (!string.IsNullOrWhiteSpace(deckDto.CardList))
             {
@@ -217,15 +222,15 @@ namespace MTG_Emulator.Backend.Controllers
                         for (int i = 0; i < num; i++)
                             deck.Cards.Add(cardEntity);
                     else
-                        invalidCardnames.Add(name);
+                        invalidCardNames.Add(name);
                 }
             }
 
-            if (invalidCardnames.Any())
+            if (invalidCardNames.Any())
                 return BadRequest(new InvalidCardsResponse
                 {
                     Error = "The following cards do not exist",
-                    InvalidCards = invalidCardnames,
+                    InvalidCards = invalidCardNames,
                 });
 
             await context.SaveChangesAsync();

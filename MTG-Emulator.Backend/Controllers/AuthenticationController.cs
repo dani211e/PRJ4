@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -13,17 +14,20 @@ namespace MTG_Emulator.Backend.Controllers
     
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthenticationController : ControllerBase
+    public class AuthenticationController : BaseController
     {
         private readonly IConfiguration configuration;
         private readonly UserManager<ApiUser> userManager;
+        private readonly MTGContext context;
 
         public AuthenticationController(
             IConfiguration configuration,
-            UserManager<ApiUser> userManager)
+            UserManager<ApiUser> userManager,
+            MTGContext context)
         {
             this.configuration = configuration;
             this.userManager = userManager;
+            this.context = context;
         }
 
         [HttpPost("register")]
@@ -41,6 +45,18 @@ namespace MTG_Emulator.Backend.Controllers
 
             var role = dto.Role == Roles.Admin ? Roles.Admin : Roles.Player;
             await userManager.AddToRoleAsync(user, role);
+
+            // Auto-create the Player profile
+            if (role == Roles.Player)
+            {
+                var player = new Player
+                {
+                    Username = dto.Username,
+                    ApiUserId = user.Id
+                };
+                context.Players.Add(player);
+                await context.SaveChangesAsync();
+            }
 
             return Ok(new { message = "User registered" });
         }
@@ -81,6 +97,32 @@ namespace MTG_Emulator.Backend.Controllers
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        
+        [HttpPut("reset-password")]
+        [Authorize]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
+        {
+            if (dto.NewPassword != dto.ConfirmPassword)
+                return BadRequest("Passwords do not match.");
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized();
+            var user = await userManager.FindByIdAsync(userId);
+            
+            if (user == null) 
+                return NotFound();
+
+            if (!IsOwnerOrAdmin(user.Id)) return Forbid();
+
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await userManager.ResetPasswordAsync(user, token, dto.NewPassword);
+
+            if (!result.Succeeded)
+                return BadRequest(result.Errors.Select(e => e.Description));
+
+            return NoContent();
         }
     }
 }

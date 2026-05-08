@@ -25,9 +25,12 @@ internal sealed class BearerSecuritySchemeTransformer(
         };
 
         foreach (var operation in document.Paths?.Values
-                     .SelectMany(p => p.Operations?.Values) ?? [])
+                                      .SelectMany(p => p.Operations?.Values ?? Enumerable.Empty<OpenApiOperation>())
+                                  ?? Enumerable.Empty<OpenApiOperation>())
         {
-            operation.Security?.Add(new OpenApiSecurityRequirement
+            operation.Security ??= new List<OpenApiSecurityRequirement>();
+
+            operation.Security.Add(new OpenApiSecurityRequirement
             {
                 [new OpenApiSecuritySchemeReference("Bearer", document)] = []
             });

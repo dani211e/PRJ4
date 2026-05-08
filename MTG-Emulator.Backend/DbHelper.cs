@@ -47,7 +47,6 @@ namespace MTG_Emulator.Backend
             var player1 = new Player
             {
                 Username = "Kasper",
-                Password = "Loser",
                 GamesWon = 0,
                 GamesLost = 1242,
                 GamesDrawn = 2,

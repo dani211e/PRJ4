@@ -17,6 +17,7 @@ namespace MTG_Emulator.Backend
     {
         public static async Task Main(string[] args)
         {
+            DotNetEnv.Env.Load();
             var builder = WebApplication.CreateBuilder(args);
 
             Log.Logger = new LoggerConfiguration()
@@ -144,7 +145,10 @@ namespace MTG_Emulator.Backend
                 await DbHelper.SeedDb(db);
 
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApiRole>>();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApiUser>>();
+                
                 await RoleSeeder.SeedRolesAsync(roleManager);
+                await AdminSeeder.SeedAdminAsync(userManager);
             }
 
             app.MapControllers();

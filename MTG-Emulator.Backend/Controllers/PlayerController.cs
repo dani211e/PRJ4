@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
@@ -10,40 +11,13 @@ namespace MTG_Emulator.Backend.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Policy = "PlayerOrAdmin")]
-    public class PlayerController : ControllerBase
+    public class PlayerController : BaseController
     {
         private readonly MTGContext context;
 
         public PlayerController(MTGContext context)
         {
             this.context = context;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<Player>> CreateProfile(string playerName, string password)
-        {
-            if (string.IsNullOrEmpty(playerName) || string.IsNullOrEmpty(password))
-                return BadRequest("Username and password are required.");
-
-            // Check if player already exists
-            var existingPlayer = await context.Players
-                .FirstOrDefaultAsync(p => p.Username == playerName);
-            if (existingPlayer != null)
-                return Conflict("Player with this username already exists.");
-
-            var player = new Player
-            {
-                Username = playerName,
-                Password = password,
-                GamesWon = 0,
-                GamesLost = 0,
-                GamesDrawn = 0,
-            };
-
-            context.Players.Add(player);
-            await context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetProfile), new { PlayerName = player.Username }, player);
         }
 
         [HttpGet("{PlayerName}")]
@@ -79,6 +53,9 @@ namespace MTG_Emulator.Backend.Controllers
 
             if (player == null)
                 return NotFound();
+            
+            if (!IsOwnerOrAdmin(player.ApiUserId)) 
+                return Forbid();
 
             context.Players.Remove(player);
             await context.SaveChangesAsync();
@@ -98,6 +75,9 @@ namespace MTG_Emulator.Backend.Controllers
 
             if (player == null)
                 return NotFound();
+            
+            if (!IsOwnerOrAdmin(player.ApiUserId)) 
+                return Forbid();
 
             switch (result)
             {
@@ -115,25 +95,6 @@ namespace MTG_Emulator.Backend.Controllers
             }
 
             await context.SaveChangesAsync();
-            return NoContent();
-        }
-
-        // Reset player password
-        [HttpPut("Profile/{PlayerName}")]
-        public async Task<ActionResult<Player>> ResetPlayerPassword(string playerName, string password)
-        {
-            if (string.IsNullOrWhiteSpace(password))
-                return BadRequest("Password cannot be empty.");
-
-            var player = await context.Players
-                .FirstOrDefaultAsync(p => p.Username == playerName);
-
-            if (player == null)
-                return NotFound();
-
-            player.Password = password;
-            await context.SaveChangesAsync();
-
             return NoContent();
         }
     }
