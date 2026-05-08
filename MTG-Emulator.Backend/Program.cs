@@ -142,13 +142,14 @@ namespace MTG_Emulator.Backend
                 }
 
                 await ScryfallImageDownloader.RunAsync(testMode: false);
-                await DbHelper.SeedDb(db);
 
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApiRole>>();
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApiUser>>();
                 
                 await RoleSeeder.SeedRolesAsync(roleManager);
                 await AdminSeeder.SeedAdminAsync(userManager);
+                
+                await DbHelper.SeedDb(db, userManager);
             }
 
             app.MapControllers();
