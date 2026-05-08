@@ -8,10 +8,42 @@ AddElementTag("backendContainer", $fontColor=$ELEMENT_FONT_COLOR, $bgColor="#335
 AddRelTag("async", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DashedLine())
 AddRelTag("sync/async", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DottedLine())
 
+Person(User, Player, "User of this program")
+
 Container_Boundary(C3, "Main Menu - C3") {
-  Component(Login, "Login Component")
-  Component(Deck, "Deck import component")
-  
+  Component(Main, "Main Page")
+  Component(Login, "Login")
+  Component(Reg, "Register")
+  Component(Battle, "Battle Game")
+  Component(Import, "Import Deck")
+  Component(Create, "Create Game")
+  Component(Join, "Join Game")
+  Component(APIman, "APIManager")
 }
 
+Container(MTGAPI, Magic API, "Container: ASP.NET Core", "Reads from and writes data to the database containing the different magic cards as JSON objects. Handles synchronization and hosting of games")
+
+'User interactions
+Rel_D(User,Login,"Logs in/out")
+Rel_D(User,Reg,"Registers user")
+
+'Unity interactions
+Rel_D(Main, Create, "Navigates to/from")
+Rel_D(Main, Join, "Navigates to/from")
+Rel_D(Login,Main, "Navigates to/from")
+Rel_D(Reg,Main, "Navigates to/from")
+Rel_D(Main, Import, "Navigates to/from")
+Rel_D(Create, Battle, "Navigates to/from")
+Rel_D(Join, Battle, "Navigates to/from")
+
+'Unity API interactions
+Rel_D(Create,APIman,"Creates game",HTTPS)
+Rel_D(Join,APIman,"Joins game",HTTPS)
+Rel_D(Login,APIman,"Logs in",HTTPS)
+Rel_D(Reg,APIman,"Registers user",HTTPS)
+Rel_D(Battle,APIman,"Sync game",HTTPS)
+Rel_D(Import,APIman,"Imports deck",HTTPS)
+
+'APIManager MTGAPI Interactions
+Rel_D(APIman,MTGAPI,"Uses", HTTPS)
 @enduml

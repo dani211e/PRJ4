@@ -1,5 +1,5 @@
 @startuml
-
+'Styling
 !NEW_C4_STYLE=1
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 SHOW_PERSON_OUTLINE()
@@ -7,13 +7,18 @@ AddElementTag("backendContainer", $fontColor=$ELEMENT_FONT_COLOR, $bgColor="#335
 AddRelTag("async", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DashedLine())
 AddRelTag("sync/async", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DottedLine())
 
-
+'User Person
 Person(User, Player, "User of this program")
+
+'MTG Emulator System
 System_Boundary(C1, "MTG Emulator - C1"){
 System(Emu, Magic Emulator, "The emulator",,,,"Software system")
 }
+
+'External actors
 System_Ext(Scry, Scryfall API, "Scryfalls api which card data is drawn from",,,,"Software system")
 
+'Interactions
 Rel_R(Emu,Scry, "Fetchs from", "HTTPS")
 Rel_U(User, Emu, "Uses")
 
