@@ -14,6 +14,9 @@ services:
       - ConnectionStrings__DefaultConnection=Server=mtg-sql;Database=MTGDB;User Id=sa;Password=${MTG_PASSWORD:?};TrustServerCertificate=True;
       - ConnectionStrings__MongoConnection=mongodb://mtg-mongo:27017/MTGLogs
       - SCRYFALL_DATA_PATH=/data/scryfall-data
+      - JWT__SigningKey=${JWT_SIGNING_KEY:?}
+      - JWT__Issuer=${JWT_ISSUER:?}
+      - JWT__Audience=${JWT_AUDIENCE:?}
     depends_on:
       mtg-sql:
         condition: service_healthy

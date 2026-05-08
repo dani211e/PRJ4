@@ -118,7 +118,7 @@ namespace MTG_Emulator.Backend
             app.UseSerilogRequestLogging();
             app.UseHttpLogging();
 
-            // Middleware order matters — auth must come before MapControllers
+            // Middleware order matters — auth must come before MapControllers and authentication must come before authorization
             app.UseAuthentication();
             app.UseAuthorization();
 
