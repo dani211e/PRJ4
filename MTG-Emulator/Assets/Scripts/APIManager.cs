@@ -30,6 +30,30 @@ public class DeckDto
     public string deckCommander;
     public List<CardDto> cards;
 }
+[Serializable]
+public class CreateGameDto
+{
+    public string gameCode;
+    public int maxPlayers;
+    public string hostName;       // pulled from GameSession.PlayerName
+}
+ 
+[Serializable]
+public class JoinGameDto
+{
+    public string gameCode;
+    public string playerName;     // pulled from GameSession.PlayerName
+}
+ 
+[Serializable]
+public class GameResponseDto
+{
+    public string gameCode;
+    public int maxPlayers;
+    public int currentPlayers;
+    public bool success;
+    public string message;
+}
 
 public class APIManager : MonoBehaviour
 {
@@ -137,4 +161,38 @@ public class APIManager : MonoBehaviour
             onSuccess?.Invoke(result);
         }
     }
+    public IEnumerator CreateGame(CreateGameDto dto, Action<GameResponseDto> onSuccess, Action<string> onError)
+    {
+        string json = JsonUtility.ToJson(dto);
+        UnityWebRequest request = new UnityWebRequest(baseUrl + "Game", "POST");
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+        request.uploadHandler   = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+            onError?.Invoke(request.downloadHandler.text);
+        else
+            onSuccess?.Invoke(JsonUtility.FromJson<GameResponseDto>(request.downloadHandler.text));
+    }
+
+    public IEnumerator JoinGame(JoinGameDto dto, Action<GameResponseDto> onSuccess, Action<string> onError)
+    {
+        string json = JsonUtility.ToJson(dto);
+        UnityWebRequest request = new UnityWebRequest(baseUrl + "Game/join", "POST");
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+        request.uploadHandler   = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+            onError?.Invoke(request.downloadHandler.text);
+        else
+            onSuccess?.Invoke(JsonUtility.FromJson<GameResponseDto>(request.downloadHandler.text));
+    }
+    
 }
