@@ -4,7 +4,7 @@ using MTG_Emulator.Backend.DB.Models;
 
 namespace MTG_Emulator.Backend.DB
 {
-    public class MTGContext : IdentityDbContext<ApiUser>
+    public class MTGContext : IdentityDbContext<ApiUser, ApiRole, string>
     {
         public MTGContext() { }
 

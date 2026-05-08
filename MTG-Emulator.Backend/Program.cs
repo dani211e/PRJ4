@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.HttpLogging;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
 using MTG_Emulator.Backend.DB;
+using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Backend.Scryfall;
 using Scalar.AspNetCore;
 using Serilog;
@@ -25,6 +29,9 @@ namespace MTG_Emulator.Backend
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddOpenApi();
 
+            if (builder.Environment.IsDevelopment())
+                builder.Configuration.AddUserSecrets<Program>();
+
             builder.Services.AddDbContext<MTGContext>(options =>
                 options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -35,6 +42,50 @@ namespace MTG_Emulator.Backend
                        .EnableSensitiveDataLogging()
                        .EnableDetailedErrors()
                        .LogTo(Log.Information, LogLevel.Warning));
+
+            builder.Services.AddIdentity<ApiUser, ApiRole>(options =>
+                {
+                    options.Password.RequireDigit = true;
+                    options.Password.RequireLowercase = true;
+                    options.Password.RequireUppercase = true;
+                    options.Password.RequireNonAlphanumeric = true;
+                    options.Password.RequiredLength = 8;
+                })
+                .AddEntityFrameworkStores<MTGContext>()
+                .AddDefaultTokenProviders();
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme =
+                    options.DefaultChallengeScheme =
+                        options.DefaultForbidScheme =
+                            options.DefaultScheme =
+                                options.DefaultSignInScheme =
+                                    options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = builder.Configuration["JWT:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = builder.Configuration["JWT:Audience"],
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        System.Text.Encoding.UTF8.GetBytes(
+                            builder.Configuration["JWT:SigningKey"]
+                            ?? throw new InvalidOperationException("JWT:SigningKey is not configured.")))
+                };
+            });
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy =>
+                    policy.RequireRole(Roles.Admin));
+
+                options.AddPolicy("PlayerOrAdmin", policy =>
+                    policy.RequireRole(Roles.Player, Roles.Admin));
+            });
 
             builder.Services.AddHttpLogging(logging =>
             {
@@ -67,6 +118,10 @@ namespace MTG_Emulator.Backend
             app.UseSerilogRequestLogging();
             app.UseHttpLogging();
 
+            // Middleware order matters — auth must come before MapControllers
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<MTGContext>();
@@ -75,6 +130,9 @@ namespace MTG_Emulator.Backend
 
                 await ScryfallImageDownloader.RunAsync(testMode: false);
                 await DbHelper.SeedDb(db);
+
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApiRole>>();
+                await RoleSeeder.SeedRolesAsync(roleManager);
             }
 
             app.MapControllers();
