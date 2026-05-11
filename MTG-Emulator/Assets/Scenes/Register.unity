@@ -339,6 +339,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1223806215}
     m_Modifications:
+    - target: {fileID: 333765824890521131, guid: a0f8ab6b5ef1f0246bc912245b3bae27, type: 3}
+      propertyPath: m_text
+      value: PASSWORD
+      objectReference: {fileID: 0}
     - target: {fileID: 3133522919950463024, guid: a0f8ab6b5ef1f0246bc912245b3bae27, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1024,6 +1028,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1223806215}
     m_Modifications:
+    - target: {fileID: 333765824890521131, guid: a0f8ab6b5ef1f0246bc912245b3bae27, type: 3}
+      propertyPath: m_text
+      value: EMAIL
+      objectReference: {fileID: 0}
     - target: {fileID: 3133522919950463024, guid: a0f8ab6b5ef1f0246bc912245b3bae27, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1383,7 +1391,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3133522919950463024, guid: a0f8ab6b5ef1f0246bc912245b3bae27, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 9
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3133522919950463024, guid: a0f8ab6b5ef1f0246bc912245b3bae27, type: 3}
       propertyPath: m_AnchoredPosition.y
