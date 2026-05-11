@@ -95,6 +95,11 @@ public class CreateGame : MonoBehaviour
         
     }
 
+    public void OnClickBack()
+    {
+        SceneManager.LoadScene("0");
+    }
+
     private void SetStatus(string status)
     {
         if (statusText != null)

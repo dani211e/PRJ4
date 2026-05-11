@@ -11,7 +11,7 @@ public static class GameSession
     public static void ResetGame()
     {
         GameCode   = string.Empty;
-        MaxPlayers = 4;
+        MaxPlayers = 5;
         IsHost     = false;
     }
 }

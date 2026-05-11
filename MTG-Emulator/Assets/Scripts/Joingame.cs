@@ -24,7 +24,7 @@ public class JoinGame : MonoBehaviour
     {
         codeInputField.onValueChanged.RemoveListener(OnCodeChanged);
         joinButton.onClick.RemoveListener(OnClickJoin);
-    }
+    }   
 
     private void OnCodeChanged(string value)
     {
@@ -39,7 +39,7 @@ public class JoinGame : MonoBehaviour
         SetStatus(upper.Length != 6 ? "Press Join!" : $"{upper.Length}/6 characters");
     }
 
-    private void OnClickJoin()
+    public void OnClickJoin()
     {
         string code = codeInputField.text.Trim().ToUpper();
 
@@ -80,6 +80,10 @@ public class JoinGame : MonoBehaviour
             Debug.LogError($"[JoinGame] {error}");
         } ));
 
+    }
+    public void OnClickBack()
+    {
+        SceneManager.LoadScene("0");
     }
     private void SetStatus(string msg)
     {
