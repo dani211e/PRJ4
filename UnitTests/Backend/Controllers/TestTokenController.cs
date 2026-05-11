@@ -40,7 +40,7 @@ namespace UnitTests.Backend.Controllers
         [TestCase("")]
         public async Task GetTokenByName_InvalidInput_ReturnNotFound(string? tokenName)
         {
-            var result = await uut.GetTokenByName(tokenName);
+            var result = await uut.GetTokenByName(tokenName!);
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
         }
 

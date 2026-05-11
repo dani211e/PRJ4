@@ -50,7 +50,7 @@ namespace UnitTests.Backend.Controllers
         [TestCase("")]
         public async Task GetCardByName_EmptyName_ReturnsBadrequest(string? cardName)
         {
-            var resultEmpty = await uut.GetCardByName(cardName);
+            var resultEmpty = await uut.GetCardByName(cardName!);
 
             Assert.That(resultEmpty.Result, Is.TypeOf<BadRequestResult>());
         }

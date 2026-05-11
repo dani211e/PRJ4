@@ -95,9 +95,9 @@ namespace UnitTests.Backend.Controllers
         {
             var dto = new CreateDeckDto
             {
-                DeckName = deckName,
-                PlayerName = playerName,
-                CardList = cardList
+                DeckName = deckName!,
+                PlayerName = playerName!,
+                CardList = cardList!
             };
 
             var result = await uut.CreateDeck(dto);
@@ -580,7 +580,7 @@ namespace UnitTests.Backend.Controllers
             var created = result.Result as CreatedAtActionResult;
             Assert.That(created?.Value, Is.TypeOf<DeckDto>());
 
-            return created.Value as DeckDto;
+            return (created.Value as DeckDto)!;
         }
     }
 }
