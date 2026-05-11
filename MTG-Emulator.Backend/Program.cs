@@ -47,7 +47,7 @@ namespace MTG_Emulator.Backend
 
             if (builder.Environment.IsDevelopment())
                 builder.Configuration.AddUserSecrets<Program>();
-            builder.Services.AddSignalR();
+            builder.Services.AddSignalR().AddNewtonsoftJsonProtocol();
 
             builder.Services.AddDbContext<MTGContext>(options =>
                 options.UseSqlServer(
