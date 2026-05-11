@@ -345,7 +345,7 @@ namespace UnitTests.Backend.Controllers
         [TestCase(" ")]
         public async Task DeleteDeckByName_InvalidDeckName_ReturnsBadRequest(string deckName)
         {
-            var result = await uut.DeleteDeckByName(deckName ?? string.Empty);
+            var result = await uut.DeleteDeckByName(deckName);
             Assert.That(result, Is.TypeOf<BadRequestResult>());
         }
 
@@ -355,7 +355,7 @@ namespace UnitTests.Backend.Controllers
         {
             var player = await insertPlayerAsync();
             var card1 = await insertCardAsync("Test Card1");
-            var card2 = await insertCardAsync("Test Card2");
+            _ = await insertCardAsync("Test Card2");
 
             var deck = new Deck
             {
