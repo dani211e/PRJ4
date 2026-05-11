@@ -81,7 +81,7 @@ public class ImportPopupUI : MonoBehaviour
         CreateDeckDto dto = new CreateDeckDto
         {
             DeckName = deckName,
-            PlayerName = "Kasper", // placeholder
+            PlayerName = GameSession.PlayerName, // placeholder
             CardList = importText,
             Commander = ""
         };
