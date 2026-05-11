@@ -30,11 +30,6 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<DeckDto>> CreateDeck([FromBody] CreateDeckDto deckDto)
         {
-            if (string.IsNullOrWhiteSpace(deckDto.DeckName))
-                return BadRequest("Invalid deck name");
-            if (string.IsNullOrWhiteSpace(deckDto.CardList))
-                return BadRequest("Invalid card data");
-
             // Resolve player from JWT instead of trusting the request body
             var callerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var player = await context.Players
@@ -87,6 +82,7 @@ namespace MTG_Emulator.Backend.Controllers
 
             var resultDto = new DeckDto
             {
+                DeckId = deck.DeckId,
                 DeckName = deck.DeckName,
                 DeckCommander = deck.DeckCommander,
                 Cards = deck.Cards.Select(c => new CardDto
@@ -98,21 +94,24 @@ namespace MTG_Emulator.Backend.Controllers
                 }).ToList(),
             };
 
-            return CreatedAtAction(nameof(GetDeckByName), new { deck.DeckName }, resultDto);
+            return CreatedAtAction(nameof(GetDeckById), new { deck.DeckName }, resultDto);
         }
 
-        [HttpGet("player/{playerId}")]
-        public async Task<ActionResult<List<DeckDto>>> GetAllDecksByPlayerId(int playerId)
+        [HttpGet("player/{username}")]
+        public async Task<ActionResult<List<DeckDto>>> GetAllDecksByUsername(string username)
         {
             var player = await context.Players
-                .FirstOrDefaultAsync(p => p.PlayerId == playerId);
+                .FirstOrDefaultAsync(p => p.Username == username);
 
             if (player == null)
-                return NotFound($"Player '{playerId}' not found.");
+                return NotFound($"Player '{username}' not found.");
+
+            if (!IsOwnerOrAdmin(player.ApiUserId))
+                return Forbid();
 
             var decks = await context.Decks
                 .Include(d => d.Cards)
-                .Where(d => d.Player.PlayerId == playerId)
+                .Where(d => d.Player.Username == username)
                 .ToListAsync();
 
             var deckDtos = decks.Select(deck => new DeckDto
@@ -131,18 +130,23 @@ namespace MTG_Emulator.Backend.Controllers
             return Ok(deckDtos);
         }
 
-        [HttpGet("{DeckName}")]
-        public async Task<ActionResult<DeckDto>> GetDeckByName(string deckName)
+        [HttpGet("{DeckId:int}")]
+        public async Task<ActionResult<DeckDto>> GetDeckById(int deckId)
         {
             var deck = await context.Decks
                 .Include(d => d.Cards)
-                .FirstOrDefaultAsync(d => d.DeckName == deckName);
+                .Include(d => d.Player)
+                .FirstOrDefaultAsync(d => d.DeckId == deckId);
 
             if (deck == null)
                 return NotFound();
 
+            if (!IsOwnerOrAdmin(deck.Player.ApiUserId))
+                return Forbid();
+
             var deckDto = new DeckDto
             {
+                DeckId = deck.DeckId,
                 DeckName = deck.DeckName,
                 DeckCommander = deck.DeckCommander,
                 Cards = deck.Cards
@@ -159,16 +163,13 @@ namespace MTG_Emulator.Backend.Controllers
             return Ok(deckDto);
         }
 
-        [HttpDelete("{DeckName}")]
-        public async Task<IActionResult> DeleteDeckByName(string deckName)
+        [HttpDelete("{DeckId:int}")]
+        public async Task<IActionResult> DeleteDeckByName(int deckid)
         {
-            if (string.IsNullOrWhiteSpace(deckName))
-                return BadRequest();
-
             var deck = await context.Decks
                 .Include(d => d.Player)
                 .Include(d => d.Cards)
-                .FirstOrDefaultAsync(d => d.DeckName == deckName);
+                .FirstOrDefaultAsync(d => d.DeckId == deckid);
 
             if (deck == null)
                 return NotFound();
@@ -182,16 +183,16 @@ namespace MTG_Emulator.Backend.Controllers
             return NoContent();
         }
 
-        [HttpPut("{DeckName}")]
-        public async Task<ActionResult<DeckDto>> UpdateDeck(string deckName, [FromBody] UpdateDeckDto? deckDto)
+        [HttpPut("{deckId:int}")]
+        public async Task<ActionResult<DeckDto>> UpdateDeck(int deckId, [FromBody] UpdateDeckDto? deckDto)
         {
-            if (string.IsNullOrWhiteSpace(deckName) || deckDto == null)
+            if (deckDto == null)
                 return BadRequest();
 
             var deck = await context.Decks
                 .Include(d => d.Player)
                 .Include(d => d.Cards)
-                .FirstOrDefaultAsync(d => d.DeckName == deckName);
+                .FirstOrDefaultAsync(d => d.DeckId == deckId);
 
             if (deck == null)
                 return NotFound();
