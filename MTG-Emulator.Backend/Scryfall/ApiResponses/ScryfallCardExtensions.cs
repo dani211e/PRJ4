@@ -38,7 +38,7 @@ namespace MTG_Emulator.Backend.Scryfall.ApiResponses
                             return new RelatedCard
                             {
                                 Name = r.Name,
-                                ImageUri = oracleId != Guid.Empty ? $"/cards/{oracleId}.jpg" : string.Empty
+                                ImageUri = $"/cards/{r.Id}.jpg",
                             };
                         })
                 );

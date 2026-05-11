@@ -5,7 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Unity.Db.DTO.CardDTO;
+using MTG_Emulator.Unity.Db.DTO.CardFace;
 using MTG_Emulator.Unity.Db.DTO.DeckDTO;
+using MTG_Emulator.Unity.Db.DTO.RelatedCardsDTO;
 
 namespace MTG_Emulator.Backend.Controllers
 {
@@ -68,6 +70,10 @@ namespace MTG_Emulator.Backend.Controllers
                     Error = "The following cards do not exist",
                     InvalidCards = invalidCardNames,
                 });
+            
+            var commanderInDeck = cards.Any(c => c.Name == deckDto.Commander);
+            if (!commanderInDeck)
+                return BadRequest($"Commander '{deckDto.Commander}' must be included in the card list.");
 
             var deck = new Deck
             {
@@ -94,7 +100,7 @@ namespace MTG_Emulator.Backend.Controllers
                 }).ToList(),
             };
 
-            return CreatedAtAction(nameof(GetDeckById), new { deck.DeckName }, resultDto);
+            return CreatedAtAction(nameof(GetDeckById), new { DeckId = deck.DeckId }, resultDto);
         }
 
         [HttpGet("player/{username}")]
@@ -114,17 +120,12 @@ namespace MTG_Emulator.Backend.Controllers
                 .Where(d => d.Player.Username == username)
                 .ToListAsync();
 
-            var deckDtos = decks.Select(deck => new DeckDto
+            var deckDtos = decks.Select(deck => new AllDecksDto
             {
+                DeckId = deck.DeckId,
                 DeckName = deck.DeckName,
                 DeckCommander = deck.DeckCommander,
-                Cards = deck.Cards.Select(c => new CardDto
-                {
-                    CardId = c.CardId,
-                    Name = c.Name,
-                    OracleText = c.OracleText,
-                    ImageUri = c.ImageUri,
-                }).ToList(),
+                DeckImageUri = deck.Cards.FirstOrDefault(c => c.Name == deck.DeckCommander)?.ImageUri ?? string.Empty
             }).ToList();
 
             return Ok(deckDtos);
@@ -135,6 +136,9 @@ namespace MTG_Emulator.Backend.Controllers
         {
             var deck = await context.Decks
                 .Include(d => d.Cards)
+                .ThenInclude(c => c.AltFace)
+                .Include(d => d.Cards)
+                .ThenInclude(c => c.RelatedCards)
                 .Include(d => d.Player)
                 .FirstOrDefaultAsync(d => d.DeckId == deckId);
 
@@ -153,9 +157,22 @@ namespace MTG_Emulator.Backend.Controllers
                     .Select(c => new CardDto
                     {
                         CardId = c.CardId,
+                        ScryfallId = c.ScryfallId,
                         Name = c.Name,
                         OracleText = c.OracleText,
                         ImageUri = c.ImageUri,
+                        AltFace = c.AltFace == null ? null : new CardFaceDto
+                        {
+                            Name = c.AltFace.Name,
+                            OracleText = c.AltFace.OracleText,
+                            ImageUri = c.AltFace.ImageUri,
+                        },
+                        RelatedCards = c.RelatedCards.Select(rc => new RelatedCardDto
+                        {
+                            RelatedCardId = rc.RelatedCardId,
+                            Name = rc.Name,
+                            ImageUri = rc.ImageUri,
+                        }).ToList()
                     })
                     .ToList(),
             };
@@ -233,6 +250,10 @@ namespace MTG_Emulator.Backend.Controllers
                     Error = "The following cards do not exist",
                     InvalidCards = invalidCardNames,
                 });
+            
+            var commanderInDeck = deck.Cards.Any(c => c.Name == deckDto.Commander);
+            if (!commanderInDeck)
+                return BadRequest($"Commander '{deckDto.Commander}' must be included in the card list.");
 
             await context.SaveChangesAsync();
             return NoContent();

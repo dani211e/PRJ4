@@ -85,7 +85,10 @@ namespace MTG_Emulator.Backend.Scryfall
 
             foreach (var card in cards)
             {
-                string cardId   = card.GetProperty("oracle_id").GetString()!;
+                string layout   = card.GetProperty("layout").GetString()!;
+                string cardId   = layout == "token"
+                    ? card.GetProperty("id").GetString()!
+                    : card.GetProperty("oracle_id").GetString()!;
                 string cardName = card.GetProperty("name").GetString()!;
 
                 if (card.TryGetProperty("image_uris", out var imageUris))
