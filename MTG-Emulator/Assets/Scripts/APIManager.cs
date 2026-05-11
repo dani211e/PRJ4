@@ -6,6 +6,7 @@ using System.Text.Json;
 using MTG_Emulator.Unity.Db.DTO.GameDTO;
 using UnityEngine;
 using UnityEngine.Networking;
+using Newtonsoft.Json;
 
 [Serializable]
 public class CreateDeckDto
@@ -116,9 +117,9 @@ public class APIManager : MonoBehaviour
 
 
 
-    public IEnumerator GetDeckByName(string deckname, Action<DeckDto> onSuccess, Action<string> onError)
+    public IEnumerator GetDecksByPlayerId(int playerId, Action<List<DeckDto>> onSuccess, Action<string> onError)
     {
-        string uri = baseUrl + "Deck/" + UnityWebRequest.EscapeURL(deckname);
+        string uri = baseUrl + "Deck/player/" + playerId;
         UnityWebRequest request = new UnityWebRequest(uri, "GET");
         request.downloadHandler = new DownloadHandlerBuffer();
         yield return request.SendWebRequest();
@@ -130,12 +131,15 @@ public class APIManager : MonoBehaviour
         {
             Debug.Log("RAW GET RESPONSE: " + request.downloadHandler.text);
 
-            DeckDto result = JsonUtility.FromJson<DeckDto>(request.downloadHandler.text);
+            List<DeckDto> result = JsonConvert.DeserializeObject<List<DeckDto>>(request.downloadHandler.text);
 
-            Debug.Log("Parsed deck name: " + result.deckName);
-            Debug.Log("Parsed commander: " + result.deckCommander);
-            Debug.Log("Parsed cards count: " + (result.cards == null ? -1 : result.cards.Count));
-
+            foreach (DeckDto item in result)
+            {
+                Debug.Log("Parsed deck name: " + item.deckName);
+                Debug.Log("Parsed commander: " + item.deckCommander);
+                Debug.Log("Parsed cards count: " + (item.cards == null ? -1 : item.cards.Count));
+            }
+            
             onSuccess?.Invoke(result);
         }
     }

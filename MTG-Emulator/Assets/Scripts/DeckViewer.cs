@@ -13,7 +13,7 @@ public class DeckViewer : MonoBehaviour
 
 
     [Header("Deck names to load")] [SerializeField]
-    private List<string> deckNames = new();
+    private List<int> decksPreGet = new();
 
     [Header("Deck UI")]
     [SerializeField] private Transform deckListParent;
@@ -42,19 +42,13 @@ public class DeckViewer : MonoBehaviour
 
     public void LoadDeckList()
     {
-        foreach (Transform child in deckListParent)
-        {
-            Destroy(child.gameObject);
-        }
-
-        foreach (string deckName in deckNames)
-        {
-            StartCoroutine(APIManager.Instance.GetDeckByName(
-                deckName,
-                deck => AddDeckButton(deck),
-                error => Debug.LogError("failed to load deck")
-            ));
-        }
+        StartCoroutine((APIManager.GetDeckByPlayerId(
+            playerId,
+            decks =>
+            {
+                Debug.Log("Loaded decks for player: " + decks.Count),
+                    
+            })))
     }
 
     public void AddDeckButton(DeckDto deck)
