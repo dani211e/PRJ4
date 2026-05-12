@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
-using NUnit.Framework;
 
 namespace UnitTests.Backend.Controllers
 {

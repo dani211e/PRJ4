@@ -4,6 +4,7 @@ using MTG_Emulator.Backend.DB.Models;
 
 namespace MTG_Emulator.Backend.DB
 {
+    // ReSharper disable once InconsistentNaming
     public class MTGContext : IdentityDbContext<ApiUser, ApiRole, string>
     {
         public MTGContext() { }

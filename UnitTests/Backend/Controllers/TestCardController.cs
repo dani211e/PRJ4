@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MTG_Emulator.Backend.Controllers;
@@ -113,9 +113,7 @@ namespace UnitTests.Backend.Controllers
         [TestCase("")]
         public async Task GetCardByName_EmptyName_ReturnsBadRequest(string? cardName)
         {
-            if (cardName != null)
-            {
-                var result = await uut.GetCardByName(cardName);
+            var resultEmpty = await uut.GetCardByName(cardName!);
 
                 Assert.That(result.Result, Is.TypeOf<BadRequestResult>());
             }
