@@ -11,7 +11,7 @@ namespace MTG_Emulator.Backend.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Policy = "PlayerOrAdmin")]
-    public class PlayerController : BaseController
+    public class PlayerController : MtgController
     {
         private readonly MTGContext context;
 

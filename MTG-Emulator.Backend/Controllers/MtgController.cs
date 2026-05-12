@@ -4,7 +4,7 @@ using MTG_Emulator.Backend.DB.Models;
 
 namespace MTG_Emulator.Backend.Controllers
 {
-    public class BaseController : ControllerBase
+    public class MtgController : ControllerBase
     {
         protected bool IsOwnerOrAdmin(string resourceApiUserId)
         {

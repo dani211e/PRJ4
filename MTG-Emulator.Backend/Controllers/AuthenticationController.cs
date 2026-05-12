@@ -14,7 +14,7 @@ namespace MTG_Emulator.Backend.Controllers
     
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthenticationController : BaseController
+    public class AuthenticationController : MtgController
     {
         private readonly IConfiguration configuration;
         private readonly UserManager<ApiUser> userManager;
