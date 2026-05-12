@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using MTG_Emulator.Unity.Db.DTO.CardDTO;
 
 namespace MTG_Emulator.Unity.Db.DTO.DeckDTO
 {
-    public class DeckDto
+    public class AllDecksDto
     {
         [Required]
         public int DeckId { get; set; }
@@ -12,6 +11,6 @@ namespace MTG_Emulator.Unity.Db.DTO.DeckDTO
         [Required]
         public string DeckCommander { get; set; } = string.Empty;
         [Required]
-        public List<CardDto> Cards { get; set; } = [];
-    }
+        public string DeckImageUri { get; set; } = string.Empty;
+    }   
 }

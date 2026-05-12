@@ -8,12 +8,13 @@ namespace MTG_Emulator.Backend.DB.Models
 
         [StringLength(256)]
         public string Username { get; set; } = string.Empty;
-
-        [StringLength(256)]
-        public string Password { get; set; } = string.Empty;
-
         public int GamesWon { get; set; }
         public int GamesLost { get; set; }
         public int GamesDrawn { get; set; }
+        
+        // Link to Identity user
+        [StringLength(64)]
+        public string ApiUserId { get; set; } = string.Empty;
+        public ApiUser ApiUser { get; set; } = null!;
     }
 }

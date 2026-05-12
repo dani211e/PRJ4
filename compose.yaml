@@ -14,6 +14,11 @@ services:
       - ConnectionStrings__DefaultConnection=Server=mtg-sql;Database=MTGDB;User Id=sa;Password=${MTG_PASSWORD:?};TrustServerCertificate=True;
       - ConnectionStrings__MongoConnection=mongodb://mtg-mongo:27017/MTGLogs
       - SCRYFALL_DATA_PATH=/data/scryfall-data
+      - JWT__SigningKey=${JWT_SIGNING_KEY:?}
+      - JWT__Issuer=${JWT_ISSUER:?}
+      - JWT__Audience=${JWT_AUDIENCE:?}
+      - SEED_ADMIN_EMAIL=${SEED_ADMIN_EMAIL:?}
+      - SEED_ADMIN_PASSWORD=${SEED_ADMIN_PASSWORD:?}
     depends_on:
       mtg-sql:
         condition: service_healthy
@@ -35,7 +40,8 @@ services:
     volumes:
       - sql_data:/var/opt/mssql
     healthcheck:
-      test: [ "CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${MTG_PASSWORD:?}", "-Q", "SELECT 1", "-No" ]
+      test: [ "CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${MTG_PASSWORD:?}", "-Q", 
+              "IF EXISTS (SELECT 1 FROM sys.databases WHERE name='MTGDB' AND state_desc='ONLINE') SELECT 1 ELSE SELECT 1","-No" ]
       interval: 10s
       timeout: 5s
       retries: 10

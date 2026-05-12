@@ -3,7 +3,7 @@ using MTG_Emulator.Backend.DB;
 
 namespace UnitTests.Backend.Controllers
 {
-    public class TestControllerBase
+    public abstract class TestControllerBase
     {
         protected MTGContext Context;
 
