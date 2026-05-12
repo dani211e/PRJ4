@@ -13,6 +13,7 @@ namespace MTG_Emulator.Backend.DB.Models
         public int GamesDrawn { get; set; }
         
         // Link to Identity user
+        [StringLength(64)]
         public string ApiUserId { get; set; } = string.Empty;
         public ApiUser ApiUser { get; set; } = null!;
     }

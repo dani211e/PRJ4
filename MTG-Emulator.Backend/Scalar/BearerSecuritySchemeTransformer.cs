@@ -24,9 +24,8 @@ internal sealed class BearerSecuritySchemeTransformer(
             Description = "Paste your JWT token here."
         };
 
-        foreach (var operation in document.Paths?.Values
-                                      .SelectMany(p => p.Operations?.Values ?? Enumerable.Empty<OpenApiOperation>())
-                                  ?? Enumerable.Empty<OpenApiOperation>())
+        foreach (var operation in document.Paths.Values
+                     .SelectMany(p => p.Operations?.Values ?? Enumerable.Empty<OpenApiOperation>()))
         {
             operation.Security ??= new List<OpenApiSecurityRequirement>();
 

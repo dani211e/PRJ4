@@ -202,7 +202,7 @@ namespace UnitTests.Backend.Controllers
             };
         }
 
-        private async Task<Player> insertPlayerAsync(
+        private async Task insertPlayerAsync(
             string username  = "Test player",
             string apiUserId = "test-api-user-id")
         {
@@ -216,7 +216,6 @@ namespace UnitTests.Backend.Controllers
             };
             Context.Players.Add(player);
             await Context.SaveChangesAsync();
-            return player;
         }
     }
 }
