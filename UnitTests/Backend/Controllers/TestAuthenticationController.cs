@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +7,6 @@ using Moq;
 using MTG_Emulator.Backend.Controllers;
 using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Unity.Db.DTO.AuthenticationDTO;
-using NUnit.Framework;
 
 namespace UnitTests.Backend.Controllers
 {

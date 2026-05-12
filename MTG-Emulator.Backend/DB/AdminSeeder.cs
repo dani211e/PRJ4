@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using MTG_Emulator.Backend.DB.Models;
 
-namespace MTG_Emulator.Backend
+namespace MTG_Emulator.Backend.DB
 {
     public static class AdminSeeder
     {
