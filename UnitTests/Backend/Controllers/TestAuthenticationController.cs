@@ -37,14 +37,14 @@ namespace UnitTests.Backend.Controllers
                 }!)
                 .Build();
 
-            uut = new AuthenticationController(configuration, userManagerMock.Object, Context);
-
-            // Default to unauthenticated so User is never null
-            uut.ControllerContext = new ControllerContext
+            uut = new AuthenticationController(configuration, userManagerMock.Object, Context)
             {
-                HttpContext = new DefaultHttpContext
+                ControllerContext = new ControllerContext
                 {
-                    User = new ClaimsPrincipal(new ClaimsIdentity())
+                    HttpContext = new DefaultHttpContext
+                    {
+                        User = new ClaimsPrincipal(new ClaimsIdentity())
+                    }
                 }
             };
         }
