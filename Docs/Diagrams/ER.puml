@@ -1,0 +1,111 @@
+﻿@startchen
+left to right direction
+
+'Entities
+entity IdentityRole{
+    Roles <<derived>>
+}
+
+entity APIRole{
+    
+}
+
+entity IdentityUser{
+    Username
+    Password
+}
+
+entity APIUser {
+
+}
+
+entity Player {
+    playerId <<key>>
+    GamesWon
+    GamesLost
+    GamesDrawn
+}
+
+entity Admin {
+}
+
+
+entity Deck <<weak>>{
+    DeckId <<key>>
+    DeckName
+    DeckCommander
+    Cards
+    Player
+}
+
+entity Cards{
+}
+
+entity RelatedCards{
+    RelatedCardId <<key>>
+    Name
+    ImageUri
+    Card
+}
+
+entity CardFace{
+    CardFaceId<<key>>
+    Name
+    OracleText
+    ImageUri
+    cardId
+    Card
+}
+
+entity Card{
+    cardId <<key>>
+    scryfallId
+    OracleText
+    ImageUri
+    RelatedCards
+    Decks
+    AltFace
+}
+
+'Relationships
+relationship Owned_By <<identifying>>{
+}
+
+relationship Consist_of {
+}
+
+relationship Manage{
+}
+
+relationship user_derives_from{
+}
+
+relationship roles_derives_from{
+}
+
+relationship get_roles_from{
+}
+
+'Links
+
+Cards =>= d {RelatedCards, CardFace, Card}
+APIUser =>= d {Player, Admin}
+
+Owned_By -1- Player
+Owned_By =n= Deck
+
+Consist_of -1- Deck
+Consist_of =n= Cards
+
+Manage -1- Admin
+Manage -n- Deck
+
+user_derives_from -1- APIUser
+user_derives_from -1- IdentityUser
+
+IdentityRole -1- roles_derives_from
+roles_derives_from -1- APIRole
+
+get_roles_from -1- APIRole
+APIUser -1- get_roles_from
+@endchen
