@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System.Text;
+using DotNetEnv;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
@@ -17,7 +20,7 @@ namespace MTG_Emulator.Backend
     {
         public static async Task Main(string[] args)
         {
-            DotNetEnv.Env.Load();
+            Env.Load();
             var builder = WebApplication.CreateBuilder(args);
 
             Log.Logger = new LoggerConfiguration()
@@ -77,7 +80,7 @@ namespace MTG_Emulator.Backend
                     ValidAudience = builder.Configuration["JWT:Audience"],
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        System.Text.Encoding.UTF8.GetBytes(
+                        Encoding.UTF8.GetBytes(
                             builder.Configuration["JWT:SigningKey"]
                             ?? throw new InvalidOperationException("JWT:SigningKey is not configured.")))
                 };
@@ -133,9 +136,11 @@ namespace MTG_Emulator.Backend
 
                 try
                 {
+                    // For some (currently undecipherable) reason migration attempts fail
+                    // on composing up, but retrying succeeds ???
                     await db.Database.MigrateAsync();
                 }
-                catch (Microsoft.Data.SqlClient.SqlException ex) when (ex.Number == 1801)
+                catch (SqlException ex) when (ex.Number == 1801)
                 {
                     Log.Warning("Database already exists, skipping creation — applying pending migrations.");
                     await db.Database.MigrateAsync();
