@@ -1,9 +1,7 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using MTG_Emulator.Backend.Controllers;
 using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Unity.Db.DTO.RelatedCardsDTO;
-using NUnit.Framework;
 
 namespace UnitTests.Backend.Controllers
 {
@@ -40,7 +38,7 @@ namespace UnitTests.Backend.Controllers
         [TestCase("")]
         public async Task GetTokenByName_InvalidInput_ReturnNotFound(string? tokenName)
         {
-            var result = await uut.GetTokenByName(tokenName);
+            var result = await uut.GetTokenByName(tokenName!);
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
         }
 
