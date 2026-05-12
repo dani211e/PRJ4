@@ -1,4 +1,3 @@
-
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,33 +8,33 @@ using UnityEngine.Networking;
 public class Card : MonoBehaviour
 {
     [Header("Visible UI")]
-    [SerializeField] private TMP_Text cardName;
     [SerializeField] private Image cardImage;
+    private TMP_Text cardName;
+
 
     private CardDto cardData;
     private Button button;
 
-    public void Setup(CardDto card, Action<CardDto> onClick)
+    public void Setup(CardDto card, Action<CardDto> onClick = null)
     {
         cardData = card;
 
         if (cardName != null)
-        {
             cardName.text = card.name;
-        }
 
         button = GetComponent<Button>();
         if (button == null)
-        {
             button = gameObject.AddComponent<Button>();
-        }
 
         button.onClick.RemoveAllListeners();
-        button.onClick.AddListener(() => onClick?.Invoke(cardData));
+
+        if (onClick != null)
+            button.onClick.AddListener(() => onClick(cardData));
 
         if (!string.IsNullOrEmpty(card.imageUri))
         {
-            StartCoroutine(LoadCardImage(card.imageUri));
+            string fullImageUrl = "http://localhost:5042" + card.imageUri;
+            StartCoroutine(LoadCardImage(fullImageUrl));
         }
     }
 
@@ -49,8 +48,11 @@ public class Card : MonoBehaviour
         else
         {
             Texture2D tex = DownloadHandlerTexture.GetContent(request);
-            cardImage.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            cardImage.sprite = Sprite.Create(
+                tex,
+                new Rect(0, 0, tex.width, tex.height),
+                new Vector2(0.5f, 0.5f)
+            );
         }
     }
 }
-

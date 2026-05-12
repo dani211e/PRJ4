@@ -1,51 +1,50 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-public class Drag :  MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+
+public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    Transform parentToReturnTo = null;
-    CanvasGroup canvasGroup;
+    private Transform parentToReturnTo;
+    private Transform dragParent;
+    private CanvasGroup canvasGroup;
+    private RectTransform rectTransform;
+    private Canvas canvas;
+
+    public bool WasDropped { get; set; }
 
     void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();
-        if(canvasGroup == null) canvasGroup = gameObject.AddComponent<CanvasGroup>();
+        if (canvasGroup == null)
+            canvasGroup = gameObject.AddComponent<CanvasGroup>();
+
+        rectTransform = GetComponent<RectTransform>();
+        canvas = GetComponentInParent<Canvas>();
     }
-    
+
     public void OnBeginDrag(PointerEventData eventData)
     {
         parentToReturnTo = transform.parent;
-        transform.SetParent(transform.parent.parent);
+        dragParent = canvas.transform;
+
+        transform.SetParent(dragParent, true);
+        transform.SetAsLastSibling();
+
         canvasGroup.blocksRaycasts = false;
+        WasDropped = false;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        transform.position = eventData.position;
+        rectTransform.position = eventData.position;
     }
 
     public void OnEndDrag(PointerEventData eventData)
-    { 
+    {
         canvasGroup.blocksRaycasts = true;
-        if (transform.parent == parentToReturnTo.parent)
-        {
-            transform.SetParent(parentToReturnTo);
-        }
-    }
-    
-    
-    
-    
-    
-    
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if (!WasDropped)
+        {
+            transform.SetParent(parentToReturnTo, true);
+        }
     }
 }

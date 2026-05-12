@@ -1,8 +1,14 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class Deck : MonoBehaviour
 {
+    [SerializeField] private TMP_Text countText;
+    [SerializeField] private Transform handParent;
+    [SerializeField] private GameObject cardPrefab;
+    
+
     private DeckDto currentDeck;
     private List<CardDto> drawPile = new();
 
@@ -20,6 +26,8 @@ public class Deck : MonoBehaviour
         if (deck.cards != null)
             drawPile.AddRange(deck.cards);
 
+        UpdateCountText();
+
         Debug.Log("Loaded gameplay deck: " + currentDeck.deckName);
         Debug.Log("Cards loaded: " + drawPile.Count);
 
@@ -28,7 +36,34 @@ public class Deck : MonoBehaviour
 
     private void ResetGameplayStateForNewDeck()
     {
+    }
 
+    public void DrawCard()
+    {
+        CardDto card = DrawTopCard();
+
+        if (card == null)
+            return;
+
+        if (handParent == null)
+        {
+            Debug.LogError("Hand parent is not assigned.");
+            return;
+        }
+
+        if (cardPrefab == null)
+        {
+            Debug.LogError("Card prefab is not assigned.");
+            return;
+        }
+
+        GameObject cardObj = Instantiate(cardPrefab, handParent);
+
+        Card cardScript = cardObj.GetComponent<Card>();
+        if (cardScript != null)
+            cardScript.Setup(card);
+        else
+            Debug.LogError("Card prefab does not have a Card script.");
     }
 
     public CardDto DrawTopCard()
@@ -41,16 +76,18 @@ public class Deck : MonoBehaviour
 
         CardDto card = drawPile[0];
         drawPile.RemoveAt(0);
+        UpdateCountText();
         return card;
-    }
-
-    public DeckDto GetCurrentDeck()
-    {
-        return currentDeck;
     }
 
     public int GetRemainingCardCount()
     {
         return drawPile.Count;
+    }
+
+    private void UpdateCountText()
+    {
+        if (countText != null)
+            countText.text = drawPile.Count.ToString();
     }
 }
