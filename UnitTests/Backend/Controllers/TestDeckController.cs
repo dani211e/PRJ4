@@ -1,12 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.Controllers;
 using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Unity.Db.DTO.DeckDTO;
-using NUnit.Framework;
 
 namespace UnitTests.Backend.Controllers
 {
@@ -95,9 +91,9 @@ namespace UnitTests.Backend.Controllers
         {
             var dto = new CreateDeckDto
             {
-                DeckName = deckName,
-                PlayerName = playerName,
-                CardList = cardList
+                DeckName = deckName!,
+                PlayerName = playerName!,
+                CardList = cardList!
             };
 
             var result = await uut.CreateDeck(dto);
@@ -349,7 +345,7 @@ namespace UnitTests.Backend.Controllers
         [TestCase(" ")]
         public async Task DeleteDeckByName_InvalidDeckName_ReturnsBadRequest(string deckName)
         {
-            var result = await uut.DeleteDeckByName(deckName ?? string.Empty);
+            var result = await uut.DeleteDeckByName(deckName);
             Assert.That(result, Is.TypeOf<BadRequestResult>());
         }
 
@@ -359,7 +355,7 @@ namespace UnitTests.Backend.Controllers
         {
             var player = await insertPlayerAsync();
             var card1 = await insertCardAsync("Test Card1");
-            var card2 = await insertCardAsync("Test Card2");
+            _ = await insertCardAsync("Test Card2");
 
             var deck = new Deck
             {
@@ -580,7 +576,7 @@ namespace UnitTests.Backend.Controllers
             var created = result.Result as CreatedAtActionResult;
             Assert.That(created?.Value, Is.TypeOf<DeckDto>());
 
-            return created.Value as DeckDto;
+            return (created.Value as DeckDto)!;
         }
     }
 }

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using MTG_Emulator.Backend.Controllers;
 using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Unity.Db.DTO.PlayerDTO;
-using NUnit.Framework;
 
 namespace UnitTests.Backend.Controllers
 {
@@ -49,7 +46,7 @@ namespace UnitTests.Backend.Controllers
         [TestCase("testPlayer", "")]
         public async Task CreateProfile_InvalidInput_ReturnBadRequest(string? playerName, string? password)
         {
-            var result = await uut.CreateProfile(playerName, password);
+            var result = await uut.CreateProfile(playerName!, password!);
             Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
         }
 
@@ -82,7 +79,7 @@ namespace UnitTests.Backend.Controllers
         [TestCase("")]
         public async Task GetProfile_InvalidInput_ReturnBadRequest(string? playerName)
         {
-            var result = await uut.GetProfile(playerName);
+            var result = await uut.GetProfile(playerName!);
             Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
         }
 
@@ -110,7 +107,7 @@ namespace UnitTests.Backend.Controllers
         [TestCase("")]
         public async Task DeleteProfile_InvalidInput_ReturnBadRequest(string? playerName)
         {
-            var result = await uut.DeleteProfile(playerName);
+            var result = await uut.DeleteProfile(playerName!);
             Assert.That(result, Is.TypeOf<BadRequestResult>());
         }
 
