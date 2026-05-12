@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace UnitTests.Backend.Controllers
 {
-    public class TestControllerBase
+    public abstract class TestControllerBase
     {
         protected MTGContext Context;
 
