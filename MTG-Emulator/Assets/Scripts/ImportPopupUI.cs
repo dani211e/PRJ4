@@ -83,7 +83,7 @@ public class ImportPopupUI : MonoBehaviour
             DeckName = deckName,
             PlayerName = GameSession.PlayerName, // placeholder
             CardList = importText,
-            Commander = ""
+            Commander = "none"
         };
 
         if (APIManager.Instance == null)

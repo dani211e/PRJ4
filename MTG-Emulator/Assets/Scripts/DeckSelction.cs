@@ -9,15 +9,14 @@ public class DeckSelectPopup : MonoBehaviour
     [SerializeField] private GameObject deckSelectionPopup;
     [SerializeField] private Transform deckListParent;
     [SerializeField] private GameObject deckButtonPrefab;
-    [SerializeField] private List<string> deckNames = new();
     [SerializeField] private Deck gameplayDeck;
+    private int CurrecntPlayerId = 1;
+
 
     public void OpenSettingsPopup()
     {
         if (settingsPopup != null)
             settingsPopup.SetActive(true);
-
-        LoadDeckList();
     }
 
     public void OpenDeckSelectionPopup()
@@ -38,19 +37,27 @@ public class DeckSelectPopup : MonoBehaviour
 
     }
 
-    private void LoadDeckList()
+    public void LoadDeckList()
     {
         foreach (Transform child in deckListParent)
-            Destroy(child.gameObject);
-
-        foreach (string deckName in deckNames)
         {
-            StartCoroutine(APIManager.Instance.GetDeckByName(
-                deckName,
-                deck => AddDeckButton(deck),
-                error => Debug.LogError("Failed to load deck '" + deckName + "': " + error)
-            ));
+            Destroy(child.gameObject);
         }
+
+        StartCoroutine(APIManager.Instance.GetDecksByPlayerId(
+            CurrecntPlayerId,
+            result =>
+            {
+                foreach (DeckDto item in result)
+                {
+                    AddDeckButton(item);
+                }
+            },
+            error =>
+            {
+                Debug.LogError("Failed to load decks " + error);
+            }
+        ));
     }
 
     private void AddDeckButton(DeckDto deck)

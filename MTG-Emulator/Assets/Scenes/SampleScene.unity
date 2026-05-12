@@ -817,7 +817,6 @@ GameObject:
   - component: {fileID: 760591802}
   - component: {fileID: 760591804}
   - component: {fileID: 760591803}
-  - component: {fileID: 760591806}
   - component: {fileID: 760591807}
   m_Layer: 5
   m_Name: Hand
@@ -883,18 +882,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 760591801}
   m_CullTransparentMesh: 1
---- !u!114 &760591806
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 760591801}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8dee5b947851872479cc0f0aca27c28f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Drop
 --- !u!114 &760591807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1276,6 +1263,7 @@ GameObject:
   - component: {fileID: 969547933}
   - component: {fileID: 969547932}
   - component: {fileID: 969547931}
+  - component: {fileID: 969547935}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1372,6 +1360,23 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &969547935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 969547930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a5f0a6ad0fa4df39db9abd37a22a4a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DeckSelectPopup
+  settingsPopup: {fileID: 1550604061}
+  deckSelectionPopup: {fileID: 930912348}
+  deckListParent: {fileID: 1778715168}
+  deckButtonPrefab: {fileID: 2265996149204443538, guid: 5bc34fbd10730d44eb50b295a2a8f4be, type: 3}
+  gameplayDeck: {fileID: 0}
 --- !u!1 &979480355
 GameObject:
   m_ObjectHideFlags: 0
@@ -1592,8 +1597,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ImportPopupUI, Assembly-CSharp
+      - m_Target: {fileID: 969547935}
+        m_TargetAssemblyTypeName: DeckSelectPopup, Assembly-CSharp
         m_MethodName: ClosePopup
         m_Mode: 1
         m_Arguments:
@@ -1642,6 +1647,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1003078716}
   m_CullTransparentMesh: 1
+--- !u!1 &1321983737
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1321983739}
+  - component: {fileID: 1321983738}
+  m_Layer: 0
+  m_Name: APIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1321983738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1321983737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0604194fe5574f98bb19102567feb980, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::APIManager
+--- !u!4 &1321983739
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1321983737}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 623.43317, y: 411.14026, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1341810067
 GameObject:
   m_ObjectHideFlags: 0
@@ -1814,7 +1863,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1384386594}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 969547935}
+        m_TargetAssemblyTypeName: DeckSelectPopup, Assembly-CSharp
+        m_MethodName: OpenDeckSelectionPopup
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1384386594
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2324,7 +2385,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1550604062
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2580,7 +2641,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1582116214}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 969547935}
+        m_TargetAssemblyTypeName: DeckSelectPopup, Assembly-CSharp
+        m_MethodName: OpenSettingsPopup
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1582116214
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2631,8 +2704,6 @@ GameObject:
   - component: {fileID: 1677671489}
   - component: {fileID: 1677671488}
   - component: {fileID: 1677671490}
-  - component: {fileID: 1677671491}
-  - component: {fileID: 1677671492}
   - component: {fileID: 1677671493}
   m_Layer: 5
   m_Name: Deckzone
@@ -2724,30 +2795,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &1677671491
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1677671486}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8dee5b947851872479cc0f0aca27c28f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Drop
---- !u!114 &1677671492
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1677671486}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59edb89dacad1e1418f6fbe7d8d077a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Deck
 --- !u!114 &1677671493
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2792,7 +2839,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1677671492}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Deck, Assembly-CSharp
         m_MethodName: DrawToHand
         m_Mode: 1
@@ -3418,4 +3465,5 @@ SceneRoots:
   m_Roots:
   - {fileID: 519420032}
   - {fileID: 37296721}
+  - {fileID: 1321983739}
   - {fileID: 969547934}
