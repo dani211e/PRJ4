@@ -7,7 +7,9 @@ namespace MTG_Emulator.Backend.DB
     {
         public static async Task SeedRolesAsync(RoleManager<ApiRole> roleManager)
         {
-            foreach (var role in new[] { Roles.Admin, Roles.Player })
+            var roles = typeof(Roles).GetFields().Select(f => f.Name).ToArray();
+
+            foreach (var role in roles)
             {
                 if (!await roleManager.RoleExistsAsync(role))
                 {
