@@ -25,7 +25,7 @@ namespace UnitTests.Backend.Controllers
 
             userManagerMock = new Mock<UserManager<ApiUser>>(
                 Mock.Of<IUserStore<ApiUser>>(),
-                null, null, null, null, null, null, null, null
+                null!, null!, null!, null!, null!, null!, null!, null!
             );
 
             var configuration = new ConfigurationBuilder()

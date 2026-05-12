@@ -100,7 +100,7 @@ namespace MTG_Emulator.Backend.Controllers
                 }).ToList(),
             };
 
-            return CreatedAtAction(nameof(GetDeckById), new { DeckId = deck.DeckId }, resultDto);
+            return CreatedAtAction(nameof(GetDeckById), new {deck.DeckId }, resultDto);
         }
 
         [HttpGet("player/{username}")]
