@@ -115,8 +115,7 @@ namespace UnitTests.Backend.Controllers
         {
             var resultEmpty = await uut.GetCardByName(cardName!);
 
-                Assert.That(result.Result, Is.TypeOf<BadRequestResult>());
-            }
+            Assert.That(resultEmpty.Result, Is.TypeOf<BadRequestResult>());
         }
         
 
