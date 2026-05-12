@@ -37,9 +37,6 @@ namespace MTG_Emulator.Backend
                 throw new FileNotFoundException(
                     $"Bulk card data not found at: {bulkDataPath}. Ensure the downloader has run first.");
 
-            var idToOracleId = await readScryfallCardsAsync(bulkDataPath)
-                .ToDictionaryAsync(c => c.Id, c => c.OracleId);
-
             var cardsEnum = readScryfallCardsAsync(bulkDataPath)
                 .Where(c => !excludedLayouts.Contains(c.Layout));
 
@@ -47,7 +44,7 @@ namespace MTG_Emulator.Backend
                 cardsEnum = cardsEnum.Take(count.Value);
 
             var cards = await cardsEnum
-                .Select(c => c.ToCard(idToOracleId))
+                .Select(c => c.ToCard())
                 .ToListAsync();
 
             var existingUser = await userManager.FindByEmailAsync("kasper@test.com");
