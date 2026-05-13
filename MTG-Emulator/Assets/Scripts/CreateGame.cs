@@ -8,11 +8,20 @@ using UnityEngine.SceneManagement;
 public class CreateGame : MonoBehaviour
 {
     [Header("UI References")]
-    [SerializeField] private TMP_Text  gameCodeText;
-    [SerializeField] private Slider    maxPlayersSlider;
-    [SerializeField] private TMP_Text  maxPlayersLabel;
-    [SerializeField] private Button    createButton;
-    [SerializeField] private TMP_Text  statusText;
+    [SerializeField]
+    private TMP_Text gameCodeText;
+
+    [SerializeField]
+    private Slider maxPlayersSlider;
+
+    [SerializeField]
+    private TMP_Text maxPlayersLabel;
+
+    [SerializeField]
+    private Button createButton;
+
+    [SerializeField]
+    private TMP_Text statusText;
 
     private string generatedCode;
 
@@ -53,9 +62,9 @@ public class CreateGame : MonoBehaviour
         if (APIManager.Instance == null)
         {
             Debug.LogError("APIManager not found");
-            return; 
+            return;
         }
-        
+
         createButton.interactable = false;
         statusText.text = "Creating Game...";
 
@@ -66,22 +75,20 @@ public class CreateGame : MonoBehaviour
         };
 
         StartCoroutine(APIManager.Instance.CreateGame(dto, onSuccess: response =>
-        {
-            GameSession.GameCode = response.gameCode;
-            GameSession.MaxPlayers = response.maxPlayers;
-            GameSession.IsHost = true;
+            {
+                GameSession.GameCode = response.gameCode;
+                GameSession.MaxPlayers = response.maxPlayers;
+                GameSession.IsHost = true;
 
-            SetStatus($"Game Created! Code:{response.gameCode}");
-            Debug.Log($"[CreateGame] Room {response.gameCode} ready for {response.maxPlayers} players.");
-            
-        },
+                setStatus($"Game Created! Code:{response.gameCode}");
+                Debug.Log($"[CreateGame] Room {response.gameCode} ready for {response.maxPlayers} players.");
+            },
             onError: error =>
             {
                 createButton.interactable = true;
                 setStatus($"Error: {error}");
                 Debug.LogError($"[CreateGame] Error: {error}");
             }));
-        
     }
 
     public void OnClickBack()
@@ -95,4 +102,3 @@ public class CreateGame : MonoBehaviour
             statusText.text = status;
     }
 }
-
