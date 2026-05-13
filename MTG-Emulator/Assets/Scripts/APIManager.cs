@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using MTG_Emulator.Unity.Db.DTO.GameDTO;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -140,7 +141,7 @@ public class APIManager : MonoBehaviour
     }
     public IEnumerator CreateGame(CreateGameDto dto, Action<GameResponseDto> onSuccess, Action<string> onError)
     {
-        string json = JsonUtility.ToJson(dto);
+        string json = JsonSerializer.Serialize(dto);
         UnityWebRequest request = new UnityWebRequest(baseUrl + "Game", "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
         request.uploadHandler   = new UploadHandlerRaw(bodyRaw);
@@ -157,7 +158,7 @@ public class APIManager : MonoBehaviour
 
     public IEnumerator JoinGame(JoinGameDto dto, Action<GameResponseDto> onSuccess, Action<string> onError)
     {
-        string json = JsonUtility.ToJson(dto);
+        string json = JsonSerializer.Serialize(dto);
         UnityWebRequest request = new UnityWebRequest(baseUrl + "Game/join", "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
         request.uploadHandler   = new UploadHandlerRaw(bodyRaw);
