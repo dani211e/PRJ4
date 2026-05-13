@@ -39,9 +39,9 @@ public class CreateGame : MonoBehaviour
 
     public void RefreshCode()
     {
-        generatedCode = GenerateCode(6);
         gameCodeText.text = generatedCode;
     }
+
 
     private void UpdateSliderLabel(float value)
     {
