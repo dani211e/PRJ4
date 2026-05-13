@@ -12,8 +12,8 @@ namespace MTG_Emulator.Backend.DB.Models
         public int GamesLost { get; set; }
         public int GamesDrawn { get; set; }
         
-        // Link to Identity user
-        [StringLength(64)]
+        // Link to Identity user (It needs to be 450 since the foreign key is a nvarchar(450)
+        [StringLength(450)]
         public string ApiUserId { get; set; } = string.Empty;
         public ApiUser ApiUser { get; set; } = null!;
     }
