@@ -1,7 +1,9 @@
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.Models;
+using MTG_Emulator.Unity.Db.DTO.GameDTO;
 
 namespace MTG_Emulator.Backend.Controllers
 {
@@ -10,6 +12,7 @@ namespace MTG_Emulator.Backend.Controllers
     public class GameController : ControllerBase
     {
         private readonly MTGContext context;
+        private readonly HashSet<string> gameCodes = new HashSet<string>();
 
         public GameController(MTGContext context)
         {
@@ -21,23 +24,21 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<GameResponseDto>> CreateGame([FromBody] CreateGameDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.GameCode) || dto.MaxPlayers < 2 || dto.MaxPlayers > 4)
-                return BadRequest(new GameResponseDto { success = false, message = "Invalid game settings." });
+            string code = generateCode();
+            while (gameCodes.Contains(code))
+            {
+                code = generateCode();
+            }
 
-            // Reject duplicate codes (extremely unlikely but safe)
-            bool codeExists = await context.Games
-                .AnyAsync(g => g.GameCode == dto.GameCode && g.Status == "Waiting");
-
-            if (codeExists)
-                return Conflict(new GameResponseDto { success = false, message = "Game code already in use." });
+            gameCodes.Add(code);
 
             var game = new Game
             {
-                GameCode       = dto.GameCode,
-                MaxPlayers     = dto.MaxPlayers,
+                GameCode = code,
+                MaxPlayers = dto.MaxPlayers,
                 CurrentPlayers = 1,
-                HostName       = dto.HostName,
-                Status         = "Waiting"
+                HostName = dto.HostName,
+                Status = "Waiting"
             };
 
             context.Games.Add(game);
@@ -45,11 +46,11 @@ namespace MTG_Emulator.Backend.Controllers
 
             return Ok(new GameResponseDto
             {
-                success        = true,
-                gameCode       = game.GameCode,
-                maxPlayers     = game.MaxPlayers,
+                success = true,
+                gameCode = code,
+                maxPlayers = game.MaxPlayers,
                 currentPlayers = game.CurrentPlayers,
-                message        = "Game created."
+                message = "Game created."
             });
         }
 
@@ -58,14 +59,12 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpPost("join")]
         public async Task<ActionResult<GameResponseDto>> JoinGame([FromBody] JoinGameDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.GameCode))
-                return BadRequest(new GameResponseDto { success = false, message = "Game code is required." });
-
             var game = await context.Games
-                .FirstOrDefaultAsync(g => g.GameCode == dto.GameCode && g.Status == "Waiting");
+                .FirstAsync(g => g.GameCode == dto.GameCode && g.Status == "Waiting");
 
             if (game == null)
-                return NotFound(new GameResponseDto { success = false, message = "Game not found or already started." });
+                return NotFound(new GameResponseDto
+                    { success = false, message = "Game not found or already started." });
 
             if (game.CurrentPlayers >= game.MaxPlayers)
                 return Conflict(new GameResponseDto { success = false, message = "Game is full." });
@@ -79,15 +78,15 @@ namespace MTG_Emulator.Backend.Controllers
 
             return Ok(new GameResponseDto
             {
-                success        = true,
-                gameCode       = game.GameCode,
-                maxPlayers     = game.MaxPlayers,
+                success = true,
+                gameCode = game.GameCode,
+                maxPlayers = game.MaxPlayers,
                 currentPlayers = game.CurrentPlayers,
-                message        = "Joined successfully."
+                message = "Joined successfully."
             });
         }
 
-        // GET api/Game/{code}  — useful for polling lobby state
+        // GET api/Game/{code}
         [HttpGet("{code}")]
         public async Task<ActionResult<GameResponseDto>> GetGame(string code)
         {
@@ -99,36 +98,35 @@ namespace MTG_Emulator.Backend.Controllers
 
             return Ok(new GameResponseDto
             {
-                success        = true,
-                gameCode       = game.GameCode,
-                maxPlayers     = game.MaxPlayers,
+                success = true,
+                gameCode = game.GameCode,
+                maxPlayers = game.MaxPlayers,
                 currentPlayers = game.CurrentPlayers,
-                message        = game.Status
+                message = game.Status
             });
         }
-    }
-    
-    // DTOs (backend side)
 
-    public class CreateGameDto
-    {
-        public string GameCode   { get; set; } = string.Empty;
-        public int    MaxPlayers { get; set; }
-        public string HostName   { get; set; } = string.Empty;
-    }
+        [HttpDelete("{code}")]
+        public async Task<ActionResult<GameResponseDto>> DeleteGame(string code)
+        {
+            var game = await context.Games
+                .FirstAsync(g => g.GameCode == code);
 
-    public class JoinGameDto
-    {
-        public string GameCode   { get; set; } = string.Empty;
-        public string PlayerName { get; set; } = string.Empty;
-    }
+            context.Games.Remove(game);
+            await context.SaveChangesAsync();
 
-    public class GameResponseDto
-    {
-        public bool   success        { get; set; }
-        public string gameCode       { get; set; } = string.Empty;
-        public int    maxPlayers     { get; set; }
-        public int    currentPlayers { get; set; }
-        public string message        { get; set; } = string.Empty;
+            return NoContent();
+        }
+
+        private static string generateCode()
+        {
+            const int maxlength = 6;
+            const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            var sb = new StringBuilder(maxlength);
+            var rng = new Random(Guid.NewGuid().GetHashCode());
+            for (int i = 0; i < maxlength; i++)
+                sb.Append(chars[rng.Next(chars.Length)]);
+            return sb.ToString();
+        }
     }
 }
