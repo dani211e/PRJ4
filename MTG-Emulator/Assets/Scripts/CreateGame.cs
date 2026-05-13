@@ -22,28 +22,28 @@ public class CreateGame : MonoBehaviour
         maxPlayersSlider.maxValue = 5;
         maxPlayersSlider.wholeNumbers = true;
         maxPlayersSlider.value = 4;
-        UpdateSliderLabel(4);
+        updateSliderLabel(4);
 
-        maxPlayersSlider.onValueChanged.AddListener(UpdateSliderLabel);
+        maxPlayersSlider.onValueChanged.AddListener(updateSliderLabel);
         createButton.onClick.AddListener(OnClickCreate);
 
-        RefreshCode();
-        SetStatus("");
+        refreshCode();
+        setStatus("");
     }
 
     private void OnDestroy()
     {
-        maxPlayersSlider.onValueChanged.RemoveListener(UpdateSliderLabel);
+        maxPlayersSlider.onValueChanged.RemoveListener(updateSliderLabel);
         createButton.onClick.RemoveListener(OnClickCreate);
     }
 
-    public void RefreshCode()
+    private void refreshCode()
     {
         gameCodeText.text = generatedCode;
     }
 
 
-    private void UpdateSliderLabel(float value)
+    private void updateSliderLabel(float value)
     {
         maxPlayersLabel.text = $"{(int)value} Players";
     }
@@ -79,7 +79,7 @@ public class CreateGame : MonoBehaviour
             onError: error =>
             {
                 createButton.interactable = true;
-                SetStatus($"Error: {error}");
+                setStatus($"Error: {error}");
                 Debug.LogError($"[CreateGame] Error: {error}");
             }));
         
@@ -90,7 +90,7 @@ public class CreateGame : MonoBehaviour
         SceneManager.LoadScene("0");
     }
 
-    private void SetStatus(string status)
+    private void setStatus(string status)
     {
         if (statusText != null)
             statusText.text = status;
