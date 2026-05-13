@@ -34,9 +34,16 @@ public class DeckDto
     public List<CardDto> cards;
 }
 
-public class APIManager : MonoBehaviour
+[Serializable]
+public class TokenResponse
 {
     public string jwtToken;
+}
+
+
+
+public class APIManager : MonoBehaviour
+{
     public static APIManager Instance;
     private string baseUrl = "http://localhost:5042/api/";
 
@@ -106,6 +113,7 @@ public class APIManager : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
 
         yield return request.SendWebRequest();
+        
         if (request.result != UnityWebRequest.Result.Success)
         {
             onError?.Invoke(request.downloadHandler.text);
@@ -114,6 +122,16 @@ public class APIManager : MonoBehaviour
         {
             onSuccess?.Invoke(request.downloadHandler.text);
         }
+        
+        string response = request.downloadHandler.text;
+        
+        string token = JsonUtility.FromJson<TokenResponse>(response).jwtToken;
+        
+        PlayerPrefs.SetString("token", token);
+        Debug.Log(token);
+        
+        
+        
     }
 
 
