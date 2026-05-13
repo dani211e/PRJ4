@@ -23,8 +23,6 @@ public class CreateGame : MonoBehaviour
     [SerializeField]
     private TMP_Text statusText;
 
-    private string generatedCode;
-
     private void Start()
     {
         maxPlayersSlider.minValue = 2;
@@ -48,7 +46,7 @@ public class CreateGame : MonoBehaviour
 
     private void refreshCode()
     {
-        gameCodeText.text = generatedCode;
+        gameCodeText.text = GameSession.GameCode;
     }
 
 
