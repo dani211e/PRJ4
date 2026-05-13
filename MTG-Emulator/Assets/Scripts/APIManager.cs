@@ -36,6 +36,7 @@ public class DeckDto
 
 public class APIManager : MonoBehaviour
 {
+    public string jwtToken;
     public static APIManager Instance;
     private string baseUrl = "http://localhost:5042/api/";
 
