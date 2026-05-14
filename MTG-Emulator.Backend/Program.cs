@@ -1,7 +1,15 @@
-﻿using Microsoft.AspNetCore.HttpLogging;
+﻿using System.Text;
+using DotNetEnv;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
 using MTG_Emulator.Backend.DB;
+using MTG_Emulator.Backend.DB.Models;
+using MTG_Emulator.Backend.Scalar;
 using MTG_Emulator.Backend.Scryfall;
 using Scalar.AspNetCore;
 using Serilog;
@@ -12,6 +20,7 @@ namespace MTG_Emulator.Backend
     {
         public static async Task Main(string[] args)
         {
+            Env.Load();
             var builder = WebApplication.CreateBuilder(args);
 
             Log.Logger = new LoggerConfiguration()
@@ -23,7 +32,13 @@ namespace MTG_Emulator.Backend
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddOpenApi();
+            builder.Services.AddOpenApi(options =>
+            {
+                options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+            });
+
+            if (builder.Environment.IsDevelopment())
+                builder.Configuration.AddUserSecrets<Program>();
 
             builder.Services.AddDbContext<MTGContext>(options =>
                 options.UseSqlServer(
@@ -35,6 +50,50 @@ namespace MTG_Emulator.Backend
                        .EnableSensitiveDataLogging()
                        .EnableDetailedErrors()
                        .LogTo(Log.Information, LogLevel.Warning));
+
+            builder.Services.AddIdentity<ApiUser, ApiRole>(options =>
+                {
+                    options.Password.RequireDigit = true;
+                    options.Password.RequireLowercase = true;
+                    options.Password.RequireUppercase = true;
+                    options.Password.RequireNonAlphanumeric = true;
+                    options.Password.RequiredLength = 8;
+                })
+                .AddEntityFrameworkStores<MTGContext>()
+                .AddDefaultTokenProviders();
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme =
+                    options.DefaultChallengeScheme =
+                        options.DefaultForbidScheme =
+                            options.DefaultScheme =
+                                options.DefaultSignInScheme =
+                                    options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = builder.Configuration["JWT:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = builder.Configuration["JWT:Audience"],
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(
+                            builder.Configuration["JWT:SigningKey"]
+                            ?? throw new InvalidOperationException("JWT:SigningKey is not configured.")))
+                };
+            });
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy =>
+                    policy.RequireRole(Roles.Admin));
+
+                options.AddPolicy("PlayerOrAdmin", policy =>
+                    policy.RequireRole(Roles.Player, Roles.Admin));
+            });
 
             builder.Services.AddHttpLogging(logging =>
             {
@@ -67,14 +126,35 @@ namespace MTG_Emulator.Backend
             app.UseSerilogRequestLogging();
             app.UseHttpLogging();
 
+            // Middleware order matters — auth must come before MapControllers and authentication must come before authorization
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<MTGContext>();
 
-                await db.Database.MigrateAsync();
+                try
+                {
+                    // For some (currently undecipherable) reason migration attempts fail
+                    // on composing up, but retrying succeeds ???
+                    await db.Database.MigrateAsync();
+                }
+                catch (SqlException ex) when (ex.Number == 1801)
+                {
+                    Log.Warning("Database already exists, skipping creation — applying pending migrations.");
+                    await db.Database.MigrateAsync();
+                }
 
                 await ScryfallImageDownloader.RunAsync(testMode: false);
-                await DbHelper.SeedDb(db);
+
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApiRole>>();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApiUser>>();
+                
+                await RoleSeeder.SeedRolesAsync(roleManager);
+                await AdminSeeder.SeedAdminAsync(userManager);
+                
+                await DbHelper.SeedDb(db, userManager);
             }
 
             app.MapControllers();

@@ -4,6 +4,7 @@ using MTG_Emulator.Backend.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MTG_Emulator.Backend.Migrations
 {
     [DbContext(typeof(MTGContext))]
-    partial class MTGContextModelSnapshot : ModelSnapshot
+    [Migration("20260508092129_AddIdentity")]
+    partial class AddIdentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,33 +38,6 @@ namespace MTG_Emulator.Backend.Migrations
                     b.HasIndex("DecksDeckId");
 
                     b.ToTable("CardDeck");
-                });
-
-            modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.ApiRole", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
-
-                    b.ToTable("AspNetRoles", (string)null);
                 });
 
             modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.ApiUser", b =>
@@ -222,40 +198,6 @@ namespace MTG_Emulator.Backend.Migrations
                     b.ToTable("Decks");
                 });
 
-            modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.Game", b =>
-                {
-                    b.Property<int>("GameId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GameId"));
-
-                    b.Property<int>("CurrentPlayers")
-                        .HasColumnType("int");
-
-                    b.Property<string>("GameCode")
-                        .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("nvarchar(6)");
-
-                    b.Property<string>("HostName")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<int>("MaxPlayers")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.HasKey("GameId");
-
-                    b.ToTable("Games");
-                });
-
             modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.Player", b =>
                 {
                     b.Property<int>("PlayerId")
@@ -263,11 +205,6 @@ namespace MTG_Emulator.Backend.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlayerId"));
-
-                    b.Property<string>("ApiUserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("GamesDrawn")
                         .HasColumnType("int");
@@ -278,15 +215,17 @@ namespace MTG_Emulator.Backend.Migrations
                     b.Property<int>("GamesWon")
                         .HasColumnType("int");
 
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("PlayerId");
-
-                    b.HasIndex("ApiUserId")
-                        .IsUnique();
 
                     b.ToTable("Players");
                 });
@@ -317,6 +256,33 @@ namespace MTG_Emulator.Backend.Migrations
                     b.HasIndex("CardId");
 
                     b.ToTable("RelatedCards");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -462,17 +428,6 @@ namespace MTG_Emulator.Backend.Migrations
                     b.Navigation("Player");
                 });
 
-            modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.Player", b =>
-                {
-                    b.HasOne("MTG_Emulator.Backend.DB.Models.ApiUser", "ApiUser")
-                        .WithOne("Player")
-                        .HasForeignKey("MTG_Emulator.Backend.DB.Models.Player", "ApiUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApiUser");
-                });
-
             modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.RelatedCard", b =>
                 {
                     b.HasOne("MTG_Emulator.Backend.DB.Models.Card", "Card")
@@ -486,7 +441,7 @@ namespace MTG_Emulator.Backend.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("MTG_Emulator.Backend.DB.Models.ApiRole", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -513,7 +468,7 @@ namespace MTG_Emulator.Backend.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("MTG_Emulator.Backend.DB.Models.ApiRole", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -533,11 +488,6 @@ namespace MTG_Emulator.Backend.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.ApiUser", b =>
-                {
-                    b.Navigation("Player");
                 });
 
             modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.Card", b =>

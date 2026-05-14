@@ -1,14 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Unity.Db.DTO.CardDTO;
-using MTG_Emulator.Unity.Db.DTO.CardFace;
-using MTG_Emulator.Unity.Db.DTO.RelatedCardsDTO;
+using MTG_Emulator.Unity.Db.DTO.CardFaceDTO;
+using MTG_Emulator.Unity.Db.DTO.RelatedCardDTO;
 
 namespace MTG_Emulator.Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "PlayerOrAdmin")]
     public class CardsController : ControllerBase
     {
         private readonly MTGContext context;

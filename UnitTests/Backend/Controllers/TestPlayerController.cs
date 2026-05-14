@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.Controllers;
 using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Unity.Db.DTO.PlayerDTO;
@@ -14,225 +17,205 @@ namespace UnitTests.Backend.Controllers
         {
             base.Setup();
             uut = new PlayerController(Context);
+            setControllerUser(uut, "test-api-user-id");
+        }
+
+        // GetProfile
+
+        [Test]
+        public async Task GetProfile_ExistingPlayer_ReturnsCorrectProfile()
+        {
+            await insertPlayerAsync();
+
+            var result = await uut.GetProfile("Test player");
+            var ok  = result.Result as OkObjectResult;
+            var dto = ok?.Value as PlayerDto;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(dto,             Is.Not.Null);
+                Assert.That(dto!.Username,   Is.EqualTo("Test player"));
+                Assert.That(dto.GamesWon,    Is.EqualTo(0));
+                Assert.That(dto.GamesLost,   Is.EqualTo(0));
+                Assert.That(dto.GamesDrawed, Is.EqualTo(0));
+            });
         }
 
         [Test]
-        public async Task CreateProfile_NewProfile_ReturnPlayer()
+        public async Task GetProfile_PlayerDoesNotExist_ReturnsNotFound()
         {
-            var result = await uut.CreateProfile("testPlayer", "testPassword");
+            var result = await uut.GetProfile("NonExistingPlayer");
 
-            var createdResult = result.Result as CreatedAtActionResult;
-            var player = createdResult!.Value as Player;
-
-            Assert.That(player, Is.Not.Null);
-            Assert.That(player.Username, Is.EqualTo("testPlayer"));
-            Assert.That(player.Password, Is.EqualTo("testPassword"));
+            Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
         }
+
+        // DeleteProfile
 
         [Test]
-        public async Task CreateProfile_ExistingProfile_ReturnPlayer()
+        public async Task DeleteProfile_ExistingPlayer_DeletesPlayer()
         {
-            var testPlayer = createTestPlayer();
-            Context.Players.Add(testPlayer);
-            await Context.SaveChangesAsync();
-            var result = await uut.CreateProfile("testPlayer", "testPassword");
+            await insertPlayerAsync();
 
-            Assert.That(result.Result, Is.TypeOf<ConflictObjectResult>());
-        }
-
-        [TestCase(null, "testPassword")]
-        [TestCase("", "testPassword")]
-        [TestCase("testPlayer", null)]
-        [TestCase("testPlayer", "")]
-        public async Task CreateProfile_InvalidInput_ReturnBadRequest(string? playerName, string? password)
-        {
-            var result = await uut.CreateProfile(playerName!, password!);
-            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
-        }
-
-
-        [Test]
-        public async Task GetProfile_ExistingProfile_ReturnPlayer()
-        {
-            var testPlayer = createTestPlayer();
-
-            Context.Players.Add(testPlayer);
-            await Context.SaveChangesAsync();
-
-            var result = await uut.GetProfile("testPlayer");
-
-            var okResult = result.Result as OkObjectResult;
-            Assert.That(okResult, Is.Not.Null);
-
-            var resultPlayer = okResult.Value as PlayerDto;
-            Assert.That(resultPlayer!.Username, Is.EqualTo("testPlayer"));
-        }
-
-        [Test]
-        public async Task GetProfile_NonExistingProfile_ReturnNull()
-        {
-            var result = await uut.GetProfile("DoesNotExist");
-            Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
-        }
-
-        [TestCase(null)]
-        [TestCase("")]
-        public async Task GetProfile_InvalidInput_ReturnBadRequest(string? playerName)
-        {
-            var result = await uut.GetProfile(playerName!);
-            Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
-        }
-
-        [Test]
-        public async Task DeleteProfile_ExistingProfile_ReturnPlayer()
-        {
-            var testPlayer = createTestPlayer();
-            Context.Players.Add(testPlayer);
-            await Context.SaveChangesAsync();
-
-            var result = await uut.DeleteProfile("testPlayer");
-            await Context.SaveChangesAsync();
-
+            var result = await uut.DeleteProfile("Test player");
             Assert.That(result, Is.TypeOf<NoContentResult>());
+
+            var deleted = await Context.Players.FirstOrDefaultAsync(p => p.Username == "Test player");
+            Assert.That(deleted, Is.Null);
         }
 
         [Test]
-        public async Task DeleteProfile_NonExistingProfile_ReturnNull()
+        public async Task DeleteProfile_PlayerDoesNotExist_ReturnsNotFound()
         {
-            var result = await uut.DeleteProfile("DoesNotExist");
+            var result = await uut.DeleteProfile("NonExistingPlayer");
+
             Assert.That(result, Is.TypeOf<NotFoundResult>());
         }
 
-        [TestCase(null)]
-        [TestCase("")]
-        public async Task DeleteProfile_InvalidInput_ReturnBadRequest(string? playerName)
+        [Test]
+        public async Task DeleteProfile_CallerIsNotOwner_ReturnsForbid()
         {
-            var result = await uut.DeleteProfile(playerName!);
-            Assert.That(result, Is.TypeOf<BadRequestResult>());
+            await insertPlayerAsync(apiUserId: "other-user-id");
+
+            var result = await uut.DeleteProfile("Test player");
+
+            Assert.That(result, Is.TypeOf<ForbidResult>());
         }
 
-        [TestCase(1)]
-        [TestCase(0)]
-        [TestCase(-1)]
-        public async Task UpdateProfile_ExistingProfileInt_ReturnPlayer(int input)
-        {
-            var endGameResult = (GameResults)input;
-            await verifyStatsUpdated(endGameResult);
-        }
-
-        [TestCase("Win")]
-        [TestCase("Draw")]
-        [TestCase("Loss")]
-        public async Task UpdateProfile_ExistingProfilestring_ReturnPlayer(string input)
-        {
-            Enum.TryParse(input, out GameResults endGameResult);
-            await verifyStatsUpdated(endGameResult);
-        }
-
-        [TestCase(GameResults.Win)]
-        [TestCase(GameResults.Draw)]
-        [TestCase(GameResults.Loss)]
-        public async Task UpdateProfile_NonExistingProfile_ReturnNull(GameResults endGameResult)
-        {
-            var result = await uut.UpdatePlayerStats("DoesNotExist", endGameResult);
-            Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
-        }
+        // UpdatePlayerStats
 
         [Test]
-        public async Task UpdateProfile_NullProfile_ReturnNull()
+        public async Task UpdatePlayerStats_Win_IncrementsGamesWon()
         {
-            var result = await uut.UpdatePlayerStats(null!, GameResults.Win);
-            Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
-        }
+            await insertPlayerAsync();
 
-        [Test]
-        public async Task UpdateProfile_EmptyProfile_ReturnNull()
-        {
-            var result = await uut.UpdatePlayerStats("", GameResults.Win);
-            Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
-        }
-
-        [TestCase(-3)]
-        [TestCase(-2)]
-        [TestCase(2)]
-        [TestCase(3)]
-        public async Task UpdateProfile_invalidGameResult_ReturnBadRequest(int input)
-        {
-            var testPlayer = createTestPlayer();
-            Context.Players.Add(testPlayer);
-            await Context.SaveChangesAsync();
-
-            var endGameResult = (GameResults)input;
-            var result = await uut.UpdatePlayerStats(testPlayer.Username, endGameResult);
-            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
-        }
-
-        [Test]
-        public async Task ResetPlayerPassword_NewPassword_ReturnPlayer()
-        {
-            var testPlayer = createTestPlayer();
-            Context.Players.Add(testPlayer);
-            await Context.SaveChangesAsync();
-
-            var result = await uut.ResetPlayerPassword(testPlayer.Username, "testPassword");
-            await Context.SaveChangesAsync();
-
+            var result = await uut.UpdatePlayerStats("Test player", GameResults.Win);
             Assert.That(result.Result, Is.TypeOf<NoContentResult>());
-        }
 
-        [Test]
-        public async Task ResetPlayerPassword_NullPassword_ReturnNull()
-        {
-            var testPlayer = createTestPlayer();
-            Context.Players.Add(testPlayer);
-            await Context.SaveChangesAsync();
-
-            var result = await uut.ResetPlayerPassword(testPlayer.Username, null!);
-            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
-        }
-
-        [Test]
-        public async Task ResetPlayerPassword_EmptyPassword_ReturnNull()
-        {
-            var testPlayer = createTestPlayer();
-            Context.Players.Add(testPlayer);
-            await Context.SaveChangesAsync();
-
-            var result = await uut.ResetPlayerPassword(testPlayer.Username, "");
-            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
-        }
-
-        [Test]
-        public async Task ResetPlayerPassword_WhiteSpacePassword_ReturnBadRequest()
-        {
-            var testPlayer = createTestPlayer();
-            Context.Players.Add(testPlayer);
-            await Context.SaveChangesAsync();
-
-            var result = await uut.ResetPlayerPassword(testPlayer.Username, " ");
-            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
-        }
-
-        private async Task verifyStatsUpdated(GameResults endGameResult)
-        {
-            var testPlayer = createTestPlayer();
-            Context.Players.Add(testPlayer);
-            await Context.SaveChangesAsync();
-
-            var result = await uut.UpdatePlayerStats(testPlayer.Username, endGameResult);
-            Assert.That(result.Result, Is.InstanceOf<NoContentResult>());
-        }
-
-        private static Player createTestPlayer()
-        {
-            return new Player
+            var player = await Context.Players.FirstAsync(p => p.Username == "Test player");
+            Assert.Multiple(() =>
             {
-                Username = "testPlayer",
-                Password = "testPassword",
-                GamesWon = 5,
-                GamesLost = 5,
-                GamesDrawn = 5,
+                Assert.That(player.GamesWon,   Is.EqualTo(1));
+                Assert.That(player.GamesLost,  Is.EqualTo(0));
+                Assert.That(player.GamesDrawn, Is.EqualTo(0));
+            });
+        }
+
+        [Test]
+        public async Task UpdatePlayerStats_Loss_IncrementsGamesLost()
+        {
+            await insertPlayerAsync();
+
+            var result = await uut.UpdatePlayerStats("Test player", GameResults.Loss);
+            Assert.That(result.Result, Is.TypeOf<NoContentResult>());
+
+            var player = await Context.Players.FirstAsync(p => p.Username == "Test player");
+            Assert.Multiple(() =>
+            {
+                Assert.That(player.GamesWon,   Is.EqualTo(0));
+                Assert.That(player.GamesLost,  Is.EqualTo(1));
+                Assert.That(player.GamesDrawn, Is.EqualTo(0));
+            });
+        }
+
+        [Test]
+        public async Task UpdatePlayerStats_Draw_IncrementsGamesDrawn()
+        {
+            await insertPlayerAsync();
+
+            var result = await uut.UpdatePlayerStats("Test player", GameResults.Draw);
+            Assert.That(result.Result, Is.TypeOf<NoContentResult>());
+
+            var player = await Context.Players.FirstAsync(p => p.Username == "Test player");
+            Assert.Multiple(() =>
+            {
+                Assert.That(player.GamesWon,   Is.EqualTo(0));
+                Assert.That(player.GamesLost,  Is.EqualTo(0));
+                Assert.That(player.GamesDrawn, Is.EqualTo(1));
+            });
+        }
+
+        [Test]
+        public async Task UpdatePlayerStats_PlayerDoesNotExist_ReturnsNotFound()
+        {
+            var result = await uut.UpdatePlayerStats("NonExistingPlayer", GameResults.Win);
+
+            Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
+        }
+
+        [Test]
+        public async Task UpdatePlayerStats_CallerIsNotOwner_ReturnsForbid()
+        {
+            await insertPlayerAsync(apiUserId: "other-user-id");
+
+            var result = await uut.UpdatePlayerStats("Test player", GameResults.Win);
+
+            Assert.That(result.Result, Is.TypeOf<ForbidResult>());
+        }
+
+        [Test]
+        public async Task UpdatePlayerStats_MultipleResults_AccumulatesCorrectly()
+        {
+            await insertPlayerAsync();
+
+            await uut.UpdatePlayerStats("Test player", GameResults.Win);
+            await uut.UpdatePlayerStats("Test player", GameResults.Win);
+            await uut.UpdatePlayerStats("Test player", GameResults.Loss);
+            await uut.UpdatePlayerStats("Test player", GameResults.Draw);
+
+            var player = await Context.Players.FirstAsync(p => p.Username == "Test player");
+            Assert.Multiple(() =>
+            {
+                Assert.That(player.GamesWon,   Is.EqualTo(2));
+                Assert.That(player.GamesLost,  Is.EqualTo(1));
+                Assert.That(player.GamesDrawn, Is.EqualTo(1));
+            });
+        }
+        
+        [Test]
+        public async Task UpdatePlayerStats_InvalidGameResult_ReturnsBadRequest()
+        {
+            await insertPlayerAsync();
+
+            var result = await uut.UpdatePlayerStats("Test player", (GameResults)999);
+
+            Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
+        }
+
+        // Helpers
+
+        private static void setControllerUser(ControllerBase controller, string apiUserId, bool isAdmin = false)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, apiUserId),
             };
+
+            if (isAdmin)
+                claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+
+            var identity  = new ClaimsIdentity(claims, "TestAuth");
+            var principal = new ClaimsPrincipal(identity);
+
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = principal }
+            };
+        }
+
+        private async Task insertPlayerAsync(
+            string username  = "Test player",
+            string apiUserId = "test-api-user-id")
+        {
+            var player = new Player
+            {
+                Username  = username,
+                ApiUserId = apiUserId,
+                GamesWon  = 0,
+                GamesLost = 0,
+                GamesDrawn = 0,
+            };
+            Context.Players.Add(player);
+            await Context.SaveChangesAsync();
         }
     }
 }

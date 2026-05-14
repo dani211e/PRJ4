@@ -5,8 +5,6 @@ namespace MTG_Emulator.Unity.Db.DTO.DeckDTO
     public class CreateDeckDto
     {
         [Required]
-        public string PlayerName { get; set; } = string.Empty;
-        [Required]
         public string DeckName { get; set; } = string.Empty;
         [Required]
         public string Commander { get; set; } = string.Empty;
