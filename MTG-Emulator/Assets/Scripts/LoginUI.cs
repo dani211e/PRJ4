@@ -31,6 +31,7 @@ using UnityEngine.SceneManagement;
                 password,
                 SuccessMessage =>
                 {
+                    SceneManager.LoadScene("0");
                     Debug.Log(SuccessMessage);
                 },
                 error =>
@@ -38,6 +39,11 @@ using UnityEngine.SceneManagement;
                     Debug.LogError(error);
                 }
                 ));
+        }
+        
+        public void OnClickBack()
+        {
+            SceneManager.LoadScene("0");
         }
     }
 

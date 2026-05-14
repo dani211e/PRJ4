@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using MTG_Emulator.Unity.Db.DTO.AuthenticationDTO;
 using MTG_Emulator.Unity.Db.DTO.GameDTO;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -32,13 +33,6 @@ public class DeckDto
     public string deckName;
     public string deckCommander;
     public List<CardDto> cards;
-}
-
-[Serializable]
-public class LoginRequest
-{
-    public string email;
-    public string password;
 }
 
 [Serializable]
@@ -112,11 +106,12 @@ public class APIManager : MonoBehaviour
     public IEnumerator CreateProfile(string email, string password, Action<string> onSuccess, Action<string> onError)
     {
         
-        LoginRequest loginData = new LoginRequest { email = email, password = password };
+        var loginData = new LoginDto { Email = email, Password = password };
         
-        string json = JsonUtility.ToJson(loginData);
+        string json = JsonSerializer.Serialize(loginData);
         string url = baseUrl + "Authentication/login";
         UnityWebRequest request = new UnityWebRequest(url, "POST");
+        request.SetRequestHeader("Content-Type", "application/json");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
@@ -134,7 +129,7 @@ public class APIManager : MonoBehaviour
         
         string reponseJson = request.downloadHandler.text;
 
-        TokenResponse reponse = JsonUtility.FromJson<TokenResponse>(reponseJson);
+        var reponse = JsonSerializer.Deserialize<TokenResponse>(reponseJson);
         
         PlayerPrefs.SetString("jwtToken", reponse.jwtToken);
         PlayerPrefs.Save();
