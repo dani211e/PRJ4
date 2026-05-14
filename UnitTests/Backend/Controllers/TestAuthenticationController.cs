@@ -7,6 +7,7 @@ using Moq;
 using MTG_Emulator.Backend.Controllers;
 using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Unity.Db.DTO.AuthenticationDTO;
+using MTG_Emulator.Unity.Db.DTO.PlayerDTO;
 
 namespace UnitTests.Backend.Controllers
 {
@@ -149,7 +150,7 @@ namespace UnitTests.Backend.Controllers
 
             Assert.That(ok, Is.Not.Null);
 
-            var token = ok!.Value?.GetType().GetProperty("token")?.GetValue(ok.Value) as string;
+            var token = ok!.Value?.GetType().GetProperty(nameof(LoginResponseDto.Token))?.GetValue(ok.Value) as string;
             Assert.That(token, Is.Not.Null.And.Not.Empty);
         }
 

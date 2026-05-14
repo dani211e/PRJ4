@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpLogging;
@@ -30,7 +31,13 @@ namespace MTG_Emulator.Backend
 
             builder.Host.UseSerilog();
 
-            builder.Services.AddControllers();
+            
+            builder.Services.AddControllers().AddJsonOptions(opt =>
+            {
+                // Unity deserialization expects case sensitive property names
+                // a null naming policy makes the casing unchanged and respects class naming
+                opt.JsonSerializerOptions.PropertyNamingPolicy = null;
+            });
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddOpenApi(options =>
             {
