@@ -222,6 +222,40 @@ namespace MTG_Emulator.Backend.Migrations
                     b.ToTable("Decks");
                 });
 
+            modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.Game", b =>
+                {
+                    b.Property<int>("GameId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GameId"));
+
+                    b.Property<int>("CurrentPlayers")
+                        .HasColumnType("int");
+
+                    b.Property<string>("GameCode")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
+
+                    b.Property<string>("HostName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<int>("MaxPlayers")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.HasKey("GameId");
+
+                    b.ToTable("Games");
+                });
+
             modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.Player", b =>
                 {
                     b.Property<int>("PlayerId")

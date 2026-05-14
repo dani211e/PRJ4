@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class DeckViewer : MonoBehaviour
 {
@@ -161,5 +162,10 @@ public class DeckViewer : MonoBehaviour
             Texture2D tex = DownloadHandlerTexture.GetContent(request);
             targetImage.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         }
+    }
+    
+    public void OnClickBack()
+    {
+        SceneManager.LoadScene("0");
     }
 }

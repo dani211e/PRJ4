@@ -15,5 +15,6 @@ namespace MTG_Emulator.Backend.DB
         public DbSet<RelatedCard> RelatedCards { get; set; }
         public DbSet<Player> Players { get; set; }
         public DbSet<CardFace> AltFaces { get; set; }
+        public DbSet<Game> Games { get; set; } 
     }
 }

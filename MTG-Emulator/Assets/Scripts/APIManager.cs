@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
+using MTG_Emulator.Unity.Db.DTO.GameDTO;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -137,4 +139,38 @@ public class APIManager : MonoBehaviour
             onSuccess?.Invoke(result);
         }
     }
+    public IEnumerator CreateGame(CreateGameDto dto, Action<GameResponseDto> onSuccess, Action<string> onError)
+    {
+        string json = JsonSerializer.Serialize(dto);
+        UnityWebRequest request = new UnityWebRequest(baseUrl + "Game", "POST");
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+        request.uploadHandler   = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+            onError?.Invoke(request.downloadHandler.text);
+        else
+            onSuccess?.Invoke(JsonSerializer.Deserialize<GameResponseDto>(request.downloadHandler.text));
+    }
+
+    public IEnumerator JoinGame(JoinGameDto dto, Action<GameResponseDto> onSuccess, Action<string> onError)
+    {
+        string json = JsonSerializer.Serialize(dto);
+        UnityWebRequest request = new UnityWebRequest(baseUrl + "Game/join", "POST");
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+        request.uploadHandler   = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+            onError?.Invoke(request.downloadHandler.text);
+        else
+            onSuccess?.Invoke(JsonSerializer.Deserialize<GameResponseDto>(request.downloadHandler.text));
+    }
+    
 }
