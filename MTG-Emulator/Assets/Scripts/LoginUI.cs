@@ -11,10 +11,10 @@ using UnityEngine.SceneManagement;
 
         public void OnClickLogin()
         {
-            string username = usernameField.text.Trim();
+            string email = usernameField.text.Trim();
             string password = passwordField.text.Trim();
 
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
                 Debug.Log("Username or password is empty");
                 return;
@@ -27,7 +27,7 @@ using UnityEngine.SceneManagement;
             }
 
             StartCoroutine(APIManager.Instance.CreateProfile(
-                username,
+                email,
                 password,
                 SuccessMessage =>
                 {

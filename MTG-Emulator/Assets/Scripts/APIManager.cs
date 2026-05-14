@@ -2,11 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using System.Text.Json;
 using MTG_Emulator.Unity.Db.DTO.GameDTO;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
-using Newtonsoft.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 [Serializable]
 public class CreateDeckDto
@@ -32,6 +32,13 @@ public class DeckDto
     public string deckName;
     public string deckCommander;
     public List<CardDto> cards;
+}
+
+[Serializable]
+public class LoginRequest
+{
+    public string email;
+    public string password;
 }
 
 [Serializable]
@@ -102,14 +109,16 @@ public class APIManager : MonoBehaviour
             onSuccess?.Invoke(JsonUtility.FromJson<DeckDto>(request.downloadHandler.text));
     }
 
-    public IEnumerator CreateProfile(string playerName, string password, Action<string> onSuccess, Action<string> onError)
+    public IEnumerator CreateProfile(string email, string password, Action<string> onSuccess, Action<string> onError)
     {
-        string url = baseUrl + "Player?playerName=" +
-                     UnityWebRequest.EscapeURL(playerName) +
-                     "&password=" +
-                     UnityWebRequest.EscapeURL(password);
-
+        
+        LoginRequest loginData = new LoginRequest { email = email, password = password };
+        
+        string json = JsonUtility.ToJson(loginData);
+        string url = baseUrl + "Authentication/login";
         UnityWebRequest request = new UnityWebRequest(url, "POST");
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
         yield return request.SendWebRequest();
@@ -123,15 +132,13 @@ public class APIManager : MonoBehaviour
             onSuccess?.Invoke(request.downloadHandler.text);
         }
         
-        string response = request.downloadHandler.text;
+        string reponseJson = request.downloadHandler.text;
+
+        TokenResponse reponse = JsonUtility.FromJson<TokenResponse>(reponseJson);
         
-        string token = JsonUtility.FromJson<TokenResponse>(response).jwtToken;
-        
-        PlayerPrefs.SetString("token", token);
-        Debug.Log(token);
-        
-        
-        
+        PlayerPrefs.SetString("jwtToken", reponse.jwtToken);
+        PlayerPrefs.Save();
+
     }
 
 
