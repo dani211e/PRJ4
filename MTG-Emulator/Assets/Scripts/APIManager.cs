@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using MTG_Emulator.Unity.Db.DTO.GameDTO;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -29,30 +30,6 @@ public class DeckDto
     public string deckName;
     public string deckCommander;
     public List<CardDto> cards;
-}
-[Serializable]
-public class CreateGameDto
-{
-    public string gameCode;
-    public int maxPlayers;
-    public string hostName;       // pulled from GameSession.PlayerName
-}
- 
-[Serializable]
-public class JoinGameDto
-{
-    public string gameCode;
-    public string playerName;     // pulled from GameSession.PlayerName
-}
- 
-[Serializable]
-public class GameResponseDto
-{
-    public string gameCode;
-    public int maxPlayers;
-    public int currentPlayers;
-    public bool success;
-    public string message;
 }
 
 public class APIManager : MonoBehaviour

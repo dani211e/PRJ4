@@ -1,3 +1,4 @@
+using MTG_Emulator.Unity.Db.DTO.GameDTO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

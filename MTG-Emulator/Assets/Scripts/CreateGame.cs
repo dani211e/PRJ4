@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using MTG_Emulator.Unity.Db.DTO.GameDTO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -42,16 +43,6 @@ public class CreateGame : MonoBehaviour
         gameCodeText.text = generatedCode;
     }
 
-    private static string GenerateCode(int length)
-    {
-        const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-        var sb = new StringBuilder(length);
-        var rng = new System.Random();
-        for (int i = 0; i < length; i++)
-            sb.Append(chars[rng.Next(chars.Length)]);
-        return sb.ToString();
-    }
-
     private void UpdateSliderLabel(float value)
     {
         maxPlayersLabel.text = $"{(int)value} Players";
@@ -70,7 +61,6 @@ public class CreateGame : MonoBehaviour
 
         var dto = new CreateGameDto
         {
-            gameCode = generatedCode,
             maxPlayers = (int)maxPlayersSlider.value,
             hostName = GameSession.PlayerName //login player name
 
