@@ -16,5 +16,7 @@ namespace MTG_Emulator.Backend.DB.Models
         [StringLength(450)]
         public string ApiUserId { get; set; } = string.Empty;
         public ApiUser ApiUser { get; set; } = null!;
+        
+        public List<Deck> Decks { get; set; } = [];
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Unity.Db.DTO.AuthenticationDTO;
+using Microsoft.EntityFrameworkCore;
 
 namespace MTG_Emulator.Backend.Controllers
 {
@@ -119,6 +120,36 @@ namespace MTG_Emulator.Backend.Controllers
             var token = await userManager.GeneratePasswordResetTokenAsync(user);
             var result = await userManager.ResetPasswordAsync(user, token, dto.NewPassword);
 
+            if (!result.Succeeded)
+                return BadRequest(result.Errors.Select(e => e.Description));
+
+            return NoContent();
+        }
+        
+        [HttpDelete("delete-account")]
+        [Authorize]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var user = await userManager.FindByIdAsync(userId!);
+            if (user == null)
+                return NotFound();
+
+            if (!IsOwnerOrAdmin(user.Id))
+                return Forbid();
+
+            var player = await context.Players
+                .Include(p => p.Decks)
+                .FirstOrDefaultAsync(p => p.ApiUserId == userId);
+
+            if (player != null)
+            {
+                context.Players.Remove(player);
+                await context.SaveChangesAsync();
+            }
+
+            var result = await userManager.DeleteAsync(user);
             if (!result.Succeeded)
                 return BadRequest(result.Errors.Select(e => e.Description));
 

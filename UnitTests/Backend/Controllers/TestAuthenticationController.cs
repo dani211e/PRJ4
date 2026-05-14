@@ -291,6 +291,133 @@ namespace UnitTests.Backend.Controllers
 
             Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
         }
+        
+        // DeleteAccount
+
+        [Test]
+        public async Task DeleteAccount_UserNotFound_ReturnsNotFound()
+        {
+            setControllerUser(uut, "ghost-id");
+
+            userManagerMock
+                .Setup(m => m.FindByIdAsync("ghost-id"))
+                .ReturnsAsync((ApiUser?)null);
+
+            var result = await uut.DeleteAccount();
+
+            Assert.That(result, Is.TypeOf<NotFoundResult>());
+        }
+
+        [Test]
+        public async Task DeleteAccount_CallerIsNotOwner_ReturnsForbid()
+        {
+            setControllerUser(uut, "caller-id");
+
+            userManagerMock
+                .Setup(m => m.FindByIdAsync("caller-id"))
+                .ReturnsAsync(new ApiUser { Id = "other-user-id" });
+
+            var result = await uut.DeleteAccount();
+
+            Assert.That(result, Is.TypeOf<ForbidResult>());
+        }
+
+        [Test]
+        public async Task DeleteAccount_PlayerExists_RemovesPlayerAndDeletesUser_ReturnsNoContent()
+        {
+            setControllerUser(uut, "user-id");
+
+            var user = new ApiUser
+            {
+                Id = "user-id",
+                UserName = "TestUser",
+                Email = "test@example.com"
+            };
+
+            var player = new Player
+            {
+                Username = "TestUser",
+                ApiUserId = "user-id"
+            };
+
+            Context.Players.Add(player);
+            await Context.SaveChangesAsync();
+
+            userManagerMock
+                .Setup(m => m.FindByIdAsync("user-id"))
+                .ReturnsAsync(user);
+
+            userManagerMock
+                .Setup(m => m.DeleteAsync(user))
+                .ReturnsAsync(IdentityResult.Success);
+
+            var result = await uut.DeleteAccount();
+
+            Assert.That(result, Is.TypeOf<NoContentResult>());
+
+            var deletedPlayer = Context.Players
+                .FirstOrDefault(p => p.ApiUserId == "user-id");
+
+            Assert.That(deletedPlayer, Is.Null);
+
+            userManagerMock.Verify(m => m.DeleteAsync(user), Times.Once);
+        }
+
+        [Test]
+        public async Task DeleteAccount_NoPlayerProfile_DeletesUser_ReturnsNoContent()
+        {
+            setControllerUser(uut, "user-id");
+
+            var user = new ApiUser
+            {
+                Id = "user-id",
+                UserName = "TestUser",
+                Email = "test@example.com"
+            };
+
+            userManagerMock
+                .Setup(m => m.FindByIdAsync("user-id"))
+                .ReturnsAsync(user);
+
+            userManagerMock
+                .Setup(m => m.DeleteAsync(user))
+                .ReturnsAsync(IdentityResult.Success);
+
+            var result = await uut.DeleteAccount();
+
+            Assert.That(result, Is.TypeOf<NoContentResult>());
+
+            userManagerMock.Verify(m => m.DeleteAsync(user), Times.Once);
+        }
+
+        [Test]
+        public async Task DeleteAccount_UserDeletionFails_ReturnsBadRequest()
+        {
+            setControllerUser(uut, "user-id");
+
+            var user = new ApiUser
+            {
+                Id = "user-id",
+                UserName = "TestUser",
+                Email = "test@example.com"
+            };
+
+            userManagerMock
+                .Setup(m => m.FindByIdAsync("user-id"))
+                .ReturnsAsync(user);
+
+            userManagerMock
+                .Setup(m => m.DeleteAsync(user))
+                .ReturnsAsync(
+                    IdentityResult.Failed(
+                        new IdentityError { Description = "Delete failed." }
+                    )
+                );
+
+            var result = await uut.DeleteAccount();
+
+            Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
+        }
 
         // Helpers
 
