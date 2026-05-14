@@ -124,16 +124,18 @@ public class APIManager : MonoBehaviour
 
         if (request.result != UnityWebRequest.Result.Success)
         {
+            onError?.Invoke(request.downloadHandler.text);
+        }
+        else
+        {
             var reponse = JsonSerializer.Deserialize<LoginResponseDto>(reponseJson);
 
             PlayerPrefs.SetString("jwtToken", reponse.Token);
             PlayerPrefs.SetString("username", reponse.Username);
             PlayerPrefs.Save();
 
-            onError?.Invoke(request.downloadHandler.text);
-        }
-        else
-        {
+            GameSession.PlayerName = reponse.Username;
+
             onSuccess?.Invoke(request.downloadHandler.text);
         }
     }
