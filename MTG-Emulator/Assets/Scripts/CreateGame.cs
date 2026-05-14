@@ -102,7 +102,7 @@ public class CreateGame : MonoBehaviour
                 GameSession.MaxPlayers = response.maxPlayers;
                 GameSession.IsHost = true;
 
-                setStatus($"Game Created! Code:{response.gameCode}");
+                setStatus($"Game Created! Code:\n{response.gameCode}");
                 Debug.Log($"[CreateGame] Room {response.gameCode} ready for {response.maxPlayers} players.");
             },
             onError: error =>
