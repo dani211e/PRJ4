@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using MTG_Emulator.Backend.DB.Models;
+using MTG_Emulator.Unity.Db.DTO.CardDTO;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 
@@ -25,7 +26,7 @@ public class Card : MonoBehaviour
 
         if (cardName != null)
         {
-            cardName.text = card.name;
+            cardName.text = card.Name;
         }
 
         button = GetComponent<Button>();
@@ -42,9 +43,9 @@ public class Card : MonoBehaviour
             button.onClick.AddListener(() => onClick(cardData));
         }
 
-        if (!string.IsNullOrEmpty(card.imageUri))
+        if (!string.IsNullOrEmpty(card.ImageUri))
         {
-            string fullImageUrl = "http://localhost:5042" + card.imageUri;
+            string fullImageUrl = "http://localhost:5042" + card.ImageUri;
             StartCoroutine(LoadCardImage(fullImageUrl));
         }
     }

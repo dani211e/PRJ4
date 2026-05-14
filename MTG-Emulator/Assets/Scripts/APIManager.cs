@@ -3,37 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using MTG_Emulator.Unity.Db.DTO.AuthenticationDTO;
+using MTG_Emulator.Unity.Db.DTO.DeckDTO;
 using MTG_Emulator.Unity.Db.DTO.GameDTO;
 using MTG_Emulator.Unity.Db.DTO.PlayerDTO;
 using UnityEngine;
 using UnityEngine.Networking;
 using JsonSerializer = System.Text.Json.JsonSerializer;
-
-[Serializable]
-public class CreateDeckDto
-{
-    public string DeckName;
-    public string PlayerName;
-    public string CardList;
-    public string Commander;
-}
-
-[Serializable]
-public class CardDto
-{
-    public int cardId;
-    public string name;
-    public string oracleText;
-    public string imageUri;
-}
-
-[Serializable]
-public class DeckDto
-{
-    public string deckName;
-    public string deckCommander;
-    public List<CardDto> cards;
-}
 
 
 public class APIManager : MonoBehaviour
@@ -56,7 +31,7 @@ public class APIManager : MonoBehaviour
 
     public IEnumerator CreateDeck(CreateDeckDto deck, Action<DeckDto> onSuccess, Action<string> onError)
     {
-        string json = JsonUtility.ToJson(deck);
+        string json = JsonSerializer.Serialize(deck);
         UnityWebRequest request = new UnityWebRequest(baseUrl + "Deck", "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -78,7 +53,7 @@ public class APIManager : MonoBehaviour
         }
         else
         {
-            DeckDto result = JsonUtility.FromJson<DeckDto>(request.downloadHandler.text);
+            DeckDto result = JsonSerializer.Deserialize<DeckDto>(request.downloadHandler.text);
             onSuccess?.Invoke(result);
         }
 
@@ -89,7 +64,7 @@ public class APIManager : MonoBehaviour
         Action<string> onError)
     {
         CreateDeckDto dto = new CreateDeckDto { DeckName = deckName, Commander = commanderName };
-        string json = JsonUtility.ToJson(dto);
+        string json = JsonSerializer.Serialize(dto);
 
         UnityWebRequest request = new UnityWebRequest(baseUrl + $"Deck/{deckName}", "PUT");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
@@ -102,7 +77,7 @@ public class APIManager : MonoBehaviour
         if (request.result != UnityWebRequest.Result.Success)
             onError?.Invoke(request.downloadHandler.text);
         else
-            onSuccess?.Invoke(JsonUtility.FromJson<DeckDto>(request.downloadHandler.text));
+            onSuccess?.Invoke(JsonSerializer.Deserialize<DeckDto>(request.downloadHandler.text));
     }
 
     public IEnumerator Login(string email, string password, Action<string> onSuccess, Action<string> onError)

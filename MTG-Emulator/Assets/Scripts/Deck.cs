@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using MTG_Emulator.Unity.Db.DTO.CardDTO;
+using MTG_Emulator.Unity.Db.DTO.DeckDTO;
 using TMPro;
 using UnityEngine;
 
@@ -23,12 +25,12 @@ public class Deck : MonoBehaviour
         currentDeck = deck;
         drawPile.Clear();
 
-        if (deck.cards != null)
-            drawPile.AddRange(deck.cards);
+        if (deck.Cards != null)
+            drawPile = new List<CardDto>(deck.Cards);
 
         UpdateCountText();
 
-        Debug.Log("Loaded gameplay deck: " + currentDeck.deckName);
+        Debug.Log("Loaded gameplay deck: " + currentDeck.DeckName);
         Debug.Log("Cards loaded: " + drawPile.Count);
 
         ResetGameplayStateForNewDeck();

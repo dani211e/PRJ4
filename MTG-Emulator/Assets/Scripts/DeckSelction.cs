@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using MTG_Emulator.Unity.Db.DTO.DeckDTO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -67,7 +68,7 @@ public class DeckSelectPopup : MonoBehaviour
 
         TMP_Text text = obj.GetComponentInChildren<TMP_Text>(true);
         if (text != null)
-            text.text = deck.deckName;
+            text.text = deck.DeckName;
 
         Button button = obj.GetComponent<Button>();
         if (button != null)

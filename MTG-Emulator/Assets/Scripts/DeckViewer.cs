@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using MTG_Emulator.Unity.Db.DTO.CardDTO;
+using MTG_Emulator.Unity.Db.DTO.DeckDTO;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -76,8 +78,8 @@ public class DeckViewer : MonoBehaviour
         TMP_Text text = obj.GetComponentInChildren<TMP_Text>();
         if (text != null)
         {
-            text.text = deck.deckName;
-            Debug.Log("Set button text to: " + deck.deckName);
+            text.text = deck.DeckName;
+            Debug.Log("Set button text to: " + deck.DeckName);
         }
 
         Button button = obj.GetComponentInChildren<Button>();
@@ -112,9 +114,9 @@ public class DeckViewer : MonoBehaviour
         }
 
 
-        commanderNameText.text = string.IsNullOrEmpty(deck.deckCommander)
+        commanderNameText.text = string.IsNullOrEmpty(deck.DeckCommander)
             ? "Select Commander"
-            : deck.deckCommander;
+            : deck.DeckCommander;
 
         if (commanderImage != null)
             commanderImage.sprite = null;
@@ -122,8 +124,8 @@ public class DeckViewer : MonoBehaviour
         foreach (Transform child in cardListParent)
             Destroy(child.gameObject);
 
-        var groupedCards = deck.cards
-            .GroupBy(c => c.name)
+        var groupedCards = deck.Cards
+            .GroupBy(c => c.Name)
             .OrderBy(g => g.Key);
 
         foreach (var group in groupedCards)
@@ -149,15 +151,15 @@ public class DeckViewer : MonoBehaviour
             return;
         }
 
-        currentDeck.deckCommander = card.name;
-        commanderNameText.text = card.name;
+        currentDeck.DeckCommander = card.Name;
+        commanderNameText.text = card.Name;
 
-        if (!string.IsNullOrEmpty(card.imageUri))
-            StartCoroutine(LoadImage(card.imageUri, commanderImage));
+        if (!string.IsNullOrEmpty(card.ImageUri))
+            StartCoroutine(LoadImage(card.ImageUri, commanderImage));
 
         // Persist commander to backend
-        StartCoroutine(APIManager.Instance.UpdateDeckCommander(currentDeck.deckName, card.name,
-            deck => Debug.Log($"Commander updated to {deck.deckCommander}"),
+        StartCoroutine(APIManager.Instance.UpdateDeckCommander(currentDeck.DeckName, card.Name,
+            deck => Debug.Log($"Commander updated to {deck.DeckCommander}"),
             error => Debug.LogError("Failed to update commander: " + error)
         ));
     }
