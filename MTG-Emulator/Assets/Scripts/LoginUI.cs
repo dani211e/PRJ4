@@ -26,7 +26,7 @@ using UnityEngine.SceneManagement;
                 return;
             }
 
-            StartCoroutine(APIManager.Instance.CreateProfile(
+            StartCoroutine(APIManager.Instance.Login(
                 email,
                 password,
                 SuccessMessage =>

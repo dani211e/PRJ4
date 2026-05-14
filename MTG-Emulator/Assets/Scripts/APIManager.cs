@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using MTG_Emulator.Unity.Db.DTO.AuthenticationDTO;
 using MTG_Emulator.Unity.Db.DTO.GameDTO;
-using Newtonsoft.Json;
+using MTG_Emulator.Unity.Db.DTO.PlayerDTO;
 using UnityEngine;
 using UnityEngine.Networking;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -35,13 +35,6 @@ public class DeckDto
     public List<CardDto> cards;
 }
 
-[Serializable]
-public class TokenResponse
-{
-    public string jwtToken;
-}
-
-
 
 public class APIManager : MonoBehaviour
 {
@@ -70,6 +63,13 @@ public class APIManager : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
+        string token = PlayerPrefs.GetString("jwtToken");
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            request.SetRequestHeader("Authorization", "Bearer " + token);
+        }
+
         yield return request.SendWebRequest();
 
         if (request.result != UnityWebRequest.Result.Success)
@@ -81,10 +81,12 @@ public class APIManager : MonoBehaviour
             DeckDto result = JsonUtility.FromJson<DeckDto>(request.downloadHandler.text);
             onSuccess?.Invoke(result);
         }
+
         Debug.Log(baseUrl + "Deck");
     }
 
-    public IEnumerator UpdateDeckCommander(string deckName, string commanderName, Action<DeckDto> onSuccess, Action<string> onError)
+    public IEnumerator UpdateDeckCommander(string deckName, string commanderName, Action<DeckDto> onSuccess,
+        Action<string> onError)
     {
         CreateDeckDto dto = new CreateDeckDto { DeckName = deckName, Commander = commanderName };
         string json = JsonUtility.ToJson(dto);
@@ -103,11 +105,10 @@ public class APIManager : MonoBehaviour
             onSuccess?.Invoke(JsonUtility.FromJson<DeckDto>(request.downloadHandler.text));
     }
 
-    public IEnumerator CreateProfile(string email, string password, Action<string> onSuccess, Action<string> onError)
+    public IEnumerator Login(string email, string password, Action<string> onSuccess, Action<string> onError)
     {
-        
         var loginData = new LoginDto { Email = email, Password = password };
-        
+
         string json = JsonSerializer.Serialize(loginData);
         string url = baseUrl + "Authentication/login";
         UnityWebRequest request = new UnityWebRequest(url, "POST");
@@ -117,59 +118,63 @@ public class APIManager : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
 
         yield return request.SendWebRequest();
-        
+
+        string reponseJson = request.downloadHandler.text;
+
+
         if (request.result != UnityWebRequest.Result.Success)
         {
+            var reponse = JsonSerializer.Deserialize<LoginResponseDto>(reponseJson);
+
+            PlayerPrefs.SetString("jwtToken", reponse.Token);
+            PlayerPrefs.SetString("username", reponse.Username);
+            PlayerPrefs.Save();
+
             onError?.Invoke(request.downloadHandler.text);
         }
         else
         {
             onSuccess?.Invoke(request.downloadHandler.text);
         }
-        
-        string reponseJson = request.downloadHandler.text;
-
-        var reponse = JsonSerializer.Deserialize<TokenResponse>(reponseJson);
-        
-        PlayerPrefs.SetString("jwtToken", reponse.jwtToken);
-        PlayerPrefs.Save();
-
     }
 
 
-
-    public IEnumerator GetDecksByPlayerId(int playerId, Action<List<DeckDto>> onSuccess, Action<string> onError)
+    public IEnumerator GetDecksByUsername(string username, Action<List<DeckDto>> onSuccess, Action<string> onError)
     {
-        string uri = baseUrl + "Deck/player/" + playerId;
+        string uri = baseUrl + "Deck/player/" + UnityWebRequest.EscapeURL(username);
         UnityWebRequest request = new UnityWebRequest(uri, "GET");
         request.downloadHandler = new DownloadHandlerBuffer();
+
+        string token = PlayerPrefs.GetString("jwtToken");
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            request.SetRequestHeader("Authorization", "Bearer " + token);
+        }
+
         yield return request.SendWebRequest();
+
         if (request.result != UnityWebRequest.Result.Success)
         {
+            Debug.Log("Get failed" + request.downloadHandler.text);
             onError?.Invoke(request.downloadHandler.text);
         }
         else
         {
             Debug.Log("RAW GET RESPONSE: " + request.downloadHandler.text);
 
-            List<DeckDto> result = JsonConvert.DeserializeObject<List<DeckDto>>(request.downloadHandler.text);
+            var result = JsonSerializer.Deserialize<List<DeckDto>>(request.downloadHandler.text);
 
-            foreach (DeckDto item in result)
-            {
-                Debug.Log("Parsed deck name: " + item.deckName);
-                Debug.Log("Parsed commander: " + item.deckCommander);
-                Debug.Log("Parsed cards count: " + (item.cards == null ? -1 : item.cards.Count));
-            }
-            
             onSuccess?.Invoke(result);
         }
     }
+
     public IEnumerator CreateGame(CreateGameDto dto, Action<GameResponseDto> onSuccess, Action<string> onError)
     {
         string json = JsonSerializer.Serialize(dto);
         UnityWebRequest request = new UnityWebRequest(baseUrl + "Game", "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
-        request.uploadHandler   = new UploadHandlerRaw(bodyRaw);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
@@ -186,7 +191,7 @@ public class APIManager : MonoBehaviour
         string json = JsonSerializer.Serialize(dto);
         UnityWebRequest request = new UnityWebRequest(baseUrl + "Game/join", "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
-        request.uploadHandler   = new UploadHandlerRaw(bodyRaw);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
@@ -197,5 +202,4 @@ public class APIManager : MonoBehaviour
         else
             onSuccess?.Invoke(JsonSerializer.Deserialize<GameResponseDto>(request.downloadHandler.text));
     }
-    
 }

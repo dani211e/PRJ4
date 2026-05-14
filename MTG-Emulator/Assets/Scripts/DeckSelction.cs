@@ -10,7 +10,6 @@ public class DeckSelectPopup : MonoBehaviour
     [SerializeField] private Transform deckListParent;
     [SerializeField] private GameObject deckButtonPrefab;
     [SerializeField] private Deck gameplayDeck;
-    private int CurrecntPlayerId = 1;
 
 
     public void OpenSettingsPopup()
@@ -43,9 +42,11 @@ public class DeckSelectPopup : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+        
+        string username = PlayerPrefs.GetString("username");
 
-        StartCoroutine(APIManager.Instance.GetDecksByPlayerId(
-            CurrecntPlayerId,
+        StartCoroutine(APIManager.Instance.GetDecksByUsername(
+            username,
             result =>
             {
                 foreach (DeckDto item in result)

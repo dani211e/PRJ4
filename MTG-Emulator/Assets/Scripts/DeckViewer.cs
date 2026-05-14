@@ -13,7 +13,6 @@ public class DeckViewer : MonoBehaviour
 
 
 
-    private int CurrecntPlayerId = 1;
     
     [Header("Deck UI")]
     [SerializeField] private Transform deckListParent;
@@ -37,6 +36,10 @@ public class DeckViewer : MonoBehaviour
 
     public void Start()
     {
+        
+        Debug.Log("APIManager instance: " + APIManager.Instance);
+        Debug.Log("Saved username: " + PlayerPrefs.GetString("username"));
+        
         LoadDeckList();
     }
 
@@ -46,9 +49,12 @@ public class DeckViewer : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+        
+        string username = PlayerPrefs.GetString("username");
+        
 
-        StartCoroutine(APIManager.Instance.GetDecksByPlayerId(
-            CurrecntPlayerId,
+        StartCoroutine(APIManager.Instance.GetDecksByUsername(
+            username,
             result =>
             {
                 foreach (DeckDto item in result)
