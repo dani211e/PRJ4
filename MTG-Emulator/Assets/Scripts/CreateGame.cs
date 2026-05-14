@@ -25,7 +25,7 @@ public class CreateGame : MonoBehaviour
     
     [Header("Streamer Mode")]
     [SerializeField] private Button toggleCodeButton;
-    [SerializeField] private TMP_Text toggleButtonText;
+    
     
     private bool codeVisible = true;
 
@@ -60,17 +60,7 @@ public class CreateGame : MonoBehaviour
     public void OnClickToggleCode()
     {
         codeVisible = !codeVisible;
-
-        if (codeVisible)
-        {
-            gameCodeText.text = GameSession.GameCode;
-            toggleButtonText.text = "HIDE CODE";
-        }
-        else
-        {
-            gameCodeText.text = "••••••";
-            toggleButtonText.text = "SHOW CODE";
-        }
+        gameCodeText.text = codeVisible ? GameSession.GameCode : "******";
     }
 
 
