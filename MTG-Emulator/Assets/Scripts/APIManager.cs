@@ -153,7 +153,7 @@ public class APIManager : MonoBehaviour
         if (request.result != UnityWebRequest.Result.Success)
             onError?.Invoke(request.downloadHandler.text);
         else
-            onSuccess?.Invoke(JsonUtility.FromJson<GameResponseDto>(request.downloadHandler.text));
+            onSuccess?.Invoke(JsonSerializer.Deserialize<GameResponseDto>(request.downloadHandler.text));
     }
 
     public IEnumerator JoinGame(JoinGameDto dto, Action<GameResponseDto> onSuccess, Action<string> onError)
@@ -170,7 +170,7 @@ public class APIManager : MonoBehaviour
         if (request.result != UnityWebRequest.Result.Success)
             onError?.Invoke(request.downloadHandler.text);
         else
-            onSuccess?.Invoke(JsonUtility.FromJson<GameResponseDto>(request.downloadHandler.text));
+            onSuccess?.Invoke(JsonSerializer.Deserialize<GameResponseDto>(request.downloadHandler.text));
     }
     
 }
