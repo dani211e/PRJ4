@@ -22,6 +22,12 @@ public class CreateGame : MonoBehaviour
 
     [SerializeField]
     private TMP_Text statusText;
+    
+    [Header("Streamer Mode")]
+    [SerializeField] private Button toggleCodeButton;
+    [SerializeField] private TMP_Text toggleButtonText;
+    
+    private bool codeVisible = true;
 
     private void Start()
     {
@@ -33,6 +39,7 @@ public class CreateGame : MonoBehaviour
 
         maxPlayersSlider.onValueChanged.AddListener(updateSliderLabel);
         createButton.onClick.AddListener(OnClickCreate);
+        toggleCodeButton.onClick.AddListener(OnClickToggleCode);
 
         refreshCode();
         setStatus("");
@@ -42,11 +49,28 @@ public class CreateGame : MonoBehaviour
     {
         maxPlayersSlider.onValueChanged.RemoveListener(updateSliderLabel);
         createButton.onClick.RemoveListener(OnClickCreate);
+        toggleCodeButton.onClick.RemoveListener(OnClickToggleCode);
     }
 
     private void refreshCode()
     {
         gameCodeText.text = GameSession.GameCode;
+    }
+    
+    public void OnClickToggleCode()
+    {
+        codeVisible = !codeVisible;
+
+        if (codeVisible)
+        {
+            gameCodeText.text = GameSession.GameCode;
+            toggleButtonText.text = "HIDE CODE";
+        }
+        else
+        {
+            gameCodeText.text = "••••••";
+            toggleButtonText.text = "SHOW CODE";
+        }
     }
 
 
