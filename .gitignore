@@ -484,6 +484,9 @@ $RECYCLE.BIN/
 # Scryfal folder
 scryfall-data/
 
+!/MTG-Emulator/**/*.meta
+
 # Ignore the build dll's that get copied to unity's asset folder
 **/MTG-Emulator.Backend.dll
 **/MTG-Emulator.Unity.dll
+**/MTG-Emulator.Unity.dll.meta
