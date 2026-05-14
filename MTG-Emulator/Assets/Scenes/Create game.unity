@@ -1539,27 +1539,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2027437785536580787, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
       propertyPath: m_Name
-      value: DarkButton
+      value: BackButton
       objectReference: {fileID: 0}
     - target: {fileID: 2469359424003154749, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
       propertyPath: m_text
       value: BACK
-      objectReference: {fileID: 0}
-    - target: {fileID: 2469359424003154749, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
-      propertyPath: m_fontStyle
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 2469359424003154749, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
-      propertyPath: m_fontColor.b
-      value: 0.3137255
-      objectReference: {fileID: 0}
-    - target: {fileID: 2469359424003154749, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
-      propertyPath: m_fontColor.r
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2469359424003154749, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
-      propertyPath: m_fontColor32.rgba
-      value: 4283453440
       objectReference: {fileID: 0}
     - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
@@ -1905,7 +1889,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 598053830303778662, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
       propertyPath: m_Name
-      value: PurpleButton
+      value: CreateGameButton
       objectReference: {fileID: 0}
     - target: {fileID: 3364501436423483388, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
       propertyPath: m_Pivot.x
