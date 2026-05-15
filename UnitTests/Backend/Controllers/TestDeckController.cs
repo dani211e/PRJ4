@@ -42,7 +42,7 @@ namespace UnitTests.Backend.Controllers
                 if (deck != null)
                 {
                     Assert.That(deck.Cards.Count(c => c.Name == "Test commander"), Is.EqualTo(1));
-                    Assert.That(deck.Cards.Count(c => c.Name == "Test card"), Is.EqualTo(1));
+                    Assert.That(deck.Cards.Count(c => c.Name == "Test card"),      Is.EqualTo(1));
                 }
             });
         }
@@ -77,9 +77,9 @@ namespace UnitTests.Backend.Controllers
             await insertPlayerAsync();
             await insertCardAsync("Test commander");
 
-            var dto = createDeckDto(cardList: cardList);
+            var dto    = createDeckDto(cardList: cardList);
             var result = await uut.CreateDeck(dto);
-            var deck = extractCreatedDto(result);
+            var deck   = extractCreatedDto(result);
 
             if (deck != null)
                 Assert.That(deck.Cards.Count, Is.EqualTo(expectedCount));
@@ -110,9 +110,9 @@ namespace UnitTests.Backend.Controllers
 
             var dto = createDeckDto(cardList: "1 Valid Card\n2 Missing Card\n");
 
-            var result = await uut.CreateDeck(dto);
+            var result     = await uut.CreateDeck(dto);
             var badRequest = result.Result as BadRequestObjectResult;
-            var value = badRequest?.Value as InvalidCardsResponse;
+            var value      = badRequest?.Value as InvalidCardsResponse;
 
             Assert.That(value,                       Is.Not.Null);
             Assert.That(value!.InvalidCards, Does.Contain("Missing Card"));
@@ -128,7 +128,7 @@ namespace UnitTests.Backend.Controllers
             var dto = createDeckDto(cardList: "1 Test commander\n2 Test commander\n");
 
             var result = await uut.CreateDeck(dto);
-            var deck = extractCreatedDto(result);
+            var deck   = extractCreatedDto(result);
 
             if (deck != null)
                 Assert.That(deck.Cards.Count(c => c.Name == "Test commander"), Is.EqualTo(3));
@@ -140,7 +140,6 @@ namespace UnitTests.Backend.Controllers
             await insertPlayerAsync();
             await insertCardAsync("Test card");
 
-            // Commander is "Test commander" but only "Test card" is in the list
             var dto = createDeckDto(cardList: "1 Test card\n");
 
             var result = await uut.CreateDeck(dto);
@@ -180,9 +179,12 @@ namespace UnitTests.Backend.Controllers
 
             await uut.CreateDeck(dto);
 
-            var deck = await Context.Decks.Include(d => d.Cards).FirstOrDefaultAsync();
-            Assert.That(deck,              Is.Not.Null);
-            Assert.That(deck!.Cards.Count, Is.EqualTo(1));
+            var deck = await Context.Decks
+                .Include(d => d.DeckCards)
+                .FirstOrDefaultAsync();
+
+            Assert.That(deck,                        Is.Not.Null);
+            Assert.That(deck!.DeckCards.Sum(dc => dc.Quantity), Is.EqualTo(1));
         }
 
         // GetDeckById
@@ -198,7 +200,7 @@ namespace UnitTests.Backend.Controllers
                 DeckName      = "Test deck",
                 DeckCommander = "Test commander",
                 Player        = player,
-                Cards         = [card],
+                DeckCards     = [new DeckCard { Card = card, Quantity = 1 }],
             };
             Context.Decks.Add(deck);
             await Context.SaveChangesAsync();
@@ -234,7 +236,7 @@ namespace UnitTests.Backend.Controllers
                 DeckName      = "Other deck",
                 DeckCommander = "Commander",
                 Player        = player,
-                Cards         = [],
+                DeckCards     = [],
             };
             Context.Decks.Add(deck);
             await Context.SaveChangesAsync();
@@ -256,7 +258,11 @@ namespace UnitTests.Backend.Controllers
                 DeckName      = "MultiCardDeck",
                 DeckCommander = "Test Card1",
                 Player        = player,
-                Cards         = [card1, card1, card2],
+                DeckCards     =
+                [
+                    new DeckCard { Card = card1, Quantity = 2 },
+                    new DeckCard { Card = card2, Quantity = 1 },
+                ],
             };
             Context.Decks.Add(deck);
             await Context.SaveChangesAsync();
@@ -266,13 +272,13 @@ namespace UnitTests.Backend.Controllers
 
             Assert.Multiple(() =>
             {
-                Assert.That(deckDto,                                             Is.Not.Null);
-                Assert.That(deckDto!.Cards.Count,                               Is.EqualTo(3));
-                Assert.That(deckDto.Cards.Count(c => c.Name == "Test Card1"),  Is.EqualTo(2));
-                Assert.That(deckDto.Cards.Count(c => c.Name == "Test Card2"),  Is.EqualTo(1));
+                Assert.That(deckDto,                                            Is.Not.Null);
+                Assert.That(deckDto!.Cards.Count,                              Is.EqualTo(3));
+                Assert.That(deckDto.Cards.Count(c => c.Name == "Test Card1"), Is.EqualTo(2));
+                Assert.That(deckDto.Cards.Count(c => c.Name == "Test Card2"), Is.EqualTo(1));
             });
         }
-        
+
         [Test]
         public async Task GetDeckById_CardWithRelatedCards_ReturnsRelatedCardDtos()
         {
@@ -293,7 +299,7 @@ namespace UnitTests.Backend.Controllers
                 DeckName      = "Related Deck",
                 DeckCommander = "Test card",
                 Player        = player,
-                Cards         = [card],
+                DeckCards     = [new DeckCard { Card = card, Quantity = 1 }],
             };
             Context.Decks.Add(deck);
             await Context.SaveChangesAsync();
@@ -301,8 +307,8 @@ namespace UnitTests.Backend.Controllers
             var result  = await uut.GetDeckById(deck.DeckId);
             var deckDto = (result.Result as OkObjectResult)?.Value as DeckDto;
 
-            Assert.That(deckDto!.Cards[0].RelatedCards,            Has.Count.EqualTo(1));
-            Assert.That(deckDto.Cards[0].RelatedCards[0].Name,     Is.EqualTo("Related card"));
+            Assert.That(deckDto!.Cards[0].RelatedCards,        Has.Count.EqualTo(1));
+            Assert.That(deckDto.Cards[0].RelatedCards[0].Name, Is.EqualTo("Related card"));
         }
 
         // GetAllDecksByUsername
@@ -316,7 +322,7 @@ namespace UnitTests.Backend.Controllers
                 DeckName      = "Deck One",
                 DeckCommander = "Commander",
                 Player        = player,
-                Cards         = [],
+                DeckCards     = [],
             });
             await Context.SaveChangesAsync();
 
@@ -324,11 +330,11 @@ namespace UnitTests.Backend.Controllers
             var ok     = result.Result as OkObjectResult;
             var decks  = ok?.Value as List<AllDecksDto>;
 
-            Assert.That(decks,              Is.Not.Null);
-            Assert.That(decks!.Count,       Is.EqualTo(1));
-            Assert.That(decks[0].DeckName,  Is.EqualTo("Deck One"));
+            Assert.That(decks,             Is.Not.Null);
+            Assert.That(decks!.Count,      Is.EqualTo(1));
+            Assert.That(decks[0].DeckName, Is.EqualTo("Deck One"));
         }
-        
+
         [Test]
         public async Task GetAllDecksByUsername_CommanderMatchesCard_ReturnsDeckImageUri()
         {
@@ -340,7 +346,7 @@ namespace UnitTests.Backend.Controllers
                 DeckName      = "Deck One",
                 DeckCommander = "Test commander",
                 Player        = player,
-                Cards         = [card],
+                DeckCards     = [new DeckCard { Card = card, Quantity = 1 }],
             });
             await Context.SaveChangesAsync();
 
@@ -379,7 +385,7 @@ namespace UnitTests.Backend.Controllers
                 DeckName      = "DeckToDelete",
                 DeckCommander = "Test Commander",
                 Player        = player,
-                Cards         = [],
+                DeckCards     = [],
             };
             Context.Decks.Add(deck);
             await Context.SaveChangesAsync();
@@ -408,7 +414,7 @@ namespace UnitTests.Backend.Controllers
                 DeckName      = "OthersDeck",
                 DeckCommander = "Commander",
                 Player        = player,
-                Cards         = [],
+                DeckCards     = [],
             };
             Context.Decks.Add(deck);
             await Context.SaveChangesAsync();
@@ -432,7 +438,7 @@ namespace UnitTests.Backend.Controllers
                 DeckName      = "DeckToUpdate",
                 DeckCommander = "Test Card1",
                 Player        = player,
-                Cards         = [card1],
+                DeckCards     = [new DeckCard { Card = card1, Quantity = 1 }],
             };
             Context.Decks.Add(deck);
             await Context.SaveChangesAsync();
@@ -446,15 +452,17 @@ namespace UnitTests.Backend.Controllers
             var result = await uut.UpdateDeck(deck.DeckId, updateDto);
             Assert.That(result.Result, Is.TypeOf<NoContentResult>());
 
-            var dbDeck = await Context.Decks.Include(d => d.Cards)
+            var dbDeck = await Context.Decks
+                .Include(d => d.DeckCards)
+                    .ThenInclude(dc => dc.Card)
                 .FirstOrDefaultAsync(d => d.DeckId == deck.DeckId);
 
             Assert.Multiple(() =>
             {
-                Assert.That(dbDeck,                                          Is.Not.Null);
-                Assert.That(dbDeck!.DeckCommander,                          Is.EqualTo("Test Card2"));
-                Assert.That(dbDeck.Cards.Count,                             Is.EqualTo(2));
-                Assert.That(dbDeck.Cards.All(c => c.Name == "Test Card2"), Is.True);
+                Assert.That(dbDeck,                                                             Is.Not.Null);
+                Assert.That(dbDeck!.DeckCommander,                                             Is.EqualTo("Test Card2"));
+                Assert.That(dbDeck.DeckCards.Sum(dc => dc.Quantity),                           Is.EqualTo(2));
+                Assert.That(dbDeck.DeckCards.All(dc => dc.Card.Name == "Test Card2"),          Is.True);
             });
         }
 
@@ -483,7 +491,7 @@ namespace UnitTests.Backend.Controllers
                 DeckName      = "OthersDeck",
                 DeckCommander = "Commander",
                 Player        = player,
-                Cards         = [],
+                DeckCards     = [],
             };
             Context.Decks.Add(deck);
             await Context.SaveChangesAsync();
@@ -504,7 +512,7 @@ namespace UnitTests.Backend.Controllers
                 DeckName      = "DeckToUpdateCards",
                 DeckCommander = "ValidCard",
                 Player        = player,
-                Cards         = [card],
+                DeckCards     = [new DeckCard { Card = card, Quantity = 1 }],
             };
             Context.Decks.Add(deck);
             await Context.SaveChangesAsync();
@@ -535,7 +543,7 @@ namespace UnitTests.Backend.Controllers
                 DeckName      = "DeckEmptyCards",
                 DeckCommander = "Test Card",
                 Player        = player,
-                Cards         = [card],
+                DeckCards     = [new DeckCard { Card = card, Quantity = 1 }],
             };
             Context.Decks.Add(deck);
             await Context.SaveChangesAsync();
@@ -562,7 +570,7 @@ namespace UnitTests.Backend.Controllers
                 DeckName      = "DeckCommanderCheck",
                 DeckCommander = "Test Card",
                 Player        = player,
-                Cards         = [card],
+                DeckCards     = [new DeckCard { Card = card, Quantity = 1 }],
             };
             Context.Decks.Add(deck);
             await Context.SaveChangesAsync();
@@ -589,7 +597,7 @@ namespace UnitTests.Backend.Controllers
                 DeckName      = "DeckWithBadLine",
                 DeckCommander = "Test Card",
                 Player        = player,
-                Cards         = [card],
+                DeckCards     = [new DeckCard { Card = card, Quantity = 1 }],
             };
             Context.Decks.Add(deck);
             await Context.SaveChangesAsync();
@@ -616,7 +624,7 @@ namespace UnitTests.Backend.Controllers
                 DeckName      = "DeckWithBadQuantity",
                 DeckCommander = "Test Card",
                 Player        = player,
-                Cards         = [card],
+                DeckCards     = [new DeckCard { Card = card, Quantity = 1 }],
             };
             Context.Decks.Add(deck);
             await Context.SaveChangesAsync();

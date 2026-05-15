@@ -19,7 +19,7 @@ namespace MTG_Emulator.Backend.DB.Models
         public string ImageUri { get; set; } = string.Empty;
 
         public List<RelatedCard> RelatedCards { get; set; } = [];
-        public List<Deck> Decks { get; set; } = [];
+        public List<DeckCard> DeckCards { get; set; } = [];
         public CardFace? AltFace { get; set; }
     }
 }

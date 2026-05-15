@@ -16,5 +16,20 @@ namespace MTG_Emulator.Backend.DB
         public DbSet<Player> Players { get; set; }
         public DbSet<CardFace> AltFaces { get; set; }
         public DbSet<Game> Games { get; set; } 
+        
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<DeckCard>()
+                .HasOne(dc => dc.Deck)
+                .WithMany(d => d.DeckCards)
+                .HasForeignKey(dc => dc.DeckId);
+
+            modelBuilder.Entity<DeckCard>()
+                .HasOne(dc => dc.Card)
+                .WithMany(c => c.DeckCards)
+                .HasForeignKey(dc => dc.CardId);
+        }
     }
 }

@@ -109,9 +109,13 @@ namespace MTG_Emulator.Backend
                 var deck1 = new Deck
                 {
                     DeckName = "Best deck ever",
-                    Cards = cards,
                     DeckCommander = cards.FirstOrDefault()?.Name ?? "Unknown Commander",
                     Player = player1,
+                    DeckCards = cards.Select(c => new DeckCard
+                    {
+                        Card = c,
+                        Quantity = 1
+                    }).ToList(),
                 };
 
                 db.Decks.Add(deck1);
