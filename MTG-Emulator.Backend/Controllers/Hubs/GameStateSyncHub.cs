@@ -1,0 +1,24 @@
+﻿using Microsoft.AspNetCore.SignalR;
+using MTG_Emulator.Unity.Synchronization;
+using MTG_Emulator.Unity.Synchronization.Events;
+
+namespace MTG_Emulator.Backend.Controllers.Hubs
+{
+    public class GameStateSyncHub : Hub, ISyncEventListener
+    {
+        public async Task MoveCard(MoveCardEvent e)
+        {
+            await Clients.Others.SendAsync(nameof(ISyncEventHandler.OnMoveCard), e);
+        }
+
+        public async Task NewCard(NewCardEvent e)
+        {
+            await Clients.Others.SendAsync(nameof(ISyncEventHandler.OnNewCard), e);
+        }
+
+        public async Task UpdatePlayerStats(PlayerStatsEvent e)
+        {
+            await Clients.Others.SendAsync(nameof(ISyncEventHandler.OnUpdatePlayerStats), e);
+        }
+    }
+}
