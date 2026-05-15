@@ -116,7 +116,7 @@ namespace MTG_Emulator.Backend.Controllers
 
             var decks = await context.Decks
                 .Include(d => d.DeckCards)
-                    .ThenInclude(dc => dc.Card)
+                .ThenInclude(dc => dc.Card)
                 .Where(d => d.Player.Username == username)
                 .ToListAsync();
 
@@ -152,12 +152,39 @@ namespace MTG_Emulator.Backend.Controllers
             if (!IsOwnerOrAdmin(deck.Player.ApiUserId))
                 return Forbid();
 
+            var commanderCard = deck.DeckCards
+                .FirstOrDefault(dc => dc.Card.Name == deck.DeckCommander)?.Card;
+
+            if (commanderCard == null)
+                return NotFound("Commander card not found in deck.");
+
             var deckDto = new DeckDto
             {
                 DeckId = deck.DeckId,
                 DeckName = deck.DeckName,
                 DeckCommander = deck.DeckCommander,
+                CommanderCard = new CardDto
+                {
+                    CardId = commanderCard.CardId,
+                    ScryfallId = commanderCard.ScryfallId,
+                    Name = commanderCard.Name,
+                    OracleText = commanderCard.OracleText,
+                    ImageUri = commanderCard.ImageUri,
+                    AltFace = commanderCard.AltFace == null ? null : new CardFaceDto
+                    {
+                        Name = commanderCard.AltFace.Name,
+                        OracleText = commanderCard.AltFace.OracleText,
+                        ImageUri = commanderCard.AltFace.ImageUri,
+                    },
+                    RelatedCards = commanderCard.RelatedCards.Select(rc => new RelatedCardDto
+                    {
+                        RelatedCardId = rc.RelatedCardId,
+                        Name = rc.Name,
+                        ImageUri = rc.ImageUri,
+                    }).ToList()
+                },
                 Cards = deck.DeckCards
+                    .Where(dc => dc.Card.Name != deck.DeckCommander)
                     .SelectMany(dc => Enumerable.Repeat(new CardDto
                     {
                         CardId = dc.Card.CardId,
