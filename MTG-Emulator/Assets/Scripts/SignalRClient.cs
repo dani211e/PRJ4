@@ -18,6 +18,7 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
     public event EventHandler<MoveCardEvent> OnMoveCardEvent;
     public event EventHandler<NewCardEvent> OnNewCardEvent;
     public event EventHandler<PlayerStatsEvent> OnPlayerStatsEvent;
+    public event EventHandler<TurnChangedEvent> OnTurnChangedEvent;
 
     public async void Awake()
     {
@@ -41,6 +42,7 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
             connection.On<MoveCardEvent>(nameof(ISyncEventHandler.OnMoveCard), OnMoveCard);
             connection.On<NewCardEvent>(nameof(ISyncEventHandler.OnNewCard), OnNewCard);
             connection.On<PlayerStatsEvent>(nameof(ISyncEventHandler.OnUpdatePlayerStats), OnUpdatePlayerStats);
+            connection.On<TurnChangedEvent>(nameof(ISyncEventHandler.OnTurnChanged), OnTurnChanged);
 
             await connection.StartAsync();
         }
@@ -74,5 +76,10 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
     {
         var t = connection.SendAsync(e.Method, e);
         t.Wait();
+    }
+
+    public void OnTurnChanged(TurnChangedEvent e)
+    {
+        OnTurnChangedEvent?.Invoke(this, e);
     }
 }

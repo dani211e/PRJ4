@@ -7,4 +7,5 @@ public interface ISyncEventHandler
     void OnMoveCard(MoveCardEvent e);
     void OnNewCard(NewCardEvent e);
     void OnUpdatePlayerStats(PlayerStatsEvent e);
+    void OnTurnChanged(TurnChangedEvent e);
 }
