@@ -22,9 +22,11 @@ public class FreeDropZone : MonoBehaviour, IDropHandler
         {
             card.SetZones(zoneType);
         }
-
-
+        
         dragged.transform.SetParent(transform, true);
         dragged.transform.SetAsLastSibling();
+        dragged.transform.localScale = Vector3.one;
+        dragged.transform.localRotation = Quaternion.identity;
+        
     }
 }

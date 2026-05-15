@@ -11,29 +11,42 @@ public class Deck : MonoBehaviour
     [SerializeField] private GameObject cardPrefab;
     
 
-    private DeckDto currentDeck;
     private List<CardDto> drawPile = new();
 
     public void LoadDeck(DeckDto deck)
     {
+        
         if (deck == null)
         {
             Debug.LogError("Tried to load a null deck.");
             return;
         }
+        
+        StartCoroutine(APIManager.Instance.GetDeckById(
+            deck.DeckId,
+            result =>
+            {
+                Debug.Log(result.Cards);
+                
+                drawPile.Clear();
 
-        currentDeck = deck;
-        drawPile.Clear();
+                if (result.Cards != null)
+                {
+                    drawPile.AddRange(result.Cards);
+                }
+                UpdateCountText();
 
-        if (deck.Cards != null)
-            drawPile = new List<CardDto>(deck.Cards);
+                Debug.Log("Loaded gameplay deck: " + result.DeckName);
+                Debug.Log("Cards loaded: " + drawPile.Count);
 
-        UpdateCountText();
+                ResetGameplayStateForNewDeck();
+                
+            }, error =>
+            {
+                Debug.LogError("Failed to load cards from deck " + deck.DeckId + " " + error);
 
-        Debug.Log("Loaded gameplay deck: " + currentDeck.DeckName);
-        Debug.Log("Cards loaded: " + drawPile.Count);
-
-        ResetGameplayStateForNewDeck();
+            }));
+        
     }
 
     private void ResetGameplayStateForNewDeck()

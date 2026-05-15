@@ -119,8 +119,7 @@ public class DeckViewer : MonoBehaviour
         {
             commanderImage.sprite = null;
         }
-
-
+        
         StartCoroutine(APIManager.Instance.GetDeckById(
             deck.DeckId,
             result =>
@@ -130,7 +129,7 @@ public class DeckViewer : MonoBehaviour
                     Destroy(child.gameObject);
                 }
 
-                var groupCards = deck.Cards.GroupBy(card => card.Name).OrderBy(g => g.Key);
+                var groupCards = result.Cards.GroupBy(card => card.Name).OrderBy(g => g.Key);
 
                 foreach (var group in groupCards)
                 {
@@ -150,7 +149,6 @@ public class DeckViewer : MonoBehaviour
                 Debug.LogError("Failed to load cards from deck " + deck.DeckId + " " + error);
 
             }));
-            
         
         
     }
