@@ -7,16 +7,30 @@ using MTG_Emulator.Unity.Synchronization.Events;
 using Newtonsoft.Json;
 using UnityEngine;
 
-public class SignalRClient : MonoBehaviour, ISynchronizationEventHandler
+public class SignalRClient : MonoBehaviour, ISyncEventHandler
 {
     private readonly Uri apiURL = new Uri("http://localhost:5042");
     private const string hubName = "GameState";
 
     private HubConnection connection;
 
+    public static SignalRClient Instance;
+    public event EventHandler<MoveCardEvent> OnMoveCardEvent;
+    public event EventHandler<NewCardEvent> OnNewCardEvent;
+    public event EventHandler<PlayerStatsEvent> OnPlayerStatsEvent;
+
     public async void Awake()
     {
-        DontDestroyOnLoad(gameObject);
+        if (!Instance)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
 
         try
         {
@@ -24,8 +38,9 @@ public class SignalRClient : MonoBehaviour, ISynchronizationEventHandler
                 .AddNewtonsoftJsonProtocol()
                 .Build();
 
-            connection.On<MoveCardEvent>(nameof(ISynchronizationEventHandler.OnMoveCard), OnMoveCard);
-            connection.On<NewCardEvent>(nameof(ISynchronizationEventHandler.OnNewCard), OnNewCard);
+            connection.On<MoveCardEvent>(nameof(ISyncEventHandler.OnMoveCard), OnMoveCard);
+            connection.On<NewCardEvent>(nameof(ISyncEventHandler.OnNewCard), OnNewCard);
+            connection.On<PlayerStatsEvent>(nameof(ISyncEventHandler.OnUpdatePlayerStats), OnUpdatePlayerStats);
 
             await connection.StartAsync();
         }
@@ -37,26 +52,27 @@ public class SignalRClient : MonoBehaviour, ISynchronizationEventHandler
 
     private void OnDestroy()
     {
-        Task.Run(() => connection.StopAsync());
+        Task.Run(() => connection?.StopAsync());
     }
 
     public void OnMoveCard(MoveCardEvent e)
     {
-        // Debug.Log($"Move card received with {e.Position}");
-
-        // We don't have a defined place/method of storing current cards atm, so use search by name
-        // (this is badbadbadbadbad for performance, should be cleaned later)
-        var obj = GameObject.Find(e.Card);
-        obj.transform.position = new Vector3(e.Position.X, e.Position.Y, 0);
+        OnMoveCardEvent?.Invoke(this, e);
     }
 
     public void OnNewCard(NewCardEvent e)
     {
-        Debug.Log($"New card received with {e.Position}");
+        OnNewCardEvent?.Invoke(this, e);
     }
 
-    public async Task BroadcastMoveCard(MoveCardEvent e)
+    public void OnUpdatePlayerStats(PlayerStatsEvent e)
     {
-        await connection.SendAsync("MoveCard", e);
+        OnPlayerStatsEvent?.Invoke(this, e);
+    }
+
+    public void Broadcast(SyncEvent e)
+    {
+        var t = connection.SendAsync(e.Method, e);
+        t.Wait();
     }
 }
