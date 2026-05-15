@@ -146,6 +146,37 @@ public class APIManager : MonoBehaviour
         }
     }
 
+    public IEnumerator GetDeckById(int deckId, Action<DeckDto> onSuccess, Action<string> onError)
+    {
+        string uri = baseUrl + "Deck/" + UnityWebRequest.EscapeURL(deckId.ToString());
+        UnityWebRequest request = new UnityWebRequest(uri, "GET");
+        request.downloadHandler = new DownloadHandlerBuffer();
+        
+        string token = PlayerPrefs.GetString("jwtToken");
+        
+        if (!string.IsNullOrEmpty(token))
+        {
+            request.SetRequestHeader("Authorization", "Bearer " + token);
+        }
+
+        yield return request.SendWebRequest();
+        
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log("Get failed" + request.downloadHandler.text);
+            onError?.Invoke(request.downloadHandler.text);
+        }
+        else
+        {
+
+            var result = JsonSerializer.Deserialize<DeckDto>(request.downloadHandler.text);
+
+            onSuccess?.Invoke(result);
+        }
+    }
+    
+    
+
     public IEnumerator CreateGame(CreateGameDto dto, Action<GameResponseDto> onSuccess, Action<string> onError)
     {
         string json = JsonSerializer.Serialize(dto);

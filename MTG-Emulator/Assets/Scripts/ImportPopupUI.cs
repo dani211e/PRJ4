@@ -83,7 +83,7 @@ public class ImportPopupUI : MonoBehaviour
         {
             DeckName = deckName,
             CardList = importText,
-            Commander = "none"
+            Commander = "Swamp"
         };
 
         if (APIManager.Instance == null)

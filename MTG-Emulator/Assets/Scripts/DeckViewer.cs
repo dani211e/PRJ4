@@ -76,6 +76,7 @@ public class DeckViewer : MonoBehaviour
         GameObject obj = Instantiate(deckButtonPrefab, deckListParent);
 
         TMP_Text text = obj.GetComponentInChildren<TMP_Text>();
+        
         if (text != null)
         {
             text.text = deck.DeckName;
@@ -101,8 +102,7 @@ public class DeckViewer : MonoBehaviour
 
     public void ShowDeck(DeckDto deck)
     {
-        currentDeck = deck;
-
+        
         if (deckListPanel != null)
         {
             deckListPanel.SetActive(false);
@@ -112,57 +112,49 @@ public class DeckViewer : MonoBehaviour
         {
             deckDetailsPanel.SetActive(true);
         }
-
-
-        commanderNameText.text = string.IsNullOrEmpty(deck.DeckCommander)
-            ? "Select Commander"
-            : deck.DeckCommander;
+        
+        commanderNameText.text = string.IsNullOrEmpty(deck.DeckCommander) ? "Select Commander" : deck.DeckCommander;
 
         if (commanderImage != null)
+        {
             commanderImage.sprite = null;
-
-        foreach (Transform child in cardListParent)
-            Destroy(child.gameObject);
-
-        var groupedCards = deck.Cards
-            .GroupBy(c => c.Name)
-            .OrderBy(g => g.Key);
-
-        foreach (var group in groupedCards)
-        {
-            GameObject rowObj = Instantiate(cardRowPrefab, cardListParent);
-
-            Transform quantityTransform = rowObj.transform.Find("CardQuantity");
-            Transform nameTransform = rowObj.transform.Find("CardName");
-
-            if (quantityTransform != null)
-                quantityTransform.GetComponent<TMP_Text>().text = group.Count().ToString();
-
-            if (nameTransform != null)
-                nameTransform.GetComponent<TMP_Text>().text = group.Key;
         }
 
+
+        StartCoroutine(APIManager.Instance.GetDeckById(
+            deck.DeckId,
+            result =>
+            {
+                foreach (Transform child in cardListParent)
+                {
+                    Destroy(child.gameObject);
+                }
+
+                var groupCards = deck.Cards.GroupBy(card => card.Name).OrderBy(g => g.Key);
+
+                foreach (var group in groupCards)
+                {
+                    GameObject rowObj = Instantiate(cardRowPrefab, cardListParent);
+
+                    Transform quantityTransform = rowObj.transform.Find("CardQuantity");
+                    Transform nameTransform = rowObj.transform.Find("CardName");
+            
+                    if (quantityTransform != null)
+                        quantityTransform.GetComponent<TMP_Text>().text = group.Count().ToString();
+                    
+                    if (nameTransform != null)
+                        nameTransform.GetComponent<TMP_Text>().text = group.Key;
+                }
+            }, error =>
+            {
+                Debug.LogError("Failed to load cards from deck " + deck.DeckId + " " + error);
+
+            }));
+            
+        
+        
     }
-
-    private void OnCardClicked(CardDto card)
-    {
-        if (currentDeck == null)
-        {
-            return;
-        }
-
-        currentDeck.DeckCommander = card.Name;
-        commanderNameText.text = card.Name;
-
-        if (!string.IsNullOrEmpty(card.ImageUri))
-            StartCoroutine(LoadImage(card.ImageUri, commanderImage));
-
-        // Persist commander to backend
-        StartCoroutine(APIManager.Instance.UpdateDeckCommander(currentDeck.DeckName, card.Name,
-            deck => Debug.Log($"Commander updated to {deck.DeckCommander}"),
-            error => Debug.LogError("Failed to update commander: " + error)
-        ));
-    }
+    
 
     private IEnumerator LoadImage(string url, Image targetImage)
     {
