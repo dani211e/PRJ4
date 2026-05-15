@@ -2,8 +2,9 @@
 
 namespace MTG_Emulator.Unity.Synchronization;
 
-public interface ISynchronizationEventHandler
+public interface ISyncEventHandler
 {
     void OnMoveCard(MoveCardEvent e);
     void OnNewCard(NewCardEvent e);
+    void OnUpdatePlayerStats(PlayerStatsEvent e);
 }

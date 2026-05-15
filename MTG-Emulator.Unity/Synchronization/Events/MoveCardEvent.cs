@@ -2,8 +2,14 @@
 
 namespace MTG_Emulator.Unity.Synchronization.Events
 {
-    public class MoveCardEvent(string client, string card, Vector2 position) : SyncCardEvent(client, card)
+    public class MoveCardEvent : SyncEvent
     {
-        public Vector2 Position { get; } = position;
+        public MoveCardEvent()
+        {
+            Method = nameof(ISyncEventListener.MoveCard);
+        }
+
+
+        public Vector2? Position { get; set; }
     }
 }
