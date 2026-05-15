@@ -32,7 +32,6 @@ namespace MTG_Emulator.Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<DeckDto>> CreateDeck([FromBody] CreateDeckDto deckDto)
         {
-            // Resolve player from JWT instead of trusting the request body
             var callerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var player = await context.Players
                 .FirstOrDefaultAsync(p => p.ApiUserId == callerId);
@@ -40,9 +39,8 @@ namespace MTG_Emulator.Backend.Controllers
             if (player == null)
                 return NotFound("Player profile not found.");
 
-            // Map cards from names
-            var cards = new List<Card>();
             var invalidCardNames = new List<string>();
+            var deckCards = new List<DeckCard>();
             string[] lines = deckDto.CardList.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
             foreach (string line in lines)
@@ -58,8 +56,7 @@ namespace MTG_Emulator.Backend.Controllers
                     .FirstOrDefaultAsync(c => c.Name == name);
 
                 if (cardEntity != null)
-                    for (int i = 0; i < amount; i++)
-                        cards.Add(cardEntity);
+                    deckCards.Add(new DeckCard { Card = cardEntity, Quantity = amount });
                 else
                     invalidCardNames.Add(name);
             }
@@ -70,8 +67,8 @@ namespace MTG_Emulator.Backend.Controllers
                     Error = "The following cards do not exist",
                     InvalidCards = invalidCardNames,
                 });
-            
-            var commanderInDeck = cards.Any(c => c.Name == deckDto.Commander);
+
+            var commanderInDeck = deckCards.Any(dc => dc.Card.Name == deckDto.Commander);
             if (!commanderInDeck)
                 return BadRequest($"Commander '{deckDto.Commander}' must be included in the card list.");
 
@@ -79,7 +76,7 @@ namespace MTG_Emulator.Backend.Controllers
             {
                 DeckName = deckDto.DeckName,
                 DeckCommander = deckDto.Commander,
-                Cards = cards,
+                DeckCards = deckCards,
                 Player = player,
             };
 
@@ -91,16 +88,18 @@ namespace MTG_Emulator.Backend.Controllers
                 DeckId = deck.DeckId,
                 DeckName = deck.DeckName,
                 DeckCommander = deck.DeckCommander,
-                Cards = deck.Cards.Select(c => new CardDto
-                {
-                    CardId = c.CardId,
-                    Name = c.Name,
-                    OracleText = c.OracleText,
-                    ImageUri = c.ImageUri,
-                }).ToList(),
+                Cards = deck.DeckCards
+                    .SelectMany(dc => Enumerable.Repeat(new CardDto
+                    {
+                        CardId = dc.Card.CardId,
+                        Name = dc.Card.Name,
+                        OracleText = dc.Card.OracleText,
+                        ImageUri = dc.Card.ImageUri,
+                    }, dc.Quantity))
+                    .ToList(),
             };
 
-            return CreatedAtAction(nameof(GetDeckById), new {deck.DeckId }, resultDto);
+            return CreatedAtAction(nameof(GetDeckById), new { deck.DeckId }, resultDto);
         }
 
         [HttpGet("player/{username}")]
@@ -116,7 +115,8 @@ namespace MTG_Emulator.Backend.Controllers
                 return Forbid();
 
             var decks = await context.Decks
-                .Include(d => d.Cards)
+                .Include(d => d.DeckCards)
+                    .ThenInclude(dc => dc.Card)
                 .Where(d => d.Player.Username == username)
                 .ToListAsync();
 
@@ -125,7 +125,8 @@ namespace MTG_Emulator.Backend.Controllers
                 DeckId = deck.DeckId,
                 DeckName = deck.DeckName,
                 DeckCommander = deck.DeckCommander,
-                DeckImageUri = deck.Cards.FirstOrDefault(c => c.Name == deck.DeckCommander)?.ImageUri ?? string.Empty
+                DeckImageUri = deck.DeckCards
+                    .FirstOrDefault(dc => dc.Card.Name == deck.DeckCommander)?.Card.ImageUri ?? string.Empty
             }).ToList();
 
             return Ok(deckDtos);
@@ -135,11 +136,14 @@ namespace MTG_Emulator.Backend.Controllers
         public async Task<ActionResult<DeckDto>> GetDeckById(int deckId)
         {
             var deck = await context.Decks
-                .Include(d => d.Cards)
+                .Include(d => d.DeckCards)
+                .ThenInclude(dc => dc.Card)
                 .ThenInclude(c => c.AltFace)
-                .Include(d => d.Cards)
+                .Include(d => d.DeckCards)
+                .ThenInclude(dc => dc.Card)
                 .ThenInclude(c => c.RelatedCards)
                 .Include(d => d.Player)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(d => d.DeckId == deckId);
 
             if (deck == null)
@@ -153,27 +157,27 @@ namespace MTG_Emulator.Backend.Controllers
                 DeckId = deck.DeckId,
                 DeckName = deck.DeckName,
                 DeckCommander = deck.DeckCommander,
-                Cards = deck.Cards
-                    .Select(c => new CardDto
+                Cards = deck.DeckCards
+                    .SelectMany(dc => Enumerable.Repeat(new CardDto
                     {
-                        CardId = c.CardId,
-                        ScryfallId = c.ScryfallId,
-                        Name = c.Name,
-                        OracleText = c.OracleText,
-                        ImageUri = c.ImageUri,
-                        AltFace = c.AltFace == null ? null : new CardFaceDto
+                        CardId = dc.Card.CardId,
+                        ScryfallId = dc.Card.ScryfallId,
+                        Name = dc.Card.Name,
+                        OracleText = dc.Card.OracleText,
+                        ImageUri = dc.Card.ImageUri,
+                        AltFace = dc.Card.AltFace == null ? null : new CardFaceDto
                         {
-                            Name = c.AltFace.Name,
-                            OracleText = c.AltFace.OracleText,
-                            ImageUri = c.AltFace.ImageUri,
+                            Name = dc.Card.AltFace.Name,
+                            OracleText = dc.Card.AltFace.OracleText,
+                            ImageUri = dc.Card.AltFace.ImageUri,
                         },
-                        RelatedCards = c.RelatedCards.Select(rc => new RelatedCardDto
+                        RelatedCards = dc.Card.RelatedCards.Select(rc => new RelatedCardDto
                         {
                             RelatedCardId = rc.RelatedCardId,
                             Name = rc.Name,
                             ImageUri = rc.ImageUri,
                         }).ToList()
-                    })
+                    }, dc.Quantity))
                     .ToList(),
             };
 
@@ -185,7 +189,7 @@ namespace MTG_Emulator.Backend.Controllers
         {
             var deck = await context.Decks
                 .Include(d => d.Player)
-                .Include(d => d.Cards)
+                .Include(d => d.DeckCards)
                 .FirstOrDefaultAsync(d => d.DeckId == deckid);
 
             if (deck == null)
@@ -208,7 +212,7 @@ namespace MTG_Emulator.Backend.Controllers
 
             var deck = await context.Decks
                 .Include(d => d.Player)
-                .Include(d => d.Cards)
+                .Include(d => d.DeckCards).ThenInclude(deckCard => deckCard.Card)
                 .FirstOrDefaultAsync(d => d.DeckId == deckId);
 
             if (deck == null)
@@ -221,7 +225,8 @@ namespace MTG_Emulator.Backend.Controllers
             deck.DeckCommander = deckDto.Commander;
 
             var invalidCardNames = new List<string>();
-            deck.Cards.Clear();
+            deck.DeckCards.Clear();
+
             if (!string.IsNullOrWhiteSpace(deckDto.CardList))
             {
                 string[] lines = deckDto.CardList.Split('\n', StringSplitOptions.RemoveEmptyEntries);
@@ -230,15 +235,14 @@ namespace MTG_Emulator.Backend.Controllers
                     int firstSpace = line.IndexOf(' ');
                     if (firstSpace == -1)
                         return BadRequest($"Wrong line in card list: '{line}'");
-                    if (!int.TryParse(line.Substring(0, firstSpace), out int num))
+                    if (!int.TryParse(line.Substring(0, firstSpace), out int amount))
                         return BadRequest($"Invalid quantity in line: '{line}'");
 
                     string name = line.Substring(firstSpace + 1);
                     var cardEntity = await context.Cards.FirstOrDefaultAsync(c => c.Name == name);
 
                     if (cardEntity != null)
-                        for (int i = 0; i < num; i++)
-                            deck.Cards.Add(cardEntity);
+                        deck.DeckCards.Add(new DeckCard { Card = cardEntity, Quantity = amount });
                     else
                         invalidCardNames.Add(name);
                 }
@@ -250,8 +254,8 @@ namespace MTG_Emulator.Backend.Controllers
                     Error = "The following cards do not exist",
                     InvalidCards = invalidCardNames,
                 });
-            
-            var commanderInDeck = deck.Cards.Any(c => c.Name == deckDto.Commander);
+
+            var commanderInDeck = deck.DeckCards.Any(dc => dc.Card.Name == deckDto.Commander);
             if (!commanderInDeck)
                 return BadRequest($"Commander '{deckDto.Commander}' must be included in the card list.");
 
