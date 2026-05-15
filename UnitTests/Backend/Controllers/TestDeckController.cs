@@ -198,7 +198,7 @@ namespace UnitTests.Backend.Controllers
             var deck = new Deck
             {
                 DeckName      = "Test deck",
-                DeckCommander = "Test commander",
+                CommanderName = "Test commander",
                 Player        = player,
                 DeckCards     = [new DeckCard { Card = card, Quantity = 1 }],
             };
@@ -234,7 +234,7 @@ namespace UnitTests.Backend.Controllers
             var deck = new Deck
             {
                 DeckName      = "Other deck",
-                DeckCommander = "Commander",
+                CommanderName = "Commander",
                 Player        = player,
                 DeckCards     = [],
             };
@@ -256,7 +256,7 @@ namespace UnitTests.Backend.Controllers
             var deck = new Deck
             {
                 DeckName      = "MultiCardDeck",
-                DeckCommander = "Test Card1",
+                CommanderName = "Test Card1",
                 Player        = player,
                 DeckCards     =
                 [
@@ -297,7 +297,7 @@ namespace UnitTests.Backend.Controllers
             var deck = new Deck
             {
                 DeckName      = "Related Deck",
-                DeckCommander = "Test card",
+                CommanderName = "Test card",
                 Player        = player,
                 DeckCards     = [new DeckCard { Card = card, Quantity = 1 }],
             };
@@ -320,7 +320,7 @@ namespace UnitTests.Backend.Controllers
             Context.Decks.Add(new Deck
             {
                 DeckName      = "Deck One",
-                DeckCommander = "Commander",
+                CommanderName = "Commander",
                 Player        = player,
                 DeckCards     = [],
             });
@@ -344,7 +344,7 @@ namespace UnitTests.Backend.Controllers
             Context.Decks.Add(new Deck
             {
                 DeckName      = "Deck One",
-                DeckCommander = "Test commander",
+                CommanderName = "Test commander",
                 Player        = player,
                 DeckCards     = [new DeckCard { Card = card, Quantity = 1 }],
             });
@@ -383,7 +383,7 @@ namespace UnitTests.Backend.Controllers
             var deck = new Deck
             {
                 DeckName      = "DeckToDelete",
-                DeckCommander = "Test Commander",
+                CommanderName = "Test Commander",
                 Player        = player,
                 DeckCards     = [],
             };
@@ -412,7 +412,7 @@ namespace UnitTests.Backend.Controllers
             var deck = new Deck
             {
                 DeckName      = "OthersDeck",
-                DeckCommander = "Commander",
+                CommanderName = "Commander",
                 Player        = player,
                 DeckCards     = [],
             };
@@ -436,7 +436,7 @@ namespace UnitTests.Backend.Controllers
             var deck = new Deck
             {
                 DeckName      = "DeckToUpdate",
-                DeckCommander = "Test Card1",
+                CommanderName = "Test Card1",
                 Player        = player,
                 DeckCards     = [new DeckCard { Card = card1, Quantity = 1 }],
             };
@@ -460,7 +460,7 @@ namespace UnitTests.Backend.Controllers
             Assert.Multiple(() =>
             {
                 Assert.That(dbDeck,                                                             Is.Not.Null);
-                Assert.That(dbDeck!.DeckCommander,                                             Is.EqualTo("Test Card2"));
+                Assert.That(dbDeck!.CommanderName,                                             Is.EqualTo("Test Card2"));
                 Assert.That(dbDeck.DeckCards.Sum(dc => dc.Quantity),                           Is.EqualTo(2));
                 Assert.That(dbDeck.DeckCards.All(dc => dc.Card.Name == "Test Card2"),          Is.True);
             });
@@ -489,7 +489,7 @@ namespace UnitTests.Backend.Controllers
             var deck = new Deck
             {
                 DeckName      = "OthersDeck",
-                DeckCommander = "Commander",
+                CommanderName = "Commander",
                 Player        = player,
                 DeckCards     = [],
             };
@@ -510,7 +510,7 @@ namespace UnitTests.Backend.Controllers
             var deck = new Deck
             {
                 DeckName      = "DeckToUpdateCards",
-                DeckCommander = "ValidCard",
+                CommanderName = "ValidCard",
                 Player        = player,
                 DeckCards     = [new DeckCard { Card = card, Quantity = 1 }],
             };
@@ -541,7 +541,7 @@ namespace UnitTests.Backend.Controllers
             var deck = new Deck
             {
                 DeckName      = "DeckEmptyCards",
-                DeckCommander = "Test Card",
+                CommanderName = "Test Card",
                 Player        = player,
                 DeckCards     = [new DeckCard { Card = card, Quantity = 1 }],
             };
@@ -568,7 +568,7 @@ namespace UnitTests.Backend.Controllers
             var deck = new Deck
             {
                 DeckName      = "DeckCommanderCheck",
-                DeckCommander = "Test Card",
+                CommanderName = "Test Card",
                 Player        = player,
                 DeckCards     = [new DeckCard { Card = card, Quantity = 1 }],
             };
@@ -595,7 +595,7 @@ namespace UnitTests.Backend.Controllers
             var deck = new Deck
             {
                 DeckName      = "DeckWithBadLine",
-                DeckCommander = "Test Card",
+                CommanderName = "Test Card",
                 Player        = player,
                 DeckCards     = [new DeckCard { Card = card, Quantity = 1 }],
             };
@@ -622,7 +622,7 @@ namespace UnitTests.Backend.Controllers
             var deck = new Deck
             {
                 DeckName      = "DeckWithBadQuantity",
-                DeckCommander = "Test Card",
+                CommanderName = "Test Card",
                 Player        = player,
                 DeckCards     = [new DeckCard { Card = card, Quantity = 1 }],
             };
