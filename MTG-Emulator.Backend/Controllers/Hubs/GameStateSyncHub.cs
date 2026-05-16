@@ -20,5 +20,10 @@ namespace MTG_Emulator.Backend.Controllers.Hubs
         {
             await Clients.Others.SendAsync(nameof(ISyncEventHandler.OnUpdatePlayerStats), e);
         }
+
+        public async Task TurnChanged(TurnChangedEvent e)
+        {
+            await Clients.All.SendAsync(nameof(ISyncEventHandler.OnTurnChanged), e);
+        }
     }
 }

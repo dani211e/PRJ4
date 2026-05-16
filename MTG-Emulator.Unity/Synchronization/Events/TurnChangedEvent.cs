@@ -9,7 +9,7 @@ namespace MTG_Emulator.Unity.Synchronization.Events
         
         public TurnChangedEvent()
         {
-            Method = nameof(ISyncEventHandler.OnTurnChanged);
+            Method = nameof(ISyncEventListener.TurnChanged);
         }
     }
 }
