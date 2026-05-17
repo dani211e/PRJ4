@@ -45,7 +45,7 @@ public class JoinGame : MonoBehaviour
     {
         string code = codeInputField.text.Trim().ToUpper();
 
-        if (code.Length == 6)
+        if (code.Length != 6)
         {
             SetStatus("Please enter a valid 6-character code.");
             return;
@@ -85,9 +85,8 @@ public class JoinGame : MonoBehaviour
                 };
                 
                 SignalRClient.Instance.Broadcast(turnOrderEvent);
+                SceneManager.LoadScene("SampleScene");
             }
-
-
         },
         onError: error =>
         {

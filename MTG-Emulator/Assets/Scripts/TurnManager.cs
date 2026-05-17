@@ -16,6 +16,8 @@ namespace MTG_Emulator.Backend.DB.Models
         private string localPlayerName;
         private string currentPlayerTurn;
         private int currentPlayerIndex = 0;
+        private int currentPhase = 0;
+
 
         private void Start()
         {
@@ -98,6 +100,46 @@ namespace MTG_Emulator.Backend.DB.Models
             endTurnButton.interactable = isMyTurn;
 
             Debug.Log(isMyTurn ? "It is my turn" : "Waiting for " + currentPlayerTurn);
+        }
+
+        public void NextPhaseOnClick()
+        {
+            if (!IsMyTurn())
+            {
+                return;
+            }
+
+            currentPhase++;
+
+            if (currentPhase <= 2)
+            {
+                UpdateTurnUI();
+                return;
+            }
+
+            currentPhase = 0;
+            EndTurnToNextPlayer();
+        }
+
+        private void EndTurnToNextPlayer()
+        {
+            currentPhase++;
+
+            if (currentPhase >= players.Count)
+            {
+                currentPlayerIndex = 0;
+            }
+            
+            string nextPlayer = players[currentPlayerIndex];
+
+            TurnChangedEvent turnEvent = new TurnChangedEvent
+            {
+                currentPlayerName = nextPlayer,
+                turnNumber = currentPlayerIndex
+            };
+            
+            SignalRClient.Instance.Broadcast(turnEvent);
+            HandleTurnChanged(this, turnEvent);
         }
 
         public bool IsMyTurn()
