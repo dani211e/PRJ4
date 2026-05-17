@@ -8,4 +8,5 @@ public interface ISyncEventListener
     Task NewCard(NewCardEvent e);
     Task UpdatePlayerStats(PlayerStatsEvent e);
     Task TurnChanged(TurnChangedEvent e);
+    Task TurnOrderCreated(TurnOrderEvent e);
 }

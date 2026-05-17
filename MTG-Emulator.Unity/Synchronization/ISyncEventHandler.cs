@@ -8,4 +8,5 @@ public interface ISyncEventHandler
     void OnNewCard(NewCardEvent e);
     void OnUpdatePlayerStats(PlayerStatsEvent e);
     void OnTurnChanged(TurnChangedEvent e);
+    void OnTurnOrderCreated(TurnOrderEvent e);
 }

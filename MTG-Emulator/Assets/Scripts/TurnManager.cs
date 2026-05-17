@@ -11,7 +11,7 @@ namespace MTG_Emulator.Backend.DB.Models
         [SerializeField] private TMP_Text turnText;
         [SerializeField] private Button endTurnButton;
 
-        [SerializeField] private List<string> players = new List<string>();
+        private List<string> players = new();
 
         private string localPlayerName;
         private string currentPlayerTurn;
@@ -28,15 +28,10 @@ namespace MTG_Emulator.Backend.DB.Models
             }
 
             SignalRClient.Instance.OnTurnChangedEvent += HandleTurnChanged;
-
-            if (players.Count == 0)
-            {
-                Debug.LogError("No players added to TurnManager.");
-                return;
-            }
-
-            currentPlayerTurn = players[0];
-            UpdateTurnUI();
+            SignalRClient.Instance.OnTurnOrderCreatedEvent += HandleTurnOrderCreated;
+            
+            turnText.text = "waiting for players";
+            endTurnButton.interactable = false;
         }
 
         private void OnDestroy()
@@ -47,6 +42,8 @@ namespace MTG_Emulator.Backend.DB.Models
             }
 
             SignalRClient.Instance.OnTurnChangedEvent -= HandleTurnChanged;
+            SignalRClient.Instance.OnTurnOrderCreatedEvent -= HandleTurnOrderCreated;
+
         }
 
         public void EndTurnOnClick()
@@ -80,6 +77,15 @@ namespace MTG_Emulator.Backend.DB.Models
         {
             currentPlayerTurn = e.currentPlayerName;
             currentPlayerIndex = e.turnNumber;
+
+            UpdateTurnUI();
+        }
+        
+        private void HandleTurnOrderCreated(object sender, TurnOrderEvent e)
+        {
+            players = e.PlayersNames;
+            currentPlayerTurn = e.currentPlayerName;
+            currentPlayerIndex = players.IndexOf(currentPlayerTurn);
 
             UpdateTurnUI();
         }

@@ -1,4 +1,5 @@
 using MTG_Emulator.Unity.Db.DTO.GameDTO;
+using MTG_Emulator.Unity.Synchronization.Events;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -73,6 +74,20 @@ public class JoinGame : MonoBehaviour
             
             SetStatus($"Joined! ({response.currentPlayers}/{response.maxPlayers} players)");
             Debug.Log($"[JoinGame] Joined room {response.gameCode}");
+
+
+            if (response.currentPlayers == response.maxPlayers)
+            {
+                TurnOrderEvent turnOrderEvent = new TurnOrderEvent
+                {
+                    PlayersNames = response.playerNames,
+                    currentPlayerName = response.currentPlayerName
+                };
+                
+                SignalRClient.Instance.Broadcast(turnOrderEvent);
+            }
+
+
         },
         onError: error =>
         {
