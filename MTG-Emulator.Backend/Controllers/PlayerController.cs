@@ -19,11 +19,11 @@ namespace MTG_Emulator.Backend.Controllers
             this.context = context;
         }
 
-        [HttpGet("{PlayerName}")]
-        public async Task<ActionResult<PlayerDto>> GetProfile(string playerName)
+        [HttpGet("{username}")]
+        public async Task<ActionResult<PlayerDto>> GetProfile(string username)
         {
             var player = await context.Players
-                .FirstOrDefaultAsync(p => p.Username == playerName);
+                .FirstOrDefaultAsync(p => p.Username == username);
 
             if (player == null)
                 return NotFound();
@@ -39,11 +39,11 @@ namespace MTG_Emulator.Backend.Controllers
             return Ok(dto);
         }
 
-        [HttpDelete("{PlayerName}")]
-        public async Task<ActionResult> DeleteProfile(string playerName)
+        [HttpDelete("{username}")]
+        public async Task<ActionResult> DeleteProfile(string username)
         {
             var player = await context.Players
-                .FirstOrDefaultAsync(p => p.Username == playerName);
+                .FirstOrDefaultAsync(p => p.Username == username);
 
             if (player == null)
                 return NotFound();
@@ -58,11 +58,11 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         // Update player's game stats
-        [HttpPut("{PlayerName}")]
-        public async Task<ActionResult<Player>> UpdatePlayerStats(string playerName, GameResults result)
+        [HttpPut("{username}")]
+        public async Task<ActionResult<Player>> UpdatePlayerStats(string username, GameResults result)
         {
             var player = await context.Players
-                .FirstOrDefaultAsync(p => p.Username == playerName);
+                .FirstOrDefaultAsync(p => p.Username == username);
 
             if (player == null)
                 return NotFound();
