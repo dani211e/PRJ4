@@ -1,5 +1,7 @@
 using System.Collections.Generic;
-using MTG_Emulator.Unity.Db.DTO.CardDTO;
+using System.Linq;
+using MTG_Emulator.Cards;
+using MTG_Emulator.Cards.Extensions;
 using MTG_Emulator.Unity.Db.DTO.DeckDTO;
 using TMPro;
 using UnityEngine;
@@ -16,7 +18,7 @@ public class Deck : MonoBehaviour
     private GameObject cardPrefab;
 
 
-    private List<CardDto> drawPile = new();
+    private List<CardInfo> drawPile = new();
 
     public void LoadDeck(DeckDto deck)
     {
@@ -36,7 +38,7 @@ public class Deck : MonoBehaviour
 
                 if (result.Cards != null)
                 {
-                    drawPile.AddRange(result.Cards);
+                    drawPile.AddRange(result.Cards.Select(c => c.ToCardInfo()));
                 }
 
                 UpdateCountText();
@@ -54,7 +56,7 @@ public class Deck : MonoBehaviour
 
     public void DrawCard()
     {
-        CardDto card = DrawTopCard();
+        CardInfo card = DrawTopCard();
 
         if (card == null)
             return;
@@ -80,7 +82,7 @@ public class Deck : MonoBehaviour
             Debug.LogError("Card prefab does not have a Card script.");
     }
 
-    public CardDto DrawTopCard()
+    public CardInfo DrawTopCard()
     {
         if (drawPile.Count == 0)
         {
@@ -88,7 +90,7 @@ public class Deck : MonoBehaviour
             return null;
         }
 
-        CardDto card = drawPile[0];
+        CardInfo card = drawPile[0];
         drawPile.RemoveAt(0);
         UpdateCountText();
         return card;

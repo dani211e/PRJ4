@@ -1,32 +1,47 @@
 using System;
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using System.Collections;
-using MTG_Emulator.Backend.DB.Models;
-using MTG_Emulator.Unity.Db.DTO.CardDTO;
-using UnityEngine.EventSystems;
+using MTG_Emulator;
+using MTG_Emulator.Cards;
+using TMPro;
+using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class Card : MonoBehaviour
 {
     [Header("Visible UI")]
-    [SerializeField] private Image cardImage;
+    [SerializeField]
+    private Image cardImage;
+
     private TMP_Text cardName;
 
 
-    private CardDto cardData;
+    private CardInfo cardData;
     private Button button;
     private bool Istapped = false;
     private CardZonesTypes currentzone;
 
-    public void Setup(CardDto card, Action<CardDto> onClick = null)
+    public void Setup(CardInfo card, Action<CardInfo> onClick = null)
     {
         cardData = card;
+        ObjectManager.AddObject(GameSession.PlayerId, cardData.Identifier, gameObject);
 
         if (cardName != null)
         {
             cardName.text = card.Name;
+        }
+
+        button = GetComponent<Button>();
+        if (button == null)
+        {
+            button = gameObject.AddComponent<Button>();
+        }
+
+        button.onClick.RemoveAllListeners();
+
+        if (onClick != null)
+        {
+            button.onClick.AddListener(() => onClick(cardData));
         }
 
         if (!string.IsNullOrEmpty(card.ImageUri))
@@ -40,7 +55,7 @@ public class Card : MonoBehaviour
     {
         currentzone = zone;
     }
-    
+
 
     private IEnumerator LoadCardImage(string url)
     {
@@ -68,6 +83,7 @@ public class Card : MonoBehaviour
             {
                 return;
             }
+
             Debug.Log("Q is pressed");
             transform.Rotate(0, 0, Istapped ? 90.0f : -90.0f);
             Istapped = !Istapped;
