@@ -6,8 +6,7 @@ namespace MTG_Emulator.Unity.Db.DTO.DeckDTO
     {
         [Required]
         public string DeckName { get; set; } = string.Empty;
-        [Required]
-        public string Commander { get; set; } = string.Empty;
+        public List<string> CommandZone { get; set; } = [];
         [Required]
         public string CardList { get; set; } = string.Empty;
     }

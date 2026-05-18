@@ -9,8 +9,6 @@ namespace MTG_Emulator.Unity.Db.DTO.DeckDTO
         [Required]
         public string DeckName { get; set; } = string.Empty;
         [Required]
-        public string DeckCommander { get; set; } = string.Empty;
-        [Required]
         public string DeckImageUri { get; set; } = string.Empty;
     }   
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MTG_Emulator.Backend.Controllers;
 using MTG_Emulator.Backend.DB.Models;
+using MTG_Emulator.Unity.Db.DTO.CardDTO;
 
 namespace UnitTests.Backend.Controllers
 {
@@ -15,6 +16,13 @@ namespace UnitTests.Backend.Controllers
             uut = new CardsController(Context);
         }
 
+        private static CardDto unwrap(ActionResult<CardDto> result)
+        {
+            var ok = result.Result as OkObjectResult;
+            return ok?.Value as CardDto
+                   ?? throw new AssertionException("Expected OkObjectResult with CardDto");
+        }
+
         [Test]
         public async Task GetCardByName_ExistingCard_ReturnsCard()
         {
@@ -23,14 +31,14 @@ namespace UnitTests.Backend.Controllers
             await Context.SaveChangesAsync();
 
             var result = await uut.GetCardByName("Test");
-
-            Assert.That(result.Value, Is.Not.Null, "Expected a card, but got null");
+            var dto    = unwrap(result);
 
             Assert.Multiple(() =>
             {
-                Assert.That(result.Value.Name,        Is.EqualTo("Test"));
-                Assert.That(result.Value.OracleText,  Is.EqualTo("Test text"));
-                Assert.That(result.Value.ImageUri,    Is.EqualTo("http://Test.com"));
+                Assert.That(dto,                     Is.Not.Null);
+                Assert.That(dto.Name,       Is.EqualTo("Test"));
+                Assert.That(dto.OracleText, Is.EqualTo("Test text"));
+                Assert.That(dto.ImageUri,   Is.EqualTo("http://Test.com"));
             });
         }
 
@@ -41,9 +49,9 @@ namespace UnitTests.Backend.Controllers
             await Context.SaveChangesAsync();
 
             var result = await uut.GetCardByName("Test");
+            var dto    = unwrap(result);
 
-            Assert.That(result.Value, Is.Not.Null);
-            Assert.That(result.Value.AltFace, Is.Null, "Expected AltFace to be null when card has none");
+            Assert.That(dto.AltFace, Is.Null, "Expected AltFace to be null when card has none");
         }
 
         [Test]
@@ -53,9 +61,10 @@ namespace UnitTests.Backend.Controllers
             await Context.SaveChangesAsync();
 
             var result = await uut.GetCardByName("Test");
+            var dto    = unwrap(result);
 
-            Assert.That(result.Value, Is.Not.Null);
-            Assert.That(result.Value.RelatedCards, Is.Empty, "Expected RelatedCards to be empty when card has none");
+            Assert.That(dto.RelatedCards, Is.Empty,
+                "Expected RelatedCards to be empty when card has none");
         }
 
         [Test]
@@ -66,15 +75,15 @@ namespace UnitTests.Backend.Controllers
             await Context.SaveChangesAsync();
 
             var result = await uut.GetCardByName("Test");
+            var dto    = unwrap(result);
 
-            Assert.That(result.Value,         Is.Not.Null);
-            Assert.That(result.Value.AltFace, Is.Not.Null, "Expected AltFace to be populated");
+            Assert.That(dto.AltFace, Is.Not.Null, "Expected AltFace to be populated");
 
             Assert.Multiple(() =>
             {
-                Assert.That(result.Value.AltFace.Name,       Is.EqualTo("Test Alt Face"));
-                Assert.That(result.Value.AltFace.OracleText, Is.EqualTo("Alt face text"));
-                Assert.That(result.Value.AltFace.ImageUri,   Is.EqualTo("http://TestAlt.com"));
+                Assert.That(dto.AltFace.Name,       Is.EqualTo("Test Alt Face"));
+                Assert.That(dto.AltFace.OracleText, Is.EqualTo("Alt face text"));
+                Assert.That(dto.AltFace.ImageUri,   Is.EqualTo("http://TestAlt.com"));
             });
         }
 
@@ -86,11 +95,13 @@ namespace UnitTests.Backend.Controllers
             await Context.SaveChangesAsync();
 
             var result = await uut.GetCardByName("Test");
+            var dto    = unwrap(result);
 
-            Assert.That(result.Value,              Is.Not.Null);
-            Assert.That(result.Value.RelatedCards, Has.Count.EqualTo(1), "Expected one related card");
+            Assert.That(dto.RelatedCards, Has.Count.EqualTo(1),
+                "Expected one related card");
 
-            var relatedCard = result.Value.RelatedCards[0];
+            var relatedCard = dto.RelatedCards[0];
+
             Assert.Multiple(() =>
             {
                 Assert.That(relatedCard.Name,     Is.EqualTo("Related Card"));
@@ -110,25 +121,28 @@ namespace UnitTests.Backend.Controllers
         [TestCase("")]
         public async Task GetCardByName_EmptyName_ReturnsBadRequest(string? cardName)
         {
-            var resultEmpty = await uut.GetCardByName(cardName!);
+            var result = await uut.GetCardByName(cardName!);
 
-            Assert.That(resultEmpty.Result, Is.TypeOf<BadRequestResult>());
+            Assert.That(result.Result, Is.TypeOf<BadRequestResult>());
         }
-        
 
         private static Card createTestCard(bool withAltFace = false, bool withRelatedCards = false)
         {
             return new Card
             {
-                Name         = "Test",
-                OracleText   = "Test text",
-                ImageUri     = "http://Test.com",
-                AltFace      = withAltFace ? new CardFace
-                {
-                    Name       = "Test Alt Face",
-                    OracleText = "Alt face text",
-                    ImageUri   = "http://TestAlt.com",
-                } : null,
+                Name       = "Test",
+                OracleText = "Test text",
+                ImageUri   = "http://Test.com",
+
+                AltFace = withAltFace
+                    ? new CardFace
+                    {
+                        Name       = "Test Alt Face",
+                        OracleText = "Alt face text",
+                        ImageUri   = "http://TestAlt.com",
+                    }
+                    : null,
+
                 RelatedCards = withRelatedCards
                     ? new List<RelatedCard>
                     {
@@ -138,7 +152,7 @@ namespace UnitTests.Backend.Controllers
                             ImageUri = "http://Related.com",
                         }
                     }
-                    : new List<RelatedCard>(),
+                    : new List<RelatedCard>()
             };
         }
     }

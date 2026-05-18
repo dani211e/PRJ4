@@ -24,6 +24,10 @@ namespace MTG_Emulator.Backend.DB
             modelBuilder.Entity<ApiUser>()
                 .HasIndex(u => u.NormalizedEmail)
                 .IsUnique(); 
+            
+            modelBuilder.Entity<Deck>()
+                .HasMany(d => d.CommandZone)
+                .WithMany();
 
             modelBuilder.Entity<DeckCard>()
                 .HasOne(dc => dc.Deck)

@@ -4,10 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.Models;
-using MTG_Emulator.Unity.Db.DTO.CardDTO;
-using MTG_Emulator.Unity.Db.DTO.CardFaceDTO;
 using MTG_Emulator.Unity.Db.DTO.DeckDTO;
-using MTG_Emulator.Unity.Db.DTO.RelatedCardDTO;
 
 namespace MTG_Emulator.Backend.Controllers
 {
@@ -39,44 +36,25 @@ namespace MTG_Emulator.Backend.Controllers
             if (player == null)
                 return NotFound("Player profile not found.");
 
-            var invalidCardNames = new List<string>();
-            var deckCards = new List<DeckCard>();
-            string[] lines = deckDto.CardList.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            var mainResult = await parseCardList(deckDto.CardList);
+            if (mainResult.FormatError != null)
+                return BadRequest(mainResult.FormatError);
 
-            foreach (string line in lines)
-            {
-                int firstSpace = line.IndexOf(' ');
-                if (firstSpace == -1)
-                    return BadRequest($"Wrong line in card list: '{line}'");
-                if (!int.TryParse(line.Substring(0, firstSpace), out int amount))
-                    return BadRequest($"Invalid quantity in line: '{line}'");
+            var commandResult = await parseCommandZone(deckDto.CommandZone);
 
-                string name = line.Substring(firstSpace + 1);
-                var cardEntity = await context.Cards
-                    .FirstOrDefaultAsync(c => c.Name == name);
-
-                if (cardEntity != null)
-                    deckCards.Add(new DeckCard { Card = cardEntity, Quantity = amount });
-                else
-                    invalidCardNames.Add(name);
-            }
-
-            if (invalidCardNames.Count != 0)
+            var allInvalid = mainResult.InvalidNames.Concat(commandResult.InvalidNames).ToList();
+            if (allInvalid.Count != 0)
                 return BadRequest(new InvalidCardsResponse
                 {
                     Error = "The following cards do not exist",
-                    InvalidCards = invalidCardNames,
+                    InvalidCards = allInvalid,
                 });
-
-            var commanderInDeck = deckCards.Any(dc => dc.Card.Name == deckDto.Commander);
-            if (!commanderInDeck)
-                return BadRequest($"Commander '{deckDto.Commander}' must be included in the card list.");
 
             var deck = new Deck
             {
                 DeckName = deckDto.DeckName,
-                CommanderName = deckDto.Commander,
-                DeckCards = deckCards,
+                DeckCards = mainResult.Cards,
+                CommandZone = commandResult.Cards,
                 Player = player,
             };
 
@@ -99,8 +77,7 @@ namespace MTG_Emulator.Backend.Controllers
                 return Forbid();
 
             var decks = await context.Decks
-                .Include(d => d.DeckCards)
-                .ThenInclude(dc => dc.Card)
+                .Include(d => d.CommandZone)
                 .Where(d => d.Player.Username == username)
                 .ToListAsync();
 
@@ -108,18 +85,20 @@ namespace MTG_Emulator.Backend.Controllers
             {
                 DeckId = deck.DeckId,
                 DeckName = deck.DeckName,
-                DeckCommander = deck.CommanderName,
-                DeckImageUri = deck.DeckCards
-                    .FirstOrDefault(dc => dc.Card.Name == deck.CommanderName)?.Card.ImageUri ?? string.Empty
+                DeckImageUri = deck.CommandZone.FirstOrDefault()?.ImageUri ?? string.Empty,
             }).ToList();
 
             return Ok(deckDtos);
         }
 
-        [HttpGet("{DeckId:int}")]
+        [HttpGet("{deckId:int}")]
         public async Task<ActionResult<DeckDto>> GetDeckById(int deckId)
         {
             var deck = await context.Decks
+                .Include(d => d.CommandZone)
+                .ThenInclude(c => c.AltFace)
+                .Include(d => d.CommandZone)
+                .ThenInclude(c => c.RelatedCards)
                 .Include(d => d.DeckCards)
                 .ThenInclude(dc => dc.Card)
                 .ThenInclude(c => c.AltFace)
@@ -136,66 +115,20 @@ namespace MTG_Emulator.Backend.Controllers
             if (!IsOwnerOrAdmin(deck.Player.ApiUserId))
                 return Forbid();
 
-            var commanderCard = deck.DeckCards
-                .FirstOrDefault(dc => dc.Card.Name == deck.CommanderName)?.Card;
-
-            if (commanderCard == null)
-                return NotFound("Commander card not found in deck.");
-
             var deckDto = new DeckDto
             {
                 DeckId = deck.DeckId,
                 DeckName = deck.DeckName,
-                DeckCommander = deck.CommanderName,
-                CommanderCard = new CardDto
-                {
-                    CardId = commanderCard.CardId,
-                    ScryfallId = commanderCard.ScryfallId,
-                    Name = commanderCard.Name,
-                    OracleText = commanderCard.OracleText,
-                    ImageUri = commanderCard.ImageUri,
-                    AltFace = commanderCard.AltFace == null ? null : new CardFaceDto
-                    {
-                        Name = commanderCard.AltFace.Name,
-                        OracleText = commanderCard.AltFace.OracleText,
-                        ImageUri = commanderCard.AltFace.ImageUri,
-                    },
-                    RelatedCards = commanderCard.RelatedCards.Select(rc => new RelatedCardDto
-                    {
-                        RelatedCardId = rc.RelatedCardId,
-                        Name = rc.Name,
-                        ImageUri = rc.ImageUri,
-                    }).ToList()
-                },
+                CommandZone = deck.CommandZone.Select(ToCardDto).ToList(),
                 Cards = deck.DeckCards
-                    .Where(dc => dc.Card.Name != deck.CommanderName)
-                    .SelectMany(dc => Enumerable.Repeat(new CardDto
-                    {
-                        CardId = dc.Card.CardId,
-                        ScryfallId = dc.Card.ScryfallId,
-                        Name = dc.Card.Name,
-                        OracleText = dc.Card.OracleText,
-                        ImageUri = dc.Card.ImageUri,
-                        AltFace = dc.Card.AltFace == null ? null : new CardFaceDto
-                        {
-                            Name = dc.Card.AltFace.Name,
-                            OracleText = dc.Card.AltFace.OracleText,
-                            ImageUri = dc.Card.AltFace.ImageUri,
-                        },
-                        RelatedCards = dc.Card.RelatedCards.Select(rc => new RelatedCardDto
-                        {
-                            RelatedCardId = rc.RelatedCardId,
-                            Name = rc.Name,
-                            ImageUri = rc.ImageUri,
-                        }).ToList()
-                    }, dc.Quantity))
+                    .SelectMany(dc => Enumerable.Repeat(ToCardDto(dc.Card), dc.Quantity))
                     .ToList(),
             };
 
             return Ok(deckDto);
         }
 
-        [HttpDelete("{DeckId:int}")]
+        [HttpDelete("{deckId:int}")]
         public async Task<IActionResult> DeleteDeckByName(int deckid)
         {
             var deck = await context.Decks
@@ -223,7 +156,8 @@ namespace MTG_Emulator.Backend.Controllers
 
             var deck = await context.Decks
                 .Include(d => d.Player)
-                .Include(d => d.DeckCards).ThenInclude(deckCard => deckCard.Card)
+                .Include(d => d.CommandZone)
+                .Include(d => d.DeckCards).ThenInclude(dc => dc.Card)
                 .FirstOrDefaultAsync(d => d.DeckId == deckId);
 
             if (deck == null)
@@ -232,46 +166,90 @@ namespace MTG_Emulator.Backend.Controllers
             if (!IsOwnerOrAdmin(deck.Player.ApiUserId))
                 return Forbid();
 
-            deck.DeckName = deckDto.DeckName;
-            deck.CommanderName = deckDto.Commander;
+            var mainResult = await parseCardList(deckDto.CardList);
+            if (mainResult.FormatError != null)
+                return BadRequest(mainResult.FormatError);
 
-            var invalidCardNames = new List<string>();
-            deck.DeckCards.Clear();
+            var commandResult = await parseCommandZone(deckDto.CommandZone);
 
-            if (!string.IsNullOrWhiteSpace(deckDto.CardList))
-            {
-                string[] lines = deckDto.CardList.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-                foreach (string line in lines)
-                {
-                    int firstSpace = line.IndexOf(' ');
-                    if (firstSpace == -1)
-                        return BadRequest($"Wrong line in card list: '{line}'");
-                    if (!int.TryParse(line.Substring(0, firstSpace), out int amount))
-                        return BadRequest($"Invalid quantity in line: '{line}'");
-
-                    string name = line.Substring(firstSpace + 1);
-                    var cardEntity = await context.Cards.FirstOrDefaultAsync(c => c.Name == name);
-
-                    if (cardEntity != null)
-                        deck.DeckCards.Add(new DeckCard { Card = cardEntity, Quantity = amount });
-                    else
-                        invalidCardNames.Add(name);
-                }
-            }
-
-            if (invalidCardNames.Any())
+            var allInvalid = mainResult.InvalidNames.Concat(commandResult.InvalidNames).ToList();
+            if (allInvalid.Count != 0)
                 return BadRequest(new InvalidCardsResponse
                 {
                     Error = "The following cards do not exist",
-                    InvalidCards = invalidCardNames,
+                    InvalidCards = allInvalid,
                 });
 
-            var commanderInDeck = deck.DeckCards.Any(dc => dc.Card.Name == deckDto.Commander);
-            if (!commanderInDeck)
-                return BadRequest($"Commander '{deckDto.Commander}' must be included in the card list.");
+            deck.DeckName   = deckDto.DeckName;
+            deck.DeckCards  = mainResult.Cards;
+            deck.CommandZone = commandResult.Cards;
 
             await context.SaveChangesAsync();
             return NoContent();
+        }
+
+        // Helpers
+
+        private record ParseCardListResult(
+            List<DeckCard> Cards,
+            List<string> InvalidNames,
+            string? FormatError
+        );
+
+        private record ParseCommandZoneResult(
+            List<Card> Cards,
+            List<string> InvalidNames
+        );
+
+        private async Task<ParseCardListResult> parseCardList(string cardList)
+        {
+            var cards = new List<DeckCard>();
+            var invalidNames = new List<string>();
+
+            string[] lines = cardList.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string line in lines)
+            {
+                int firstSpace = line.IndexOf(' ');
+                if (firstSpace == -1)
+                    return new ParseCardListResult([], [], FormatError: $"Wrong line in card list: '{line}'");
+                if (!int.TryParse(line[..firstSpace], out int amount))
+                    return new ParseCardListResult([], [], FormatError: $"Invalid quantity in line: '{line}'");
+
+                string name = normalizeCardName(line[(firstSpace + 1)..].Trim());
+                var    cardEntity = await context.Cards.FirstOrDefaultAsync(c => c.Name == name);
+
+                if (cardEntity != null)
+                    cards.Add(new DeckCard { Card = cardEntity, Quantity = amount });
+                else
+                    invalidNames.Add(name);
+            }
+
+            return new ParseCardListResult(cards, invalidNames, FormatError: null);
+        }
+
+        private async Task<ParseCommandZoneResult> parseCommandZone(List<string> commandZone)
+        {
+            var cards = new List<Card>();
+            var invalidNames = new List<string>();
+
+            foreach (string line in commandZone)
+            {
+                string name = normalizeCardName(line.Trim());
+                var cardEntity = await context.Cards.FirstOrDefaultAsync(c => c.Name == name);
+
+                if (cardEntity != null)
+                    cards.Add(cardEntity);
+                else
+                    invalidNames.Add(name);
+            }
+
+            return new ParseCommandZoneResult(cards, invalidNames);
+        }
+        private static string normalizeCardName(string name)
+        {
+            int slashIndex = name.IndexOf(" // ", StringComparison.Ordinal);
+            return slashIndex != -1 ? name[..slashIndex] : name;
         }
     }
 }

@@ -106,14 +106,15 @@ namespace MTG_Emulator.Backend
 
             if (!db.Decks.Any())
             {
+                var firstCard = cards.FirstOrDefault();
                 var deck1 = new Deck
                 {
-                    DeckName = "Best deck ever",
-                    CommanderName = cards.FirstOrDefault()?.Name ?? "Unknown Commander",
-                    Player = player1,
-                    DeckCards = cards.Select(c => new DeckCard
+                    DeckName    = "Best deck ever",
+                    CommandZone = firstCard != null ? [firstCard] : [],
+                    Player      = player1,
+                    DeckCards   = cards.Skip(1).Select(c => new DeckCard
                     {
-                        Card = c,
+                        Card     = c,
                         Quantity = 1
                     }).ToList(),
                 };
