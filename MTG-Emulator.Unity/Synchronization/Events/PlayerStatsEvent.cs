@@ -11,5 +11,7 @@ public class PlayerStatsEvent : SyncEvent
 
     public int? Health { get; set;}
 
+    public string PlayerName { get; set; } = string.Empty;
+
     public int? LibraryCount { get; set;}
 }
