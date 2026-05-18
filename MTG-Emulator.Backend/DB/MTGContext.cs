@@ -20,6 +20,10 @@ namespace MTG_Emulator.Backend.DB
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            
+            modelBuilder.Entity<ApiUser>()
+                .HasIndex(u => u.NormalizedEmail)
+                .IsUnique(); 
 
             modelBuilder.Entity<DeckCard>()
                 .HasOne(dc => dc.Deck)
