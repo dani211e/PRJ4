@@ -36,14 +36,11 @@ namespace UnitTests.Backend.Controllers
 
             Assert.Multiple(() =>
             {
-                Assert.That(deck?.DeckName,      Is.EqualTo("Test deck"));
-                Assert.That(deck?.DeckCommander, Is.EqualTo("Test commander"));
-                Assert.That(deck?.Cards,         Has.Count.EqualTo(2));
-                if (deck != null)
-                {
-                    Assert.That(deck.Cards.Count(c => c.Name == "Test commander"), Is.EqualTo(1));
-                    Assert.That(deck.Cards.Count(c => c.Name == "Test card"),      Is.EqualTo(1));
-                }
+                Assert.That(deck?.DeckName,               Is.EqualTo("Test deck"));
+                Assert.That(deck?.DeckCommander,          Is.EqualTo("Test commander"));
+                Assert.That(deck?.CommanderCard.Name,     Is.EqualTo("Test commander"));
+                Assert.That(deck?.Cards,                  Has.Count.EqualTo(1));
+                Assert.That(deck?.Cards[0].Name,          Is.EqualTo("Test card"));
             });
         }
 
@@ -69,20 +66,20 @@ namespace UnitTests.Backend.Controllers
             Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
         }
 
-        [TestCase("1 Test commander\n", 1)]
-        [TestCase("2 Test commander\n", 2)]
-        [TestCase("3 Test commander\n", 3)]
+        [TestCase("1 Test commander\n1 Test card\n", 1)]
+        [TestCase("1 Test commander\n2 Test card\n", 2)]
+        [TestCase("1 Test commander\n3 Test card\n", 3)]
         public async Task CreateDeck_ParsesCardQuantitiesCorrectly(string cardList, int expectedCount)
         {
             await insertPlayerAsync();
             await insertCardAsync("Test commander");
+            await insertCardAsync("Test card");
 
             var dto    = createDeckDto(cardList: cardList);
             var result = await uut.CreateDeck(dto);
             var deck   = extractCreatedDto(result);
 
-            if (deck != null)
-                Assert.That(deck.Cards.Count, Is.EqualTo(expectedCount));
+            Assert.That(deck?.Cards.Count, Is.EqualTo(expectedCount));
         }
 
         [Test]
@@ -124,14 +121,14 @@ namespace UnitTests.Backend.Controllers
         {
             await insertPlayerAsync();
             await insertCardAsync("Test commander");
+            await insertCardAsync("Test card");
 
-            var dto = createDeckDto(cardList: "1 Test commander\n2 Test commander\n");
+            var dto = createDeckDto(cardList: "1 Test commander\n1 Test card\n2 Test card\n");
 
             var result = await uut.CreateDeck(dto);
             var deck   = extractCreatedDto(result);
 
-            if (deck != null)
-                Assert.That(deck.Cards.Count(c => c.Name == "Test commander"), Is.EqualTo(3));
+            Assert.That(deck?.Cards.Count(c => c.Name == "Test card"), Is.EqualTo(3));
         }
 
         [Test]
@@ -872,10 +869,20 @@ namespace UnitTests.Backend.Controllers
 
         private static DeckDto? extractCreatedDto(ActionResult<DeckDto> result)
         {
-            Assert.That(result.Result, Is.TypeOf<CreatedAtActionResult>());
-            var created = result.Result as CreatedAtActionResult;
-            Assert.That(created?.Value, Is.TypeOf<DeckDto>());
-            return created!.Value as DeckDto;
+            if (result.Result is CreatedAtActionResult created)
+            {
+                Assert.That(created.Value, Is.TypeOf<DeckDto>());
+                return created.Value as DeckDto;
+            }
+
+            if (result.Result is OkObjectResult ok)
+            {
+                Assert.That(ok.Value, Is.TypeOf<DeckDto>());
+                return ok.Value as DeckDto;
+            }
+
+            Assert.Fail($"Expected CreatedAtActionResult or OkObjectResult but was {result.Result?.GetType().Name}");
+            return null;
         }
     }
 }
