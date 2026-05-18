@@ -15,6 +15,7 @@ public class Card : MonoBehaviour
 
     private TMP_Text cardName;
 
+    public Guid Identifier => cardData.Identifier;
 
     private CardInfo cardData;
     private Button button;
@@ -49,6 +50,14 @@ public class Card : MonoBehaviour
             string fullImageUrl = "http://localhost:5042" + card.ImageUri;
             StartCoroutine(LoadCardImage(fullImageUrl));
         }
+
+        SignalRClient.Instance.OnMoveCardEvent += (_, e) =>
+        {
+            if (cardData.Identifier != e.Identifier)
+                return;
+            if (e.Position.HasValue)
+                transform.position = e.Position.Value.ToUnity3();
+        };
     }
 
     public void SetZones(CardZonesTypes zone)

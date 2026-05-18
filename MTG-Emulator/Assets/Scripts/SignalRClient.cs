@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using MTG_Emulator.Unity.Synchronization;
 using MTG_Emulator.Unity.Synchronization.Events;
-using Newtonsoft.Json;
 using UnityEngine;
 
 public class SignalRClient : MonoBehaviour, ISyncEventHandler
@@ -46,8 +45,8 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
             connection.On<TurnChangedEvent>(nameof(ISyncEventHandler.OnTurnChanged), OnTurnChanged);
             connection.On<TurnOrderEvent>(nameof(ISyncEventHandler.OnTurnOrderCreated), OnTurnOrderCreated);
 
-           var t = connection.StartAsync();
-           t.Wait();
+            var t = connection.StartAsync();
+            t.Wait();
         }
         catch (Exception ex)
         {

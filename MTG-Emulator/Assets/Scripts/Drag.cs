@@ -1,3 +1,4 @@
+using MTG_Emulator.Unity.Synchronization.Events;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -8,7 +9,8 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
     private CanvasGroup canvasGroup;
     private RectTransform rectTransform;
     private Canvas canvas;
-
+    private Card card;
+    
     public bool WasDropped { get; set; }
 
     void Awake()
@@ -19,6 +21,7 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 
         rectTransform = GetComponent<RectTransform>();
         canvas = GetComponentInParent<Canvas>();
+        card = GetComponent<Card>();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -45,6 +48,11 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
         if (!WasDropped)
         {
             transform.SetParent(parentToReturnTo, true);
+
+            SignalRClient.Instance?.Broadcast(new MoveCardEvent(GameSession.PlayerId, card.Identifier)
+            {
+                Position = transform.position.ToSystem2(),
+            });
         }
     }
 }
