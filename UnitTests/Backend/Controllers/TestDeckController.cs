@@ -183,6 +183,26 @@ namespace UnitTests.Backend.Controllers
             Assert.That(deck,                        Is.Not.Null);
             Assert.That(deck!.DeckCards.Sum(dc => dc.Quantity), Is.EqualTo(1));
         }
+        
+        [Test]
+        public async Task CreateDeck_DoubleFacedCardName_NormalizesAndFindsCard()
+        {
+            await insertPlayerAsync();
+            await insertCardAsync("Test commander");
+            await insertCardAsync("Huntmaster of the Fells");
+
+            var dto = createDeckDto(cardList: "1 Test commander\n1 Huntmaster of the Fells // Ravager of the Fells\n");
+
+            var result = await uut.CreateDeck(dto);
+            var deck   = extractCreatedDto(result);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(deck,                Is.Not.Null);
+                Assert.That(deck!.Cards.Count,  Is.EqualTo(1));
+                Assert.That(deck.Cards[0].Name, Is.EqualTo("Huntmaster of the Fells"));
+            });
+        }
 
         // GetDeckById
 
@@ -787,6 +807,39 @@ namespace UnitTests.Backend.Controllers
             var result = await uut.UpdateDeck(deck.DeckId, updateDto);
 
             Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
+        }
+        
+        [Test]
+        public async Task UpdateDeck_DoubleFacedCardName_NormalizesAndFindsCard()
+        {
+            var player = await insertPlayerAsync();
+            var card   = await insertCardAsync("Test commander");
+            await insertCardAsync("Huntmaster of the Fells");
+
+            var deck = new Deck
+            {
+                DeckName      = "Test deck",
+                CommanderName = "Test commander",
+                Player        = player,
+                DeckCards     = [new DeckCard { Card = card, Quantity = 1 }],
+            };
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
+
+            var updateDto = createUpdateDeckDto(
+                deckName:  "Test deck",
+                commander: "Test commander",
+                cardList:  "1 Test commander\n1 Huntmaster of the Fells // Ravager of the Fells\n"
+            );
+
+            var result = await uut.UpdateDeck(deck.DeckId, updateDto);
+            Assert.That(result.Result, Is.TypeOf<NoContentResult>());
+
+            var dbDeck = await Context.Decks
+                .Include(d => d.DeckCards).ThenInclude(dc => dc.Card)
+                .FirstOrDefaultAsync(d => d.DeckId == deck.DeckId);
+
+            Assert.That(dbDeck!.DeckCards.Any(dc => dc.Card.Name == "Huntmaster of the Fells"), Is.True);
         }
 
         // Helpers
