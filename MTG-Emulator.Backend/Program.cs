@@ -57,6 +57,7 @@ namespace MTG_Emulator.Backend
                     options.Password.RequireLowercase = true;
                     options.Password.RequireUppercase = true;
                     options.Password.RequireNonAlphanumeric = true;
+                    options.User.RequireUniqueEmail = true;
                     options.Password.RequiredLength = 8;
                 })
                 .AddEntityFrameworkStores<MTGContext>()
