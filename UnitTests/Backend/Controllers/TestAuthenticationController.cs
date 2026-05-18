@@ -91,7 +91,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task Register_AdminRole_CallerIsAdmin_CreatesAdminWithoutPlayerProfile()
         {
-            setControllerUser(uut, "caller-id", isAdmin: true);
+            SetControllerUser(uut, "caller-id", isAdmin: true);
 
             userManagerMock
                 .Setup(m => m.CreateAsync(It.IsAny<ApiUser>(), "Password1!"))
@@ -183,7 +183,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task ResetPassword_PasswordMismatch_ReturnsBadRequest()
         {
-            setControllerUser(uut, "user-id");
+            SetControllerUser(uut, "user-id");
 
             var result = await uut.ResetPassword(new ResetPasswordDto
             {
@@ -217,7 +217,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task ResetPassword_UserNotFound_ReturnsNotFound()
         {
-            setControllerUser(uut, "ghost-id");
+            SetControllerUser(uut, "ghost-id");
 
             userManagerMock
                 .Setup(m => m.FindByIdAsync("ghost-id"))
@@ -235,7 +235,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task ResetPassword_CallerIsNotOwner_ReturnsForbid()
         {
-            setControllerUser(uut, "caller-id");
+            SetControllerUser(uut, "caller-id");
 
             userManagerMock
                 .Setup(m => m.FindByIdAsync("caller-id"))
@@ -253,7 +253,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task ResetPassword_ValidRequest_ReturnsNoContent()
         {
-            setControllerUser(uut, "user-id");
+            SetControllerUser(uut, "user-id");
 
             var user = new ApiUser { Id = "user-id", UserName = "TestUser", Email = "test@example.com" };
 
@@ -273,7 +273,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task ResetPassword_IdentityFails_ReturnsBadRequest()
         {
-            setControllerUser(uut, "user-id");
+            SetControllerUser(uut, "user-id");
 
             var user = new ApiUser { Id = "user-id", UserName = "TestUser", Email = "test@example.com" };
 
@@ -297,7 +297,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task DeleteAccount_UserNotFound_ReturnsNotFound()
         {
-            setControllerUser(uut, "ghost-id");
+            SetControllerUser(uut, "ghost-id");
 
             userManagerMock
                 .Setup(m => m.FindByIdAsync("ghost-id"))
@@ -311,7 +311,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task DeleteAccount_CallerIsNotOwner_ReturnsForbid()
         {
-            setControllerUser(uut, "caller-id");
+            SetControllerUser(uut, "caller-id");
 
             userManagerMock
                 .Setup(m => m.FindByIdAsync("caller-id"))
@@ -325,7 +325,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task DeleteAccount_PlayerExists_RemovesPlayerAndDeletesUser_ReturnsNoContent()
         {
-            setControllerUser(uut, "user-id");
+            SetControllerUser(uut, "user-id");
 
             var user = new ApiUser
             {
@@ -366,7 +366,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task DeleteAccount_NoPlayerProfile_DeletesUser_ReturnsNoContent()
         {
-            setControllerUser(uut, "user-id");
+            SetControllerUser(uut, "user-id");
 
             var user = new ApiUser
             {
@@ -393,7 +393,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task DeleteAccount_UserDeletionFails_ReturnsBadRequest()
         {
-            setControllerUser(uut, "user-id");
+            SetControllerUser(uut, "user-id");
 
             var user = new ApiUser
             {
@@ -418,23 +418,6 @@ namespace UnitTests.Backend.Controllers
 
             Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
         }
-
-        // Helpers
-
-        private static void setControllerUser(ControllerBase controller, string userId, bool isAdmin = false)
-        {
-            var claims = new List<Claim> { new(ClaimTypes.NameIdentifier, userId) };
-
-            if (isAdmin)
-                claims.Add(new(ClaimTypes.Role, "Admin"));
-
-            controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext
-                {
-                    User = new ClaimsPrincipal(new ClaimsIdentity(claims, "TestAuth"))
-                }
-            };
-        }
+        
     }
 }
