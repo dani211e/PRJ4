@@ -111,6 +111,7 @@ public class CreateGame : MonoBehaviour
                 GameSession.GameCode = response.gameCode;
                 GameSession.MaxPlayers = response.maxPlayers;
                 GameSession.IsHost = true;
+                GameSession.PlayerId = response.currentPlayers;
 
                 setStatus($"Game Created! Code:\n{response.gameCode}");
                 Debug.Log($"[CreateGame] Room {response.gameCode} ready for {response.maxPlayers} players.");
