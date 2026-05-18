@@ -6,47 +6,46 @@ using UnityEngine;
 
 public class Deck : MonoBehaviour
 {
-    [SerializeField] private TMP_Text countText;
-    [SerializeField] private Transform handParent;
-    [SerializeField] private GameObject cardPrefab;
-    
+    [SerializeField]
+    private TMP_Text countText;
+
+    [SerializeField]
+    private Transform handParent;
+
+    [SerializeField]
+    private GameObject cardPrefab;
+
 
     private List<CardDto> drawPile = new();
 
     public void LoadDeck(DeckDto deck)
     {
-        
         if (deck == null)
         {
             Debug.LogError("Tried to load a null deck.");
             return;
         }
-        
+
         StartCoroutine(APIManager.Instance.GetDeckById(
             deck.DeckId,
             result =>
             {
                 Debug.Log(result.Cards);
-                
+
                 drawPile.Clear();
 
                 if (result.Cards != null)
                 {
                     drawPile.AddRange(result.Cards);
                 }
+
                 UpdateCountText();
 
                 Debug.Log("Loaded gameplay deck: " + result.DeckName);
                 Debug.Log("Cards loaded: " + drawPile.Count);
 
                 ResetGameplayStateForNewDeck();
-                
-            }, error =>
-            {
-                Debug.LogError("Failed to load cards from deck " + deck.DeckId + " " + error);
-
-            }));
-        
+            }, error => { Debug.LogError("Failed to load cards from deck " + deck.DeckId + " " + error); }));
     }
 
     private void ResetGameplayStateForNewDeck()
