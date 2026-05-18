@@ -20,7 +20,7 @@ namespace MTG_Emulator.Backend.Controllers
             this.context = context;
         }
 
-        [HttpGet("{CardName}")]
+        [HttpGet("{cardName}")]
         public async Task<ActionResult<CardDto>> GetCardByName(string cardName)
         {
             if (string.IsNullOrEmpty(cardName))

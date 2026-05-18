@@ -9,12 +9,12 @@ namespace MTG_Emulator.Backend.Controllers
 {
     public class MtgController : ControllerBase
     {
-        protected bool IsOwnerOrAdmin(string resourceApiUserId)
+        public bool IsOwnerOrAdmin(string resourceApiUserId)
         {
             var callerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return resourceApiUserId == callerId || User.IsInRole(Roles.Admin);
         }
-        
+
         protected static CardDto ToCardDto(Card card) => new()
         {
             CardId = card.CardId,

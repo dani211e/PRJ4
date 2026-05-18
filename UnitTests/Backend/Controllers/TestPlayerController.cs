@@ -17,7 +17,7 @@ namespace UnitTests.Backend.Controllers
         {
             base.Setup();
             uut = new PlayerController(Context);
-            setControllerUser(uut, "test-api-user-id");
+            SetControllerUser(uut, "test-api-user-id");
         }
 
         // GetProfile
@@ -25,7 +25,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task GetProfile_ExistingPlayer_ReturnsCorrectProfile()
         {
-            await insertPlayerAsync();
+            await InsertPlayerAsync();
 
             var result = await uut.GetProfile("Test player");
             var ok  = result.Result as OkObjectResult;
@@ -54,7 +54,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task DeleteProfile_ExistingPlayer_DeletesPlayer()
         {
-            await insertPlayerAsync();
+            await InsertPlayerAsync();
 
             var result = await uut.DeleteProfile("Test player");
             Assert.That(result, Is.TypeOf<NoContentResult>());
@@ -74,7 +74,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task DeleteProfile_CallerIsNotOwner_ReturnsForbid()
         {
-            await insertPlayerAsync(apiUserId: "other-user-id");
+            await InsertPlayerAsync(apiUserId: "other-user-id");
 
             var result = await uut.DeleteProfile("Test player");
 
@@ -86,7 +86,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task UpdatePlayerStats_Win_IncrementsGamesWon()
         {
-            await insertPlayerAsync();
+            await InsertPlayerAsync();
 
             var result = await uut.UpdatePlayerStats("Test player", GameResults.Win);
             Assert.That(result.Result, Is.TypeOf<NoContentResult>());
@@ -103,7 +103,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task UpdatePlayerStats_Loss_IncrementsGamesLost()
         {
-            await insertPlayerAsync();
+            await InsertPlayerAsync();
 
             var result = await uut.UpdatePlayerStats("Test player", GameResults.Loss);
             Assert.That(result.Result, Is.TypeOf<NoContentResult>());
@@ -120,7 +120,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task UpdatePlayerStats_Draw_IncrementsGamesDrawn()
         {
-            await insertPlayerAsync();
+            await InsertPlayerAsync();
 
             var result = await uut.UpdatePlayerStats("Test player", GameResults.Draw);
             Assert.That(result.Result, Is.TypeOf<NoContentResult>());
@@ -145,7 +145,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task UpdatePlayerStats_CallerIsNotOwner_ReturnsForbid()
         {
-            await insertPlayerAsync(apiUserId: "other-user-id");
+            await InsertPlayerAsync(apiUserId: "other-user-id");
 
             var result = await uut.UpdatePlayerStats("Test player", GameResults.Win);
 
@@ -155,7 +155,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task UpdatePlayerStats_MultipleResults_AccumulatesCorrectly()
         {
-            await insertPlayerAsync();
+            await InsertPlayerAsync();
 
             await uut.UpdatePlayerStats("Test player", GameResults.Win);
             await uut.UpdatePlayerStats("Test player", GameResults.Win);
@@ -174,48 +174,12 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task UpdatePlayerStats_InvalidGameResult_ReturnsBadRequest()
         {
-            await insertPlayerAsync();
+            await InsertPlayerAsync();
 
             var result = await uut.UpdatePlayerStats("Test player", (GameResults)999);
 
             Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
         }
-
-        // Helpers
-
-        private static void setControllerUser(ControllerBase controller, string apiUserId, bool isAdmin = false)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, apiUserId),
-            };
-
-            if (isAdmin)
-                claims.Add(new Claim(ClaimTypes.Role, "Admin"));
-
-            var identity  = new ClaimsIdentity(claims, "TestAuth");
-            var principal = new ClaimsPrincipal(identity);
-
-            controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext { User = principal }
-            };
-        }
-
-        private async Task insertPlayerAsync(
-            string username  = "Test player",
-            string apiUserId = "test-api-user-id")
-        {
-            var player = new Player
-            {
-                Username  = username,
-                ApiUserId = apiUserId,
-                GamesWon  = 0,
-                GamesLost = 0,
-                GamesDrawn = 0,
-            };
-            Context.Players.Add(player);
-            await Context.SaveChangesAsync();
-        }
+        
     }
 }

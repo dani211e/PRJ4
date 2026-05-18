@@ -91,7 +91,7 @@ namespace MTG_Emulator.Backend.Controllers
             return Ok(deckDtos);
         }
 
-        [HttpGet("{DeckId:int}")]
+        [HttpGet("{deckId:int}")]
         public async Task<ActionResult<DeckDto>> GetDeckById(int deckId)
         {
             var deck = await context.Decks
@@ -128,7 +128,7 @@ namespace MTG_Emulator.Backend.Controllers
             return Ok(deckDto);
         }
 
-        [HttpDelete("{DeckId:int}")]
+        [HttpDelete("{deckId:int}")]
         public async Task<IActionResult> DeleteDeckByName(int deckid)
         {
             var deck = await context.Decks
