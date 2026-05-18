@@ -31,14 +31,14 @@ namespace UnitTests.Backend.Controllers
             await Context.SaveChangesAsync();
 
             var result = await uut.GetCardByName("Test");
-            var dto = unwrap(result);
+            var dto    = unwrap(result);
 
             Assert.Multiple(() =>
             {
-                Assert.That(dto, Is.Not.Null);
-                Assert.That(dto.Name, Is.EqualTo("Test"));
+                Assert.That(dto,                     Is.Not.Null);
+                Assert.That(dto.Name,       Is.EqualTo("Test"));
                 Assert.That(dto.OracleText, Is.EqualTo("Test text"));
-                Assert.That(dto.ImageUri, Is.EqualTo("http://Test.com"));
+                Assert.That(dto.ImageUri,   Is.EqualTo("http://Test.com"));
             });
         }
 
@@ -49,7 +49,7 @@ namespace UnitTests.Backend.Controllers
             await Context.SaveChangesAsync();
 
             var result = await uut.GetCardByName("Test");
-            var dto = unwrap(result);
+            var dto    = unwrap(result);
 
             Assert.That(dto.AltFace, Is.Null, "Expected AltFace to be null when card has none");
         }
@@ -61,7 +61,7 @@ namespace UnitTests.Backend.Controllers
             await Context.SaveChangesAsync();
 
             var result = await uut.GetCardByName("Test");
-            var dto = unwrap(result);
+            var dto    = unwrap(result);
 
             Assert.That(dto.RelatedCards, Is.Empty,
                 "Expected RelatedCards to be empty when card has none");
@@ -75,15 +75,15 @@ namespace UnitTests.Backend.Controllers
             await Context.SaveChangesAsync();
 
             var result = await uut.GetCardByName("Test");
-            var dto = unwrap(result);
+            var dto    = unwrap(result);
 
             Assert.That(dto.AltFace, Is.Not.Null, "Expected AltFace to be populated");
 
             Assert.Multiple(() =>
             {
-                Assert.That(dto.AltFace.Name, Is.EqualTo("Test Alt Face"));
+                Assert.That(dto.AltFace.Name,       Is.EqualTo("Test Alt Face"));
                 Assert.That(dto.AltFace.OracleText, Is.EqualTo("Alt face text"));
-                Assert.That(dto.AltFace.ImageUri, Is.EqualTo("http://TestAlt.com"));
+                Assert.That(dto.AltFace.ImageUri,   Is.EqualTo("http://TestAlt.com"));
             });
         }
 
@@ -95,7 +95,7 @@ namespace UnitTests.Backend.Controllers
             await Context.SaveChangesAsync();
 
             var result = await uut.GetCardByName("Test");
-            var dto = unwrap(result);
+            var dto    = unwrap(result);
 
             Assert.That(dto.RelatedCards, Has.Count.EqualTo(1),
                 "Expected one related card");
@@ -104,7 +104,7 @@ namespace UnitTests.Backend.Controllers
 
             Assert.Multiple(() =>
             {
-                Assert.That(relatedCard.Name, Is.EqualTo("Related Card"));
+                Assert.That(relatedCard.Name,     Is.EqualTo("Related Card"));
                 Assert.That(relatedCard.ImageUri, Is.EqualTo("http://Related.com"));
             });
         }
