@@ -132,7 +132,7 @@ namespace UnitTests.Backend.Controllers
 
             Assert.Multiple(() =>
             {
-                Assert.That(deck, Is.Not.Null);
+                Assert.That(deck,                                                  Is.Not.Null);
                 Assert.That(deck!.DeckCards.Sum(dc => dc.Quantity), Is.EqualTo(1));
                 Assert.That(deck.CommandZone.Count,                       Is.EqualTo(1));
             });
@@ -252,8 +252,7 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task GetAllDecksByUsername_PlayerDoesNotExist_ReturnsNotFound()
         {
-            Assert.That(
-                (await uut.GetAllDecksByUsername("NonExistingPlayer")).Result,
+            Assert.That((await uut.GetAllDecksByUsername("NonExistingPlayer")).Result,
                 Is.TypeOf<NotFoundObjectResult>());
         }
 
@@ -262,8 +261,7 @@ namespace UnitTests.Backend.Controllers
         {
             await InsertPlayerAsync(username: "Other player", apiUserId: "other-user-id");
 
-            Assert.That(
-                (await uut.GetAllDecksByUsername("Other player")).Result,
+            Assert.That((await uut.GetAllDecksByUsername("Other player")).Result,
                 Is.TypeOf<ForbidResult>());
         }
 
@@ -341,16 +339,14 @@ namespace UnitTests.Backend.Controllers
         [Test]
         public async Task UpdateDeck_DeckDoesNotExist_ReturnsNotFound()
         {
-            Assert.That(
-                (await uut.UpdateDeck(999, createUpdateDeckDto())).Result,
+            Assert.That((await uut.UpdateDeck(999, createUpdateDeckDto())).Result,
                 Is.TypeOf<NotFoundResult>());
         }
 
         [Test]
         public async Task UpdateDeck_NullDto_ReturnsBadRequest()
         {
-            Assert.That(
-                (await uut.UpdateDeck(1, null!)).Result,
+            Assert.That((await uut.UpdateDeck(1, null!)).Result,
                 Is.TypeOf<BadRequestResult>());
         }
 
@@ -362,8 +358,7 @@ namespace UnitTests.Backend.Controllers
             Context.Decks.Add(deck);
             await Context.SaveChangesAsync();
 
-            Assert.That(
-                (await uut.UpdateDeck(deck.DeckId, createUpdateDeckDto())).Result,
+            Assert.That((await uut.UpdateDeck(deck.DeckId, createUpdateDeckDto())).Result,
                 Is.TypeOf<ForbidResult>());
         }
 
