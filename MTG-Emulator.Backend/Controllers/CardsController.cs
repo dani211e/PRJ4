@@ -11,7 +11,7 @@ namespace MTG_Emulator.Backend.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Policy = "PlayerOrAdmin")]
-    public class CardsController : ControllerBase
+    public class CardsController : MtgController
     {
         private readonly MTGContext context;
 
@@ -34,26 +34,7 @@ namespace MTG_Emulator.Backend.Controllers
             if (card == null)
                 return NotFound();
 
-            return new CardDto
-            {
-                CardId = card.CardId,
-                ScryfallId = card.ScryfallId,
-                Name = card.Name,
-                OracleText = card.OracleText,
-                ImageUri = card.ImageUri,
-                AltFace = card.AltFace == null ? null : new CardFaceDto
-                {
-                    Name = card.AltFace.Name,
-                    OracleText = card.AltFace.OracleText,
-                    ImageUri = card.AltFace.ImageUri,
-                },
-                RelatedCards = card.RelatedCards.Select(rc => new RelatedCardDto
-                {
-                    RelatedCardId = rc.RelatedCardId,
-                    Name = rc.Name,
-                    ImageUri = rc.ImageUri,
-                }).ToList()
-            };
+            return Ok(ToCardDto(card));
         }
     }
 }
