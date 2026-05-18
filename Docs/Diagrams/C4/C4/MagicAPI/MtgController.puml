@@ -1,6 +1,6 @@
-@startuml
+﻿@startuml
 
-class MTGContext
+class ControllerBase
 
 class Card {
     + CardId: int
@@ -24,38 +24,41 @@ class RelatedCard {
     + ImageUri: string
 }
 
+class MtgController {
+    + IsOwnerOrAdmin(resourceApiUserId: string) : bool
+    # ToCardDto(card: Card) : CardDto
+}
+
+MtgController --|> ControllerBase
+
 class CardDto {
     + CardId: int
     + ScryfallId: Guid
     + Name: string
     + OracleText: string
     + ImageUri: string
-
     + AltFace: CardFaceDto?
     + RelatedCards: List<RelatedCardDto>
 }
 
-class MtgController {
-    + IsOwnerOrAdmin(resourceApiUserId: string) : bool
-    # ToCardDto(card: Card) : CardDto
+class CardFaceDto {
+    + Name: string
+    + OracleText: string
+    + ImageUri: string
 }
 
-class CardsController {
-    - context: MTGContext
-
-    + CardsController(context: MTGContext)
-    + GetCardByName(cardName: string) : Task<ActionResult<CardDto>>
+class RelatedCardDto {
+    + RelatedCardId: int
+    + Name: string
+    + ImageUri: string
 }
 
 Card "1" o-- "0..1" CardFace : AltFace
 Card "1" o-- "*" RelatedCard : RelatedCards
 
-CardsController --|> MtgController
-
-CardsController --> MTGContext : uses
-CardsController ..> Card : queries
-
-CardsController ..> CardDto : returns
-
+MtgController ..> Card
+MtgController ..> CardDto
+MtgController ..> CardFaceDto
+MtgController ..> RelatedCardDto
 
 @enduml
