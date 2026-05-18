@@ -11,4 +11,8 @@ public class GameResponseDto
     public List<string> playerNames { get; set; } = new();
     
     public string currentPlayerName  { get; set; } = string.Empty;
+    
+    public string hostIp         { get; set; } = string.Empty;
+    
+    public int    hostPort       { get; set; }
 }
