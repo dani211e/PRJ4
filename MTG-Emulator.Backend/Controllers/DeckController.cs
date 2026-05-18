@@ -83,24 +83,7 @@ namespace MTG_Emulator.Backend.Controllers
             context.Decks.Add(deck);
             await context.SaveChangesAsync();
 
-            var resultDto = new DeckDto
-            {
-                DeckId = deck.DeckId,
-                DeckName = deck.DeckName,
-                DeckCommander = deck.CommanderName,
-                Cards = deck.DeckCards
-                    .SelectMany(dc => Enumerable.Repeat(new CardDto
-                    {
-                        CardId = dc.Card.CardId,
-                        ScryfallId = dc.Card.ScryfallId,
-                        Name = dc.Card.Name,
-                        OracleText = dc.Card.OracleText,
-                        ImageUri = dc.Card.ImageUri,
-                    }, dc.Quantity))
-                    .ToList(),
-            };
-
-            return CreatedAtAction(nameof(GetDeckById), new { deck.DeckId }, resultDto);
+            return await GetDeckById(deck.DeckId);
         }
 
         [HttpGet("player/{username}")]
