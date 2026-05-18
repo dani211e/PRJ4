@@ -11,6 +11,8 @@ namespace MTG_Emulator.Unity.Db.DTO.DeckDTO
         public string DeckName { get; set; } = string.Empty;
         [Required]
         public string DeckCommander { get; set; } = string.Empty;
+        [Required] 
+        public CardDto CommanderCard { get; set; } = new();
         [Required]
         public List<CardDto> Cards { get; set; } = [];
     }

@@ -109,7 +109,7 @@ namespace MTG_Emulator.Backend
                 var deck1 = new Deck
                 {
                     DeckName = "Best deck ever",
-                    DeckCommander = cards.FirstOrDefault()?.Name ?? "Unknown Commander",
+                    CommanderName = cards.FirstOrDefault()?.Name ?? "Unknown Commander",
                     Player = player1,
                     DeckCards = cards.Select(c => new DeckCard
                     {
