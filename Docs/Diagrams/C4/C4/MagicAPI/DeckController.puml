@@ -1,0 +1,94 @@
+@startuml
+
+class ControllerBase
+
+class MTGContext
+
+class MtgController {
+    + IsOwnerOrAdmin(resourceApiUserId: string) : bool
+    # ToCardDto(card: Card) : CardDto
+}
+
+class DeckController {
+    - context: MTGContext
+
+    + CreateDeck(deckDto: CreateDeckDto) : Task<ActionResult<DeckDto>>
+    + GetAllDecksByUsername(username: string) : Task<ActionResult<List<AllDecksDto>>>
+    + GetDeckById(deckId: int) : Task<ActionResult<DeckDto>>
+    + DeleteDeckByName(deckId: int) : Task<IActionResult>
+    + UpdateDeck(deckId: int, deckDto: UpdateDeckDto?) : Task<ActionResult<DeckDto>>
+}
+
+DeckController --|> MtgController
+MtgController --|> ControllerBase
+
+DeckController --> MTGContext : uses
+
+class Deck
+class DeckCard
+class Card
+class Player
+
+Deck "1" o-- "*" DeckCard
+Deck "1" --> "1" Player
+
+DeckCard "*" --> "1" Card
+
+Card "1" o-- "0..1" CardFace : AltFace
+Card "1" o-- "*" RelatedCard : Tokens
+
+class DeckDto {
+    + DeckId: int
+    + DeckName: string
+    + CommandZone: List<CardDto>
+    + Cards: List<CardDto>
+}
+
+class AllDecksDto {
+    + DeckId: int
+    + DeckName: string
+    + DeckImageUri: string
+}
+
+class CreateDeckDto {
+    + DeckName: string
+    + CardList: string
+    + CommandZone: List<string>
+}
+
+class UpdateDeckDto {
+    + DeckName: string
+    + CardList: string
+    + CommandZone: List<string>
+}
+
+class InvalidCardsResponse {
+    + Error: string
+    + InvalidCards: List<string>
+}
+
+class CardDto
+class CardFaceDto
+class RelatedCardDto
+
+CardDto o-- "0..1" CardFaceDto : AltFace
+CardDto o-- "*" RelatedCardDto : Tokens
+
+DeckController ..> DeckDto
+DeckController ..> AllDecksDto
+DeckController ..> CreateDeckDto
+DeckController ..> UpdateDeckDto
+DeckController ..> InvalidCardsResponse
+
+DeckController ..> CardDto
+DeckController ..> Card
+DeckController ..> Deck
+DeckController ..> DeckCard
+DeckController ..> Player
+
+MtgController ..> Card
+MtgController ..> CardDto
+MtgController ..> CardFaceDto
+MtgController ..> RelatedCardDto
+
+@enduml

@@ -1,0 +1,72 @@
+@startuml
+
+class ControllerBase
+
+class UserManager_ApiUser
+class ApiUser
+class IConfiguration
+class JwtSecurityToken
+class JwtSecurityTokenHandler
+class SymmetricSecurityKey
+class SigningCredentials
+
+class MTGContext
+class Player
+class Deck
+
+class RegisterDto {
+    + Username: string
+    + Email: string
+    + Password: string
+    + Role: string
+}
+
+class LoginDto {
+    + Email: string
+    + Password: string
+}
+
+class ResetPasswordDto {
+    + NewPassword: string
+    + ConfirmPassword: string
+}
+
+class MtgController {
+    + IsOwnerOrAdmin(resourceApiUserId: string) : bool
+}
+
+class AuthenticationController {
+    - configuration: IConfiguration
+    - userManager: UserManager_ApiUser
+    - context: MTGContext
+
+    + Register(dto: RegisterDto) : Task<IActionResult>
+    + Login(dto: LoginDto) : Task<IActionResult>
+    + ResetPassword(dto: ResetPasswordDto) : Task<IActionResult>
+    + DeleteAccount() : Task<IActionResult>
+
+    - generateJwt(user: ApiUser, roles: IList<string>) : string
+}
+
+AuthenticationController --|> MtgController
+MtgController --|> ControllerBase
+
+AuthenticationController --> IConfiguration : uses
+AuthenticationController --> UserManager_ApiUser : uses
+AuthenticationController --> MTGContext : uses
+
+UserManager_ApiUser --> ApiUser
+
+Player "1" --> "1" ApiUser
+Player "1" o-- "*" Deck
+
+AuthenticationController ..> RegisterDto
+AuthenticationController ..> LoginDto
+AuthenticationController ..> ResetPasswordDto
+
+AuthenticationController ..> JwtSecurityToken
+AuthenticationController ..> JwtSecurityTokenHandler
+AuthenticationController ..> SymmetricSecurityKey
+AuthenticationController ..> SigningCredentials
+
+@enduml

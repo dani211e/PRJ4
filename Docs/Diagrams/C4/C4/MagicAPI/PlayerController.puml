@@ -1,0 +1,50 @@
+@startuml
+
+class ControllerBase
+
+class MTGContext
+
+class Player {
+    + Username: string
+    + GamesWon: int
+    + GamesLost: int
+    + GamesDrawn: int
+    + ApiUserId: string
+}
+
+class PlayerDto {
+    + Username: string
+    + GamesWon: int
+    + GamesLost: int
+    + GamesDrawed: int
+}
+
+enum GameResults {
+    Win = 1
+    Draw = 0
+    Loss = -1
+}
+
+class MtgController {
+    + IsOwnerOrAdmin(resourceApiUserId: string) : bool
+}
+
+class PlayerController {
+    - context: MTGContext
+
+    + GetProfile(username: string) : Task<ActionResult<PlayerDto>>
+    + DeleteProfile(username: string) : Task<ActionResult>
+    + UpdatePlayerStats(username: string, result: GameResults) : Task<ActionResult<Player>>
+}
+
+PlayerController --|> MtgController
+MtgController --|> ControllerBase
+
+PlayerController --> MTGContext : uses
+PlayerController ..> Player : queries
+PlayerController ..> PlayerDto : returns
+PlayerController ..> GameResults : input
+
+Player --> GameResults
+
+@enduml
