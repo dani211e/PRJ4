@@ -92,6 +92,7 @@ namespace MTG_Emulator.Backend.Controllers
                     .SelectMany(dc => Enumerable.Repeat(new CardDto
                     {
                         CardId = dc.Card.CardId,
+                        ScryfallId = dc.Card.ScryfallId,
                         Name = dc.Card.Name,
                         OracleText = dc.Card.OracleText,
                         ImageUri = dc.Card.ImageUri,
