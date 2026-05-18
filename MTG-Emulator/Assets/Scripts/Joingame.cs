@@ -81,11 +81,16 @@ public class JoinGame : MonoBehaviour
                 TurnOrderEvent turnOrderEvent = new TurnOrderEvent
                 {
                     PlayersNames = response.playerNames,
-                    currentPlayerName = response.currentPlayerName
+                    CurrentPlayerName = response.currentPlayerName,
                 };
+
+                if (SignalRClient.Instance == null)
+                {
+                    return;
+                }
                 
                 SignalRClient.Instance.Broadcast(turnOrderEvent);
-                SceneManager.LoadScene("SampleScene");
+                SceneManager.LoadScene("InGame");
             }
         },
         onError: error =>

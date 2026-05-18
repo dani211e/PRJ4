@@ -29,20 +29,6 @@ public class Card : MonoBehaviour
             cardName.text = card.Name;
         }
 
-        button = GetComponent<Button>();
-        if (button == null)
-        {
-            button = gameObject.AddComponent<Button>();
-
-        }
-
-        button.onClick.RemoveAllListeners();
-
-        if (onClick != null)
-        {
-            button.onClick.AddListener(() => onClick(cardData));
-        }
-
         if (!string.IsNullOrEmpty(card.ImageUri))
         {
             string fullImageUrl = "http://localhost:5042" + card.ImageUri;

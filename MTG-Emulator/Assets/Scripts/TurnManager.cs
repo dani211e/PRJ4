@@ -47,33 +47,7 @@ namespace MTG_Emulator.Backend.DB.Models
             SignalRClient.Instance.OnTurnOrderCreatedEvent -= HandleTurnOrderCreated;
 
         }
-
-        public void EndTurnOnClick()
-        {
-            if (!IsMyTurn())
-            {
-                Debug.Log("Not your turn.");
-                return;
-            }
-
-            currentPlayerIndex++;
-
-            if (currentPlayerIndex >= players.Count)
-            {
-                currentPlayerIndex = 0;
-            }
-
-            string nextPlayer = players[currentPlayerIndex];
-
-            TurnChangedEvent turnEvent = new TurnChangedEvent
-            {
-                currentPlayerName = nextPlayer,
-                turnNumber = currentPlayerIndex
-            };
-
-            SignalRClient.Instance.Broadcast(turnEvent);
-            
-        }
+        
 
         private void HandleTurnChanged(object sender, TurnChangedEvent e)
         {
@@ -86,7 +60,7 @@ namespace MTG_Emulator.Backend.DB.Models
         private void HandleTurnOrderCreated(object sender, TurnOrderEvent e)
         {
             players = e.PlayersNames;
-            currentPlayerTurn = e.currentPlayerName;
+            currentPlayerTurn = e.CurrentPlayerName;
             currentPlayerIndex = players.IndexOf(currentPlayerTurn);
 
             UpdateTurnUI();

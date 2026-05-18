@@ -4,6 +4,7 @@ using MTG_Emulator.Backend.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MTG_Emulator.Backend.Migrations
 {
     [DbContext(typeof(MTGContext))]
-    partial class MTGContextModelSnapshot : ModelSnapshot
+    [Migration("20260518112351_AddPlayersNameOnJoin")]
+    partial class AddPlayersNameOnJoin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace MTG_Emulator.Backend.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("CardDeck", b =>
-                {
-                    b.Property<int>("CommandZoneCardId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DeckId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CommandZoneCardId", "DeckId");
-
-                    b.HasIndex("DeckId");
-
-                    b.ToTable("CardDeck");
-                });
 
             modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.ApiRole", b =>
                 {
@@ -119,9 +107,7 @@ namespace MTG_Emulator.Backend.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
-                        .IsUnique()
-                        .HasDatabaseName("EmailIndex")
-                        .HasFilter("[NormalizedEmail] IS NOT NULL");
+                        .HasDatabaseName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
@@ -204,6 +190,11 @@ namespace MTG_Emulator.Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DeckId"));
 
+                    b.Property<string>("DeckCommander")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
                     b.Property<string>("DeckName")
                         .IsRequired()
                         .HasMaxLength(256)
@@ -261,10 +252,18 @@ namespace MTG_Emulator.Backend.Migrations
                         .HasMaxLength(6)
                         .HasColumnType("nvarchar(6)");
 
+                    b.Property<string>("HostIp")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
                     b.Property<string>("HostName")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<int>("HostPort")
+                        .HasColumnType("int");
 
                     b.Property<int>("MaxPlayers")
                         .HasColumnType("int");
@@ -450,21 +449,6 @@ namespace MTG_Emulator.Backend.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("CardDeck", b =>
-                {
-                    b.HasOne("MTG_Emulator.Backend.DB.Models.Card", null)
-                        .WithMany()
-                        .HasForeignKey("CommandZoneCardId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MTG_Emulator.Backend.DB.Models.Deck", null)
-                        .WithMany()
-                        .HasForeignKey("DeckId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.CardFace", b =>

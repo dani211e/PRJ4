@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class SignalRClient : MonoBehaviour, ISyncEventHandler
 {
-    private readonly Uri apiURL = new Uri("http://localhost:5042");
+    private readonly Uri apiURL = new Uri("http://localhost:5042/");
     private const string hubName = "GameState";
 
     private HubConnection connection;
@@ -21,9 +21,9 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
     public event EventHandler<TurnChangedEvent> OnTurnChangedEvent;
     public event EventHandler<TurnOrderEvent> OnTurnOrderCreatedEvent; 
 
-    public async void Awake()
+    public void Awake()
     {
-        if (!Instance)
+        if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
@@ -46,7 +46,8 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
             connection.On<TurnChangedEvent>(nameof(ISyncEventHandler.OnTurnChanged), OnTurnChanged);
             connection.On<TurnOrderEvent>(nameof(ISyncEventHandler.OnTurnOrderCreated), OnTurnOrderCreated);
 
-            await connection.StartAsync();
+           var t = connection.StartAsync();
+           t.Wait();
         }
         catch (Exception ex)
         {

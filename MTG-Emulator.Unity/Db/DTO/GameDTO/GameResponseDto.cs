@@ -11,5 +11,4 @@ public class GameResponseDto
     public List<string> playerNames { get; set; } = new();
     
     public string currentPlayerName  { get; set; } = string.Empty;
-    
 }

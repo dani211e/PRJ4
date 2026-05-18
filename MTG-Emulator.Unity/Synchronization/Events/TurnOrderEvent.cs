@@ -3,7 +3,7 @@
 public class TurnOrderEvent : SyncEvent
 {
     public List<string> PlayersNames { get; set; } = new();
-    public string currentPlayerName { get; set; } = string.Empty;
+    public string CurrentPlayerName { get; set; } = string.Empty;
 
     public TurnOrderEvent()
     {

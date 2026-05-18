@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using MTG_Emulator.Unity.Db.DTO.GameDTO;
+using MTG_Emulator.Unity.Synchronization.Events;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,6 +32,8 @@ public class CreateGame : MonoBehaviour
 
     private void Start()
     {
+
+        
         maxPlayersSlider.minValue = 2;
         maxPlayersSlider.maxValue = 5;
         maxPlayersSlider.wholeNumbers = true;
@@ -41,12 +44,29 @@ public class CreateGame : MonoBehaviour
         createButton.onClick.AddListener(OnClickCreate);
         toggleCodeButton.onClick.AddListener(OnClickToggleCode);
 
+        if (SignalRClient.Instance == null)
+        {
+            Debug.Log("SignalR is null");
+            return;
+        }
+        else
+        {
+            SignalRClient.Instance.OnTurnOrderCreatedEvent += HandleTurnOrderCreated;
+            Debug.Log("Host subscribed to OnTurnOrderCreatedEvent");
+        }
+        
+
         refreshCode();
         setStatus("");
     }
 
     private void OnDestroy()
     {
+        if (SignalRClient.Instance != null)
+        {
+            SignalRClient.Instance.OnTurnOrderCreatedEvent -= HandleTurnOrderCreated;
+        }
+        
         maxPlayersSlider.onValueChanged.RemoveListener(updateSliderLabel);
         createButton.onClick.RemoveListener(OnClickCreate);
         toggleCodeButton.onClick.RemoveListener(OnClickToggleCode);
@@ -113,4 +133,15 @@ public class CreateGame : MonoBehaviour
         if (statusText != null)
             statusText.text = status;
     }
+
+
+    private void HandleTurnOrderCreated(object sender, TurnOrderEvent e)
+    {
+        var a = new LoadSceneParameters(LoadSceneMode.Single);
+        var b = SceneManager.LoadScene("InGame", a);
+        Debug.Log(b.name + b.buildIndex);
+        Debug.Log("swtich to ingame from create game screen");
+        
+    }
+    
 }

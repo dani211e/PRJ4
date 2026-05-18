@@ -28,7 +28,7 @@ namespace MTG_Emulator.Backend.Controllers.Hubs
 
         public async Task TurnOrderCreated(TurnOrderEvent e)
         {
-            await Clients.Others.SendAsync(nameof(ISyncEventHandler.OnTurnOrderCreated), e);
+            await Clients.All.SendAsync(nameof(ISyncEventHandler.OnTurnOrderCreated), e);
         }
     }
 }
