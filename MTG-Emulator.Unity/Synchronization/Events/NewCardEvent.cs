@@ -2,10 +2,12 @@
 
 namespace MTG_Emulator.Unity.Synchronization.Events
 {
-    public class NewCardEvent : SyncEvent
+    public class NewCardEvent : ObjectEvent
     {
-        public NewCardEvent()
+        public NewCardEvent(int playerIndex, Guid identifier)
         {
+            PlayerIndex = playerIndex;
+            Identifier = identifier;
             Method = nameof(ISyncEventListener.NewCard);
         }
 

@@ -2,10 +2,12 @@
 
 namespace MTG_Emulator.Unity.Synchronization.Events
 {
-    public class MoveCardEvent : SyncEvent
+    public class MoveCardEvent : ObjectEvent
     {
-        public MoveCardEvent()
+        public MoveCardEvent(int playerIndex, Guid identifier)
         {
+            PlayerIndex = playerIndex;
+            Identifier = identifier;
             Method = nameof(ISyncEventListener.MoveCard);
         }
 

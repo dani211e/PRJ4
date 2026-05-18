@@ -1,15 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace MTG_Emulator.Unity.Synchronization.Events;
 
-namespace MTG_Emulator.Unity.Synchronization.Events;
-
-public class PlayerStatsEvent : SyncEvent
+public class PlayerStatsEvent : ObjectEvent
 {
-    public PlayerStatsEvent()
+    public PlayerStatsEvent(int playerIndex)
     {
+        PlayerIndex = playerIndex;
         Method = nameof(ISyncEventListener.UpdatePlayerStats);
     }
 
-    public int? Health { get; set;}
+    public int? Health { get; set; }
 
     public string PlayerName { get; set; } = string.Empty;
 
