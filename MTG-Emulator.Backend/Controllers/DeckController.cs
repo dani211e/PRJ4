@@ -52,6 +52,11 @@ namespace MTG_Emulator.Backend.Controllers
                     return BadRequest($"Invalid quantity in line: '{line}'");
 
                 string name = line.Substring(firstSpace + 1);
+                
+                int slashIndex = name.IndexOf(" // ", StringComparison.Ordinal);
+                if (slashIndex != -1)
+                    name = name.Substring(0, slashIndex);
+                
                 var cardEntity = await context.Cards
                     .FirstOrDefaultAsync(c => c.Name == name);
 
@@ -250,6 +255,11 @@ namespace MTG_Emulator.Backend.Controllers
                         return BadRequest($"Invalid quantity in line: '{line}'");
 
                     string name = line.Substring(firstSpace + 1);
+                    
+                    int slashIndex = name.IndexOf(" // ", StringComparison.Ordinal);
+                    if (slashIndex != -1)
+                        name = name.Substring(0, slashIndex);
+                    
                     var cardEntity = await context.Cards.FirstOrDefaultAsync(c => c.Name == name);
 
                     if (cardEntity != null)
