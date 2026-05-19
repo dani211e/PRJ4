@@ -14,6 +14,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="10.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -34,14 +35,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MTG-Emulator.Unity\MTG-Emulator.Unity.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DB\DTO\CardDTO\" />
-    <Folder Include="DB\DTO\CardFace\" />
-    <Folder Include="DB\DTO\DeckDTO\" />
-    <Folder Include="DB\DTO\PlayerDTO\" />
-    <Folder Include="DB\DTO\RelatedCardsDTO\" />
   </ItemGroup>
 
   <ItemGroup>

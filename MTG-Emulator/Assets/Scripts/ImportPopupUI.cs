@@ -1,7 +1,8 @@
 using System;
 using System.Collections;
-using UnityEngine;
+using MTG_Emulator.Unity.Db.DTO.DeckDTO;
 using TMPro;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class ImportPopupUI : MonoBehaviour
@@ -81,9 +82,8 @@ public class ImportPopupUI : MonoBehaviour
         CreateDeckDto dto = new CreateDeckDto
         {
             DeckName = deckName,
-            PlayerName = GameSession.PlayerName, // placeholder
             CardList = importText,
-            Commander = ""
+            Commander = "Swamp"
         };
 
         if (APIManager.Instance == null)

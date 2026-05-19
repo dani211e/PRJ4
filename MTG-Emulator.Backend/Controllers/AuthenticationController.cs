@@ -9,6 +9,7 @@ using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Unity.Db.DTO.AuthenticationDTO;
 using Microsoft.EntityFrameworkCore;
+using MTG_Emulator.Unity.Db.DTO.PlayerDTO;
 
 namespace MTG_Emulator.Backend.Controllers
 {
@@ -71,7 +72,12 @@ namespace MTG_Emulator.Backend.Controllers
 
             var roles = await userManager.GetRolesAsync(user);
             var token = generateJwt(user, roles);
-            return Ok(new { token });
+            var resp = new LoginResponseDto
+            {
+                Username = user.UserName,
+                Token = token
+            };
+            return Ok(resp);
         }
 
         private string generateJwt(ApiUser user, IList<string> roles)

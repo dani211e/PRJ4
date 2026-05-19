@@ -18,5 +18,7 @@ namespace MTG_Emulator.Backend.DB.Models
 
         [StringLength(32)]
         public string Status { get; set; } = "Waiting";
+
+        public List<string> PlayerNames { get; set; } = new();
     }
 }

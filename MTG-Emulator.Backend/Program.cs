@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpLogging;
@@ -7,6 +8,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using MTG_Emulator.Backend.Controllers.Hubs;
 using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Backend.Scalar;
@@ -30,7 +32,13 @@ namespace MTG_Emulator.Backend
 
             builder.Host.UseSerilog();
 
-            builder.Services.AddControllers();
+            
+            builder.Services.AddControllers().AddJsonOptions(opt =>
+            {
+                // Unity deserialization expects case sensitive property names
+                // a null naming policy makes the casing unchanged and respects class naming
+                opt.JsonSerializerOptions.PropertyNamingPolicy = null;
+            });
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddOpenApi(options =>
             {
@@ -39,6 +47,7 @@ namespace MTG_Emulator.Backend
 
             if (builder.Environment.IsDevelopment())
                 builder.Configuration.AddUserSecrets<Program>();
+            builder.Services.AddSignalR().AddNewtonsoftJsonProtocol();
 
             builder.Services.AddDbContext<MTGContext>(options =>
                 options.UseSqlServer(
@@ -159,6 +168,7 @@ namespace MTG_Emulator.Backend
             }
 
             app.MapControllers();
+            app.MapHub<GameStateSyncHub>("/GameState");
             app.MapOpenApi();
             app.MapScalarApiReference();
 

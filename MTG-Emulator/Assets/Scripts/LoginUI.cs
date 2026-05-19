@@ -8,12 +8,13 @@ using UnityEngine.SceneManagement;
         [SerializeField] private TMP_InputField usernameField;
         [SerializeField] private TMP_InputField passwordField;
 
+
         public void OnClickLogin()
         {
-            string username = usernameField.text.Trim();
+            string email = usernameField.text.Trim();
             string password = passwordField.text.Trim();
 
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
                 Debug.Log("Username or password is empty");
                 return;
@@ -25,11 +26,12 @@ using UnityEngine.SceneManagement;
                 return;
             }
 
-            StartCoroutine(APIManager.Instance.CreateProfile(
-                username,
+            StartCoroutine(APIManager.Instance.Login(
+                email,
                 password,
                 SuccessMessage =>
                 {
+                    SceneManager.LoadScene("0");
                     Debug.Log(SuccessMessage);
                 },
                 error =>
@@ -37,6 +39,11 @@ using UnityEngine.SceneManagement;
                     Debug.LogError(error);
                 }
                 ));
+        }
+        
+        public void OnClickBack()
+        {
+            SceneManager.LoadScene("0");
         }
     }
 

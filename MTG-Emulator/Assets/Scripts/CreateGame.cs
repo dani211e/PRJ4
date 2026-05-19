@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using MTG_Emulator.Unity.Db.DTO.GameDTO;
+using MTG_Emulator.Unity.Synchronization.Events;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,11 +23,12 @@ public class CreateGame : MonoBehaviour
 
     [SerializeField]
     private TMP_Text statusText;
-    
+
     [Header("Streamer Mode")]
-    [SerializeField] private Button toggleCodeButton;
-    
-    
+    [SerializeField]
+    private Button toggleCodeButton;
+
+
     private bool codeVisible = true;
 
     private void Start()
@@ -41,12 +43,29 @@ public class CreateGame : MonoBehaviour
         createButton.onClick.AddListener(OnClickCreate);
         toggleCodeButton.onClick.AddListener(OnClickToggleCode);
 
+        if (SignalRClient.Instance == null)
+        {
+            Debug.Log("SignalR is null");
+            return;
+        }
+        else
+        {
+            SignalRClient.Instance.OnTurnOrderCreatedEvent += HandleTurnOrderCreated;
+            Debug.Log("Host subscribed to OnTurnOrderCreatedEvent");
+        }
+
+
         refreshCode();
         setStatus("");
     }
 
     private void OnDestroy()
     {
+        if (SignalRClient.Instance != null)
+        {
+            SignalRClient.Instance.OnTurnOrderCreatedEvent -= HandleTurnOrderCreated;
+        }
+
         maxPlayersSlider.onValueChanged.RemoveListener(updateSliderLabel);
         createButton.onClick.RemoveListener(OnClickCreate);
         toggleCodeButton.onClick.RemoveListener(OnClickToggleCode);
@@ -56,7 +75,7 @@ public class CreateGame : MonoBehaviour
     {
         gameCodeText.text = GameSession.GameCode;
     }
-    
+
     public void OnClickToggleCode()
     {
         codeVisible = !codeVisible;
@@ -91,6 +110,7 @@ public class CreateGame : MonoBehaviour
                 GameSession.GameCode = response.gameCode;
                 GameSession.MaxPlayers = response.maxPlayers;
                 GameSession.IsHost = true;
+                GameSession.PlayerId = response.currentPlayers - 1;
 
                 setStatus($"Game Created! Code:\n{response.gameCode}");
                 Debug.Log($"[CreateGame] Room {response.gameCode} ready for {response.maxPlayers} players.");
@@ -112,5 +132,14 @@ public class CreateGame : MonoBehaviour
     {
         if (statusText != null)
             statusText.text = status;
+    }
+
+
+    private void HandleTurnOrderCreated(object sender, TurnOrderEvent e)
+    {
+        var a = new LoadSceneParameters(LoadSceneMode.Single);
+        var b = SceneManager.LoadScene("InGame", a);
+        Debug.Log(b.name + b.buildIndex);
+        Debug.Log("swtich to ingame from create game screen");
     }
 }

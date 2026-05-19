@@ -1,27 +1,33 @@
-
 using System;
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using System.Collections;
+using MTG_Emulator.Cards;
+using TMPro;
+using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class Card : MonoBehaviour
 {
     [Header("Visible UI")]
-    [SerializeField] private TMP_Text cardName;
-    [SerializeField] private Image cardImage;
+    [SerializeField]
+    private Image cardImage;
 
-    private CardDto cardData;
+    private TMP_Text cardName;
+
+    public Guid Identifier => cardData.Identifier;
+
+    private CardInfo cardData;
     private Button button;
+    private bool Istapped = false;
+    private CardZonesTypes currentzone;
 
-    public void Setup(CardDto card, Action<CardDto> onClick)
+    public void Setup(CardInfo card, Action<CardInfo> onClick = null)
     {
         cardData = card;
 
         if (cardName != null)
         {
-            cardName.text = card.name;
+            cardName.text = card.Name;
         }
 
         button = GetComponent<Button>();
@@ -31,13 +37,32 @@ public class Card : MonoBehaviour
         }
 
         button.onClick.RemoveAllListeners();
-        button.onClick.AddListener(() => onClick?.Invoke(cardData));
 
-        if (!string.IsNullOrEmpty(card.imageUri))
+        if (onClick != null)
         {
-            StartCoroutine(LoadCardImage(card.imageUri));
+            button.onClick.AddListener(() => onClick(cardData));
         }
+
+        if (!string.IsNullOrEmpty(card.ImageUri))
+        {
+            string fullImageUrl = "http://localhost:5042" + card.ImageUri;
+            StartCoroutine(LoadCardImage(fullImageUrl));
+        }
+
+        // SignalRClient.Instance.OnMoveCardEvent += (_, e) =>
+        // {
+        //     if (cardData.Identifier != e.Identifier)
+        //         return;
+        //     if (e.Position.HasValue)
+        //         transform.position = e.Position.Value.ToUnity3();
+        // };
     }
+
+    public void SetZones(CardZonesTypes zone)
+    {
+        currentzone = zone;
+    }
+
 
     private IEnumerator LoadCardImage(string url)
     {
@@ -49,8 +74,26 @@ public class Card : MonoBehaviour
         else
         {
             Texture2D tex = DownloadHandlerTexture.GetContent(request);
-            cardImage.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            cardImage.sprite = Sprite.Create(
+                tex,
+                new Rect(0, 0, tex.width, tex.height),
+                new Vector2(0.5f, 0.5f)
+            );
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (currentzone != CardZonesTypes.Bf)
+            {
+                return;
+            }
+
+            Debug.Log("Q is pressed");
+            transform.Rotate(0, 0, Istapped ? 90.0f : -90.0f);
+            Istapped = !Istapped;
         }
     }
 }
-
