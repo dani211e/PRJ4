@@ -15,8 +15,5 @@ namespace MTG_Emulator.Unity.Db.DTO.PlayerDTO
 
         [Required]
         public int GamesDrawed { get; set; }
-
-        [Required]
-        public List<string> DeckNames { get; set; } = new();
     }
 }
