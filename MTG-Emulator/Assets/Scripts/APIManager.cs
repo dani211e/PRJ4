@@ -9,6 +9,7 @@ using MTG_Emulator.Unity.Db.DTO.PlayerDTO;
 using UnityEngine;
 using UnityEngine.Networking;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+using System.Text.Json;
 
 
 public class APIManager : MonoBehaviour
@@ -28,6 +29,10 @@ public class APIManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     public IEnumerator CreateDeck(CreateDeckDto deck, Action<DeckDto> onSuccess, Action<string> onError)
     {
@@ -60,24 +65,45 @@ public class APIManager : MonoBehaviour
         Debug.Log(baseUrl + "Deck");
     }
 
-    public IEnumerator UpdateDeckCommander(string deckName, string commanderName, Action<DeckDto> onSuccess,
-        Action<string> onError)
+    public IEnumerator UpdateDeckCommander(int deckId, List<string> commanderNames, string deckName, string cardList,
+        Action<DeckDto> onSuccess, Action<string> onError)
     {
-        CreateDeckDto dto = new CreateDeckDto { DeckName = deckName, Commander = commanderName };
+        var dto = new CreateDeckDto
+        {
+            DeckName = deckName,
+            CardList = cardList,
+            CommandZone = commanderNames
+        };
+
         string json = JsonSerializer.Serialize(dto);
 
-        UnityWebRequest request = new UnityWebRequest(baseUrl + $"Deck/{deckName}", "PUT");
+        UnityWebRequest request = new UnityWebRequest(baseUrl + $"Deck/{deckId}", "PUT");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
+
+        string token = PlayerPrefs.GetString("jwtToken");
+        if (!string.IsNullOrEmpty(token))
+            request.SetRequestHeader("Authorization", "Bearer " + token);
 
         yield return request.SendWebRequest();
 
         if (request.result != UnityWebRequest.Result.Success)
             onError?.Invoke(request.downloadHandler.text);
         else
-            onSuccess?.Invoke(JsonSerializer.Deserialize<DeckDto>(request.downloadHandler.text));
+        {
+            string responseText = request.downloadHandler.text;
+            Debug.Log("UpdateDeckCommander response: " + responseText);
+
+            if (string.IsNullOrEmpty(responseText))
+            {
+                Debug.Log("Commander updated successfully (empty response)");
+                onSuccess?.Invoke(null);
+            }
+            else
+                onSuccess?.Invoke(JsonSerializer.Deserialize<DeckDto>(responseText, JsonOptions));
+        }
     }
 
     public IEnumerator Login(string email, string password, Action<string> onSuccess, Action<string> onError)
@@ -133,8 +159,8 @@ public class APIManager : MonoBehaviour
 
         if (request.result != UnityWebRequest.Result.Success)
         {
-            Debug.Log("Get failed" + request.downloadHandler.text);
-            onError?.Invoke(request.downloadHandler.text);
+            Debug.LogError("Get failed: " + request.result + " | HTTP " + request.responseCode + " | " + request.downloadHandler.text);
+            onError?.Invoke(request.result + " | HTTP " + request.responseCode + " | " + request.downloadHandler.text);
         }
         else
         {
@@ -209,5 +235,12 @@ public class APIManager : MonoBehaviour
             onError?.Invoke(request.downloadHandler.text);
         else
             onSuccess?.Invoke(JsonSerializer.Deserialize<GameResponseDto>(request.downloadHandler.text));
+    }
+}
+namespace MTG_Emulator.Unity.Db.DTO.DeckDTO
+{
+    public class UpdateDeckDto
+    {
+        public List<string> CommandZone { get; set; } = new();
     }
 }

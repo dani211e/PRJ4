@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Unity.Db.DTO.CardDTO;
 using MTG_Emulator.Unity.Db.DTO.DeckDTO;
 using UnityEngine;
@@ -13,9 +14,6 @@ public class DeckViewer : MonoBehaviour
 {
     public static DeckViewer Instance;
 
-
-
-    
     [Header("Deck UI")]
     [SerializeField] private Transform deckListParent;
     [SerializeField] private GameObject deckButtonPrefab;
@@ -23,51 +21,51 @@ public class DeckViewer : MonoBehaviour
     [Header("Commander UI")]
     [SerializeField] private TMP_Text commanderNameText;
     [SerializeField] private Image commanderImage;
+    [SerializeField] private Transform commanderPanel;
+    [SerializeField] private GameObject commanderEntryPrefab;
 
     [Header("Card List")]
     [SerializeField] private Transform cardListParent;
     [SerializeField] private GameObject cardRowPrefab;
 
+    [Header("Panels")]
+    [SerializeField] private GameObject menuPanel;
     [SerializeField] private GameObject deckListPanel;
     [SerializeField] private GameObject deckDetailsPanel;
 
     private DeckDto currentDeck;
+    private List<CardDto> _selectedCommanders = new();
 
     private void Awake() => Instance = this;
 
 
     public void Start()
     {
-        
         Debug.Log("APIManager instance: " + APIManager.Instance);
         Debug.Log("Saved username: " + PlayerPrefs.GetString("username"));
-        
+
+        if (menuPanel != null) menuPanel.SetActive(true);
+        if (deckListPanel != null) deckListPanel.SetActive(false);
+        if (deckDetailsPanel != null) deckDetailsPanel.SetActive(false);
+
         LoadDeckList();
     }
 
     public void LoadDeckList()
     {
         foreach (Transform child in deckListParent)
-        {
             Destroy(child.gameObject);
-        }
-        
+
         string username = PlayerPrefs.GetString("username");
-        
 
         StartCoroutine(APIManager.Instance.GetDecksByUsername(
             username,
             result =>
             {
                 foreach (DeckDto item in result)
-                {
                     AddDeckButton(item);
-                }
             },
-            error =>
-            {
-                Debug.LogError("Failed to load decks " + error);
-            }
+            error => Debug.LogError("Failed to load decks: " + error)
         ));
     }
 
@@ -76,7 +74,6 @@ public class DeckViewer : MonoBehaviour
         GameObject obj = Instantiate(deckButtonPrefab, deckListParent);
 
         TMP_Text text = obj.GetComponentInChildren<TMP_Text>();
-        
         if (text != null)
         {
             text.text = deck.DeckName;
@@ -91,43 +88,45 @@ public class DeckViewer : MonoBehaviour
         }
     }
 
+    // Called by DeckListBackButton — goes back to MenuPanel
+    public void ShowMenuPanel()
+    {
+        if (deckListPanel != null) deckListPanel.SetActive(false);
+        if (deckDetailsPanel != null) deckDetailsPanel.SetActive(false);
+        if (menuPanel != null) menuPanel.SetActive(true);
+    }
+
+    // Called by DeckDetailsBackButton — goes back to deck list
     public void ShowDeckList()
     {
-        if (deckDetailsPanel != null)
-            deckDetailsPanel.SetActive(false);
-
-        if (deckListPanel != null)
-            deckListPanel.SetActive(true);
+        if (deckDetailsPanel != null) deckDetailsPanel.SetActive(false);
+        if (deckListPanel != null) deckListPanel.SetActive(true);
     }
 
     public void ShowDeck(DeckDto deck)
     {
-        
-        if (deckListPanel != null)
-        {
-            deckListPanel.SetActive(false);
-        }
+        Debug.Log("ShowDeck called for: " + deck.DeckName);
+        currentDeck = deck;
+        _selectedCommanders = deck.CommandZone?.ToList() ?? new List<CardDto>();
 
-        if (deckDetailsPanel != null)
-        {
-            deckDetailsPanel.SetActive(true);
-        }
-        
-        commanderNameText.text = string.IsNullOrEmpty(deck.DeckCommander) ? "Select Commander" : deck.DeckCommander;
+        if (deckListPanel != null) deckListPanel.SetActive(false);
+        if (deckDetailsPanel != null) deckDetailsPanel.SetActive(true);
+
+        commanderNameText.text = _selectedCommanders.Count > 0
+            ? string.Join(", ", _selectedCommanders.Select(c => c.Name))
+            : "Select Commander";
 
         if (commanderImage != null)
-        {
             commanderImage.sprite = null;
-        }
-        
+
         StartCoroutine(APIManager.Instance.GetDeckById(
             deck.DeckId,
             result =>
             {
+                _selectedCommanders = result.CommandZone?.ToList() ?? new List<CardDto>();
+
                 foreach (Transform child in cardListParent)
-                {
                     Destroy(child.gameObject);
-                }
 
                 var groupCards = result.Cards.GroupBy(card => card.Name).OrderBy(g => g.Key);
 
@@ -137,25 +136,46 @@ public class DeckViewer : MonoBehaviour
 
                     Transform quantityTransform = rowObj.transform.Find("CardQuantity");
                     Transform nameTransform = rowObj.transform.Find("CardName");
-            
+
                     if (quantityTransform != null)
                         quantityTransform.GetComponent<TMP_Text>().text = group.Count().ToString();
-                    
+
                     if (nameTransform != null)
                         nameTransform.GetComponent<TMP_Text>().text = group.Key;
                 }
-            }, error =>
-            {
-                Debug.LogError("Failed to load cards from deck " + deck.DeckId + " " + error);
 
-            }));
-        
-        
+                foreach (Transform child in commanderPanel)
+                    Destroy(child.gameObject);
+
+                float yOffset = 0f;
+                foreach (var commander in _selectedCommanders)
+                {
+                    GameObject entry = Instantiate(commanderEntryPrefab, commanderPanel);
+                    RectTransform rt = entry.GetComponent<RectTransform>();
+                    rt.anchorMin = new Vector2(0, 1);
+                    rt.anchorMax = new Vector2(1, 1);
+                    rt.pivot = new Vector2(0.5f, 1);
+                    rt.offsetMin = new Vector2(10, -yOffset - 400);
+                    rt.offsetMax = new Vector2(-10, -yOffset);
+                    yOffset += 420f;
+
+                    TMP_Text nameText = entry.GetComponentInChildren<TMP_Text>();
+                    if (nameText != null) nameText.text = commander.Name;
+
+                    Image img = entry.transform.Find("CardImage")?.GetComponent<Image>();
+                    if (img != null && !string.IsNullOrEmpty(commander.ImageUri))
+                        StartCoroutine(LoadImage(commander.ImageUri, img));
+                }
+            },
+            error => Debug.LogError("Failed to load cards from deck " + deck.DeckId + " " + error)
+        ));
     }
-    
 
     private IEnumerator LoadImage(string url, Image targetImage)
     {
+        if (!url.StartsWith("http"))
+            url = "http://localhost:5042" + url;
+        
         UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
         yield return request.SendWebRequest();
 
@@ -167,7 +187,42 @@ public class DeckViewer : MonoBehaviour
             targetImage.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         }
     }
-    
+
+    public void SelectCommander(CardDto card)
+    {
+        if (_selectedCommanders.Any(c => c.Name == card.Name))
+            _selectedCommanders.RemoveAll(c => c.Name == card.Name);
+        else
+            _selectedCommanders.Add(card);
+
+        commanderNameText.text = _selectedCommanders.Count > 0
+            ? string.Join(", ", _selectedCommanders.Select(c => c.Name))
+            : "No Commander";
+
+        if (_selectedCommanders.Count > 0 && !string.IsNullOrEmpty(_selectedCommanders[0].ImageUri))
+            StartCoroutine(LoadImage(_selectedCommanders[0].ImageUri, commanderImage));
+        else if (commanderImage != null)
+        {
+            commanderImage.sprite = null;
+            commanderImage.color = Color.white;
+        }
+
+        StartCoroutine(APIManager.Instance.UpdateDeckCommander(
+            currentDeck.DeckId,
+            _selectedCommanders.Select(c => c.Name).ToList(),
+            currentDeck.DeckName,
+            string.Join("\n", currentDeck.Cards.Select(c => $"1 {c.Name}")),
+            result =>
+            {
+                if (result != null)
+                    Debug.Log("Commander updated: " + string.Join(", ", result.CommandZone.Select(c => c.Name)));
+                else
+                    Debug.Log("Commander updated successfully.");
+            },
+            error => Debug.LogError("Failed to update commander: " + error)
+        ));
+    }
+
     public void OnClickBack()
     {
         SceneManager.LoadScene("0");
