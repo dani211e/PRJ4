@@ -25,6 +25,10 @@
 
         public void Logout()
         {
+            PlayerPrefs.DeleteKey("jwtToken");
+            PlayerPrefs.DeleteKey("username");
+            PlayerPrefs.Save();
             SceneManager.LoadScene("Login screen");
+            
         }
     }

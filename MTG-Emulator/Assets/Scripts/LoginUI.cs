@@ -41,9 +41,9 @@ using UnityEngine.SceneManagement;
                 ));
         }
         
-        public void OnClickBack()
+        public void OnClickRegister()
         {
-            SceneManager.LoadScene("0");
+            SceneManager.LoadScene("Register");
         }
     }
 

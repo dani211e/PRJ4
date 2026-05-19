@@ -818,11 +818,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2027437785536580787, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
       propertyPath: m_Name
-      value: BackButton
+      value: RegisterButton
       objectReference: {fileID: 0}
     - target: {fileID: 2469359424003154749, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
       propertyPath: m_text
-      value: back
+      value: REGISTER
       objectReference: {fileID: 0}
     - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
@@ -842,7 +842,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnClickBack
+      value: OnClickRegister
       objectReference: {fileID: 0}
     - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName

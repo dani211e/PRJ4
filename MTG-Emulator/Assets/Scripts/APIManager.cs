@@ -236,6 +236,23 @@ public class APIManager : MonoBehaviour
         else
             onSuccess?.Invoke(JsonSerializer.Deserialize<GameResponseDto>(request.downloadHandler.text));
     }
+    
+    public IEnumerator Register(RegisterDto dto, Action<string> onSuccess, Action<string> onError)
+    {
+        string json = JsonSerializer.Serialize(dto);
+        UnityWebRequest request = new UnityWebRequest(baseUrl + "Authentication/register", "POST");
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+            onError?.Invoke(request.downloadHandler.text);
+        else
+            onSuccess?.Invoke(request.downloadHandler.text);
+    }
 }
 namespace MTG_Emulator.Unity.Db.DTO.DeckDTO
 {
