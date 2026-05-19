@@ -48,11 +48,11 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
         if (!WasDropped)
         {
             transform.SetParent(parentToReturnTo, true);
-
-            SignalRClient.Instance?.Broadcast(new MoveCardEvent(GameSession.PlayerId, card.Identifier)
-            {
-                Position = transform.position.ToSystem2(),
-            });
         }
+
+        SignalRClient.Instance.Broadcast(new MoveCardEvent(GameSession.PlayerId, card.Identifier)
+        {
+            Position = transform.position.ToSystem2(),
+        });
     }
 }

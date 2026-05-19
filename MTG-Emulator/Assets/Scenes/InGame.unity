@@ -4046,6 +4046,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MTG_Emulator.CardListener
   cardPrefab: {fileID: 7015738966440023518, guid: bc11d992d5ec23842bb2a12dd3c8d774, type: 3}
   handZone: {fileID: 1899433327}
+  battlefield: {fileID: 414315789}
 --- !u!1 &1384386591
 GameObject:
   m_ObjectHideFlags: 0
