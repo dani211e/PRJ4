@@ -23,17 +23,16 @@ public class CreateGame : MonoBehaviour
 
     [SerializeField]
     private TMP_Text statusText;
-    
+
     [Header("Streamer Mode")]
-    [SerializeField] private Button toggleCodeButton;
-    
-    
+    [SerializeField]
+    private Button toggleCodeButton;
+
+
     private bool codeVisible = true;
 
     private void Start()
     {
-
-        
         maxPlayersSlider.minValue = 2;
         maxPlayersSlider.maxValue = 5;
         maxPlayersSlider.wholeNumbers = true;
@@ -54,7 +53,7 @@ public class CreateGame : MonoBehaviour
             SignalRClient.Instance.OnTurnOrderCreatedEvent += HandleTurnOrderCreated;
             Debug.Log("Host subscribed to OnTurnOrderCreatedEvent");
         }
-        
+
 
         refreshCode();
         setStatus("");
@@ -66,7 +65,7 @@ public class CreateGame : MonoBehaviour
         {
             SignalRClient.Instance.OnTurnOrderCreatedEvent -= HandleTurnOrderCreated;
         }
-        
+
         maxPlayersSlider.onValueChanged.RemoveListener(updateSliderLabel);
         createButton.onClick.RemoveListener(OnClickCreate);
         toggleCodeButton.onClick.RemoveListener(OnClickToggleCode);
@@ -76,7 +75,7 @@ public class CreateGame : MonoBehaviour
     {
         gameCodeText.text = GameSession.GameCode;
     }
-    
+
     public void OnClickToggleCode()
     {
         codeVisible = !codeVisible;
@@ -111,7 +110,7 @@ public class CreateGame : MonoBehaviour
                 GameSession.GameCode = response.gameCode;
                 GameSession.MaxPlayers = response.maxPlayers;
                 GameSession.IsHost = true;
-                GameSession.PlayerId = response.currentPlayers;
+                GameSession.PlayerId = response.currentPlayers - 1;
 
                 setStatus($"Game Created! Code:\n{response.gameCode}");
                 Debug.Log($"[CreateGame] Room {response.gameCode} ready for {response.maxPlayers} players.");
@@ -142,7 +141,5 @@ public class CreateGame : MonoBehaviour
         var b = SceneManager.LoadScene("InGame", a);
         Debug.Log(b.name + b.buildIndex);
         Debug.Log("swtich to ingame from create game screen");
-        
     }
-    
 }

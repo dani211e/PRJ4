@@ -53,7 +53,7 @@ namespace MTG_Emulator.Backend.DB.Models
             health += amount;
             healthText.text = health.ToString();
 
-            PlayerStatsEvent statsEvent = new PlayerStatsEvent
+            PlayerStatsEvent statsEvent = new PlayerStatsEvent(GameSession.PlayerId)
             {
                 PlayerName = playerName,
                 Health = health

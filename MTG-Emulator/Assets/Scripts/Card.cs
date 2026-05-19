@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using MTG_Emulator;
 using MTG_Emulator.Cards;
 using TMPro;
 using UnityEngine;
@@ -25,7 +24,6 @@ public class Card : MonoBehaviour
     public void Setup(CardInfo card, Action<CardInfo> onClick = null)
     {
         cardData = card;
-        ObjectManager.AddObject(GameSession.PlayerId, cardData.Identifier, gameObject);
 
         if (cardName != null)
         {
@@ -51,13 +49,13 @@ public class Card : MonoBehaviour
             StartCoroutine(LoadCardImage(fullImageUrl));
         }
 
-        SignalRClient.Instance.OnMoveCardEvent += (_, e) =>
-        {
-            if (cardData.Identifier != e.Identifier)
-                return;
-            if (e.Position.HasValue)
-                transform.position = e.Position.Value.ToUnity3();
-        };
+        // SignalRClient.Instance.OnMoveCardEvent += (_, e) =>
+        // {
+        //     if (cardData.Identifier != e.Identifier)
+        //         return;
+        //     if (e.Position.HasValue)
+        //         transform.position = e.Position.Value.ToUnity3();
+        // };
     }
 
     public void SetZones(CardZonesTypes zone)

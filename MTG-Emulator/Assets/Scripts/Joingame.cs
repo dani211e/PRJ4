@@ -71,7 +71,7 @@ public class JoinGame : MonoBehaviour
             GameSession.GameCode = response.gameCode;
             GameSession.MaxPlayers = response.maxPlayers;
             GameSession.IsHost = false;
-            GameSession.PlayerId = response.currentPlayers;
+            GameSession.PlayerId = response.currentPlayers - 1;
             
             SetStatus($"Joined! ({response.currentPlayers}/{response.maxPlayers} players)");
             Debug.Log($"[JoinGame] Joined room {response.gameCode}");

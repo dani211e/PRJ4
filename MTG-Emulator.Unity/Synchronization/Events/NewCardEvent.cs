@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using MTG_Emulator.Unity.Db.DTO.CardDTO;
 
 namespace MTG_Emulator.Unity.Synchronization.Events
 {
@@ -12,5 +13,6 @@ namespace MTG_Emulator.Unity.Synchronization.Events
         }
 
         public Vector2? Position { get; set; }
+        public CardDto? Card { get; set; }
     }
 }

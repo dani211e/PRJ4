@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using MTG_Emulator;
 using MTG_Emulator.Cards;
 using MTG_Emulator.Cards.Extensions;
 using MTG_Emulator.Unity.Db.DTO.DeckDTO;
@@ -80,6 +82,8 @@ public class Deck : MonoBehaviour
             cardScript.Setup(card);
         else
             Debug.LogError("Card prefab does not have a Card script.");
+
+        CardManager.AddObject(GameSession.PlayerId, card, cardObj);
     }
 
     public CardInfo DrawTopCard()

@@ -4002,6 +4002,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1374471262}
+  - component: {fileID: 1374471263}
   m_Layer: 5
   m_Name: EnemySide
   m_TagString: Untagged
@@ -4031,6 +4032,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 160}
   m_SizeDelta: {x: 1138, y: 320}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1374471263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1374471261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13fafb064cf74ab9a8d4efef8b12fb7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MTG_Emulator.CardListener
+  cardPrefab: {fileID: 7015738966440023518, guid: bc11d992d5ec23842bb2a12dd3c8d774, type: 3}
+  handZone: {fileID: 1899433327}
 --- !u!1 &1384386591
 GameObject:
   m_ObjectHideFlags: 0
@@ -4909,7 +4924,7 @@ GameObject:
   - component: {fileID: 1555623679}
   - component: {fileID: 1555623678}
   m_Layer: 0
-  m_Name: ObjectManager
+  m_Name: CardManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4927,7 +4942,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64d111596d2b453ba922266f2b22e72f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MTG_Emulator.ObjectManager
-  cardPrefab: {fileID: 7015738966440023518, guid: bc11d992d5ec23842bb2a12dd3c8d774, type: 3}
 --- !u!4 &1555623679
 Transform:
   m_ObjectHideFlags: 0
