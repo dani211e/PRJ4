@@ -50,10 +50,15 @@ namespace MTG_Emulator.Backend.Controllers
                     InvalidCards = allInvalid,
                 });
 
+            var commandZoneIds = commandResult.Cards.Select(c => c.CardId).ToHashSet();
+            var filteredDeckCards = mainResult.Cards
+                .Where(dc => !commandZoneIds.Contains(dc.Card.CardId))
+                .ToList();
+
             var deck = new Deck
             {
                 DeckName = deckDto.DeckName,
-                DeckCards = mainResult.Cards,
+                DeckCards = filteredDeckCards,
                 CommandZone = commandResult.Cards,
                 Player = player,
             };
@@ -180,8 +185,12 @@ namespace MTG_Emulator.Backend.Controllers
                     InvalidCards = allInvalid,
                 });
 
-            deck.DeckName   = deckDto.DeckName;
-            deck.DeckCards  = mainResult.Cards;
+            var commandZoneIds = commandResult.Cards.Select(c => c.CardId).ToHashSet();
+
+            deck.DeckName    = deckDto.DeckName;
+            deck.DeckCards   = mainResult.Cards
+                .Where(dc => !commandZoneIds.Contains(dc.Card.CardId))
+                .ToList(); 
             deck.CommandZone = commandResult.Cards;
 
             await context.SaveChangesAsync();
