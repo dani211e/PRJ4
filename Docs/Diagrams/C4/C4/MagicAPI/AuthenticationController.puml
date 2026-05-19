@@ -1,72 +1,105 @@
 @startuml
 
 class ControllerBase
+class IdentityUser
+class IdentityRole
+class IdentityDbContext_ApiUser_ApiRole_string
 
-class UserManager_ApiUser
-class ApiUser
-class IConfiguration
-class JwtSecurityToken
-class JwtSecurityTokenHandler
-class SymmetricSecurityKey
-class SigningCredentials
+class ApiRole {
+}
 
-class MTGContext
-class Player
-class Deck
+class ApiUser {
+    + Player? Player
+}
+
+class Roles {
+    {static} + Admin : string
+    {static} + Player : string
+}
+
+class Player {
+    + PlayerId : int
+    + Username : string
+    + GamesWon : int
+    + GamesLost : int
+    + GamesDrawn : int
+    + ApiUserId : string
+    + ApiUser : ApiUser
+    + Decks : List<Deck>
+}
+
+class Deck {
+    + DeckId : int
+    + DeckName : string
+    + CommandZone : List<Card>
+    + DeckCards : List<DeckCard>
+    + Player : Player
+}
+
+class MTGContext {
+    + Cards : DbSet<Card>
+    + Decks : DbSet<Deck>
+    + RelatedCards : DbSet<RelatedCard>
+    + Players : DbSet<Player>
+    + AltFaces : DbSet<CardFace>
+    + Games : DbSet<Game>
+    # OnModelCreating(modelBuilder)
+}
 
 class RegisterDto {
-    + Username: string
-    + Email: string
-    + Password: string
-    + Role: string
+    + Username : string
+    + Email : string
+    + Password : string
+    + Role : string
 }
 
 class LoginDto {
-    + Email: string
-    + Password: string
+    + Email : string
+    + Password : string
 }
 
 class ResetPasswordDto {
-    + NewPassword: string
-    + ConfirmPassword: string
+    + NewPassword : string
+    + ConfirmPassword : string
 }
 
 class MtgController {
     + IsOwnerOrAdmin(resourceApiUserId: string) : bool
+    # ToCardDto(card: Card) : CardDto
 }
 
 class AuthenticationController {
-    - configuration: IConfiguration
-    - userManager: UserManager_ApiUser
-    - context: MTGContext
+    - configuration : IConfiguration
+    - userManager : UserManager<ApiUser>
+    - context : MTGContext
 
     + Register(dto: RegisterDto) : Task<IActionResult>
     + Login(dto: LoginDto) : Task<IActionResult>
     + ResetPassword(dto: ResetPasswordDto) : Task<IActionResult>
     + DeleteAccount() : Task<IActionResult>
-
     - generateJwt(user: ApiUser, roles: IList<string>) : string
 }
 
-AuthenticationController --|> MtgController
+ApiUser --|> IdentityUser
+ApiRole --|> IdentityRole
+MTGContext --|> IdentityDbContext_ApiUser_ApiRole_string
 MtgController --|> ControllerBase
+AuthenticationController --|> MtgController
 
-AuthenticationController --> IConfiguration : uses
-AuthenticationController --> UserManager_ApiUser : uses
-AuthenticationController --> MTGContext : uses
+ApiUser "1" --> "0..1" Player : has
+Player "1" o-- "*" Deck : owns
 
-UserManager_ApiUser --> ApiUser
-
-Player "1" --> "1" ApiUser
-Player "1" o-- "*" Deck
+MTGContext --> ApiUser
+MTGContext --> ApiRole
+MTGContext --> Player
+MTGContext --> Deck
 
 AuthenticationController ..> RegisterDto
 AuthenticationController ..> LoginDto
 AuthenticationController ..> ResetPasswordDto
-
-AuthenticationController ..> JwtSecurityToken
-AuthenticationController ..> JwtSecurityTokenHandler
-AuthenticationController ..> SymmetricSecurityKey
-AuthenticationController ..> SigningCredentials
+AuthenticationController ..> ApiUser
+AuthenticationController ..> Roles
+AuthenticationController --> MTGContext : uses
+AuthenticationController --> ApiUser : via UserManager
 
 @enduml
