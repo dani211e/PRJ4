@@ -1,0 +1,132 @@
+﻿@startchen
+left to right direction
+
+' Base Identity entities
+entity IdentityUser {
+    Id <<key>>
+    Username
+    Email
+    Password
+}
+
+entity IdentityRole {
+    Id <<key>>
+    Name
+}
+
+' Derived entities
+entity ApiUser {
+}
+
+entity ApiRole {
+}
+
+' Domain entities
+entity Player {
+    PlayerId <<key>>
+    Username
+    GamesWon
+    GamesLost
+    GamesDrawn
+}
+
+entity Deck <<weak>> {
+    DeckId <<key>>
+    DeckName
+}
+
+entity DeckCard <<weak>> {
+    DeckCardId <<key>>
+    Quantity
+}
+
+entity Card {
+    CardId <<key>>
+    ScryfallId
+    Name
+    OracleText
+    ImageUri
+}
+
+entity CardFace <<weak>> {
+    CardFaceId <<key>>
+    Name
+    OracleText
+    ImageUri
+}
+
+entity RelatedCard <<weak>> {
+    RelatedCardId <<key>>
+    Name
+    ImageUri
+}
+
+' Relationships
+relationship Derives_User {
+}
+
+relationship Derives_Role {
+}
+
+relationship Assigned_Role {
+}
+
+relationship Has_Player {
+}
+
+relationship Owns {
+}
+
+relationship Has_DeckCard {
+}
+
+relationship References_Card {
+}
+
+relationship Has_CommandZone {
+}
+
+relationship Has_AltFace {
+}
+
+relationship Has_RelatedCard {
+}
+
+' Identity hierarchy
+ApiUser -1- Derives_User
+Derives_User -1- IdentityUser
+
+ApiRole -1- Derives_Role
+Derives_Role -1- IdentityRole
+
+' Role assignment (many-to-many)
+ApiUser -n- Assigned_Role
+Assigned_Role -n- ApiRole
+
+' User to Player
+ApiUser -1- Has_Player
+Has_Player -1- Player
+
+' Deck ownership
+Player -1- Owns
+Owns =n= Deck
+
+' Deck to DeckCard to Card
+Deck =1= Has_DeckCard
+Has_DeckCard =n= DeckCard
+DeckCard -n- References_Card
+References_Card -1- Card
+
+' Command zone (Deck to Card, many-to-many)
+Deck -n- Has_CommandZone
+Has_CommandZone -n- Card
+
+' Card to CardFace (one-to-one)
+Card =1= Has_AltFace
+Has_AltFace =1= CardFace
+
+' Card to RelatedCard (one-to-many)
+Card =1= Has_RelatedCard
+Has_RelatedCard =n= RelatedCard
+
+@endchen
