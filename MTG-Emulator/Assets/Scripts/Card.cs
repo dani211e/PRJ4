@@ -44,10 +44,7 @@ public class Card : MonoBehaviour
         }
 
         if (!string.IsNullOrEmpty(card.ImageUri))
-        {
-            string fullImageUrl = "http://localhost:5042" + card.ImageUri;
-            StartCoroutine(APIManager.Instance.LoadImage(fullImageUrl, cardImage));
-        }
+            StartCoroutine(APIManager.Instance.LoadImage(card.ImageUri, cardImage));
 
         // SignalRClient.Instance.OnMoveCardEvent += (_, e) =>
         // {
