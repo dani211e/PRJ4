@@ -11,43 +11,66 @@ using UnityEngine.UI;
 public class ImportPopupUI : MonoBehaviour
 {
     [Header("Panels")]
-    [SerializeField] private GameObject importPopup;
-    [SerializeField] private GameObject importFormPanel;
-    [SerializeField] private GameObject commanderPickerPanel;
+    [SerializeField]
+    private GameObject importPopup;
+
+    [SerializeField]
+    private GameObject importFormPanel;
+
+    [SerializeField]
+    private GameObject commanderPickerPanel;
 
     [Header("Import Form")]
     public TMP_InputField deckNameField;
+
     public TMP_InputField importField;
 
     [Header("Commander Picker")]
-    [SerializeField] private Transform cardPickerListParent;
-    [SerializeField] private GameObject cardPickerRowPrefab;
-    [SerializeField] private Transform commandZoneParent;
-    [SerializeField] private GameObject commandZoneEntryPrefab;
-    [SerializeField] private TMP_Text commandZoneLabel;
-    [SerializeField] private Button doneButton;
-    
+    [SerializeField]
+    private Transform cardPickerListParent;
+
+    [SerializeField]
+    private GameObject cardPickerRowPrefab;
+
+    [SerializeField]
+    private Transform commandZoneParent;
+
+    [SerializeField]
+    private GameObject commandZoneEntryPrefab;
+
+    [SerializeField]
+    private TMP_Text commandZoneLabel;
+
+    [SerializeField]
+    private Button doneButton;
+
     private DeckDto _createdDeck;
     private List<string> _selectedCommanders = new();
     private string _originalCardList = "";
-    
+
 
     private void Start()
     {
-        if (importPopup != null) importPopup.SetActive(false);
-        if (commanderPickerPanel != null) commanderPickerPanel.SetActive(false);
+        if (importPopup != null)
+            importPopup.SetActive(false);
+        if (commanderPickerPanel != null)
+            commanderPickerPanel.SetActive(false);
     }
 
     public void OpenImportPopup()
     {
-        if (importPopup != null) importPopup.SetActive(true);
-        if (importFormPanel != null) importFormPanel.SetActive(true);
-        if (commanderPickerPanel != null) commanderPickerPanel.SetActive(false);
+        if (importPopup != null)
+            importPopup.SetActive(true);
+        if (importFormPanel != null)
+            importFormPanel.SetActive(true);
+        if (commanderPickerPanel != null)
+            commanderPickerPanel.SetActive(false);
     }
 
     public void ClosePopup()
     {
-        if (importPopup != null) importPopup.SetActive(false);
+        if (importPopup != null)
+            importPopup.SetActive(false);
     }
 
     public void SubmitDeck()
@@ -100,7 +123,8 @@ public class ImportPopupUI : MonoBehaviour
         foreach (string line in lines)
         {
             string trimmed = line.Trim();
-            if (string.IsNullOrEmpty(trimmed)) continue;
+            if (string.IsNullOrEmpty(trimmed))
+                continue;
 
             string[] parts = trimmed.Split(' ');
 
@@ -116,12 +140,16 @@ public class ImportPopupUI : MonoBehaviour
 
     private void ShowCommanderPicker(DeckDto deck)
     {
-        Debug.Log($"ShowCommanderPicker called. importPopup={importPopup?.activeSelf}, importFormPanel={importFormPanel?.activeSelf}, commanderPickerPanel={commanderPickerPanel?.activeSelf}");
-    
-        if (importFormPanel != null) importFormPanel.SetActive(false);
-        if (commanderPickerPanel != null) commanderPickerPanel.SetActive(true);
-    
-        Debug.Log($"After set: commanderPickerPanel={commanderPickerPanel?.activeSelf}, parent={commanderPickerPanel?.transform.parent.gameObject.activeSelf}");
+        Debug.Log(
+            $"ShowCommanderPicker called. importPopup={importPopup?.activeSelf}, importFormPanel={importFormPanel?.activeSelf}, commanderPickerPanel={commanderPickerPanel?.activeSelf}");
+
+        if (importFormPanel != null)
+            importFormPanel.SetActive(false);
+        if (commanderPickerPanel != null)
+            commanderPickerPanel.SetActive(true);
+
+        Debug.Log(
+            $"After set: commanderPickerPanel={commanderPickerPanel?.activeSelf}, parent={commanderPickerPanel?.transform.parent.gameObject.activeSelf}");
         UpdateCommandZoneLabel();
 
         foreach (Transform child in cardPickerListParent)
@@ -160,14 +188,16 @@ public class ImportPopupUI : MonoBehaviour
 
     private void AddToCommandZone(string cardName)
     {
-        if (_selectedCommanders.Contains(cardName)) return;
+        if (_selectedCommanders.Contains(cardName))
+            return;
 
         _selectedCommanders.Add(cardName);
         UpdateCommandZoneLabel();
 
         GameObject entry = Instantiate(commandZoneEntryPrefab, commandZoneParent);
         TMP_Text entryText = entry.GetComponentInChildren<TMP_Text>();
-        if (entryText != null) entryText.text = cardName;
+        if (entryText != null)
+            entryText.text = cardName;
 
         Button removeButton = entry.transform.Find("RemoveButton")?.GetComponent<Button>();
         if (removeButton != null)
@@ -186,7 +216,8 @@ public class ImportPopupUI : MonoBehaviour
 
     private void SaveCommandersToBackend()
     {
-        if (_createdDeck == null) return;
+        if (_createdDeck == null)
+            return;
 
         StartCoroutine(APIManager.Instance.UpdateDeckCommander(
             _createdDeck.DeckId,
@@ -212,7 +243,8 @@ public class ImportPopupUI : MonoBehaviour
 
     private void OnDone()
     {
-        if (_createdDeck == null) return;
+        if (_createdDeck == null)
+            return;
         StartCoroutine(LoadDeckScene(_createdDeck));
         ClosePopup();
     }
@@ -231,7 +263,3 @@ public class ImportPopupUI : MonoBehaviour
             Debug.LogError("DeckViewer.Instance not found after scene load!");
     }
 }
-
-
-
-

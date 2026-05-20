@@ -15,23 +15,41 @@ public class DeckViewer : MonoBehaviour
     public static DeckViewer Instance;
 
     [Header("Deck UI")]
-    [SerializeField] private Transform deckListParent;
-    [SerializeField] private GameObject deckButtonPrefab;
+    [SerializeField]
+    private Transform deckListParent;
+
+    [SerializeField]
+    private GameObject deckButtonPrefab;
 
     [Header("Commander UI")]
-    [SerializeField] private TMP_Text commanderNameText;
-    [SerializeField] private Image commanderImage;
-    [SerializeField] private Transform commanderPanel;
-    [SerializeField] private GameObject commanderEntryPrefab;
+    [SerializeField]
+    private TMP_Text commanderNameText;
+
+    [SerializeField]
+    private Image commanderImage;
+
+    [SerializeField]
+    private Transform commanderPanel;
+
+    [SerializeField]
+    private GameObject commanderEntryPrefab;
 
     [Header("Card List")]
-    [SerializeField] private Transform cardListParent;
-    [SerializeField] private GameObject cardRowPrefab;
+    [SerializeField]
+    private Transform cardListParent;
+
+    [SerializeField]
+    private GameObject cardRowPrefab;
 
     [Header("Panels")]
-    [SerializeField] private GameObject menuPanel;
-    [SerializeField] private GameObject deckListPanel;
-    [SerializeField] private GameObject deckDetailsPanel;
+    [SerializeField]
+    private GameObject menuPanel;
+
+    [SerializeField]
+    private GameObject deckListPanel;
+
+    [SerializeField]
+    private GameObject deckDetailsPanel;
 
     private DeckDto currentDeck;
     private List<CardDto> _selectedCommanders = new();
@@ -44,9 +62,12 @@ public class DeckViewer : MonoBehaviour
         Debug.Log("APIManager instance: " + APIManager.Instance);
         Debug.Log("Saved username: " + PlayerPrefs.GetString("username"));
 
-        if (menuPanel != null) menuPanel.SetActive(true);
-        if (deckListPanel != null) deckListPanel.SetActive(false);
-        if (deckDetailsPanel != null) deckDetailsPanel.SetActive(false);
+        if (menuPanel != null)
+            menuPanel.SetActive(true);
+        if (deckListPanel != null)
+            deckListPanel.SetActive(false);
+        if (deckDetailsPanel != null)
+            deckDetailsPanel.SetActive(false);
 
         LoadDeckList();
     }
@@ -91,16 +112,21 @@ public class DeckViewer : MonoBehaviour
     // Called by DeckListBackButton goes back to MenuPanel
     public void ShowMenuPanel()
     {
-        if (deckListPanel != null) deckListPanel.SetActive(false);
-        if (deckDetailsPanel != null) deckDetailsPanel.SetActive(false);
-        if (menuPanel != null) menuPanel.SetActive(true);
+        if (deckListPanel != null)
+            deckListPanel.SetActive(false);
+        if (deckDetailsPanel != null)
+            deckDetailsPanel.SetActive(false);
+        if (menuPanel != null)
+            menuPanel.SetActive(true);
     }
 
     // Called by DeckDetailsBackButton  goes back to deck list
     public void ShowDeckList()
     {
-        if (deckDetailsPanel != null) deckDetailsPanel.SetActive(false);
-        if (deckListPanel != null) deckListPanel.SetActive(true);
+        if (deckDetailsPanel != null)
+            deckDetailsPanel.SetActive(false);
+        if (deckListPanel != null)
+            deckListPanel.SetActive(true);
     }
 
     public void ShowDeck(DeckDto deck)
@@ -109,8 +135,10 @@ public class DeckViewer : MonoBehaviour
         currentDeck = deck;
         _selectedCommanders = deck.CommandZone?.ToList() ?? new List<CardDto>();
 
-        if (deckListPanel != null) deckListPanel.SetActive(false);
-        if (deckDetailsPanel != null) deckDetailsPanel.SetActive(true);
+        if (deckListPanel != null)
+            deckListPanel.SetActive(false);
+        if (deckDetailsPanel != null)
+            deckDetailsPanel.SetActive(true);
 
         commanderNameText.text = _selectedCommanders.Count > 0
             ? string.Join(", ", _selectedCommanders.Select(c => c.Name))
@@ -160,7 +188,8 @@ public class DeckViewer : MonoBehaviour
                     yOffset += 420f;
 
                     TMP_Text nameText = entry.GetComponentInChildren<TMP_Text>();
-                    if (nameText != null) nameText.text = commander.Name;
+                    if (nameText != null)
+                        nameText.text = commander.Name;
 
                     Image img = entry.transform.Find("CardImage")?.GetComponent<Image>();
                     if (img != null && !string.IsNullOrEmpty(commander.ImageUri))
@@ -175,7 +204,7 @@ public class DeckViewer : MonoBehaviour
     {
         if (!url.StartsWith("http"))
             url = "http://localhost:5042" + url;
-        
+
         UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
         yield return request.SendWebRequest();
 
