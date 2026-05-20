@@ -2718,17 +2718,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -20, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1561041328 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8982635118188649427, guid: 66a260f3c9348534dae627932f47d39a, type: 3}
-  m_PrefabInstance: {fileID: 810442878920462315}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TMP_InputField
 --- !u!1 &1589839485
 GameObject:
   m_ObjectHideFlags: 0
@@ -2966,61 +2955,6 @@ MonoBehaviour:
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
   m_ScrollDeltaPerTick: 6
---- !u!1 &1655544054
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1655544056}
-  - component: {fileID: 1655544057}
-  m_Layer: 0
-  m_Name: UIManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1655544056
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1655544054}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1655544057
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1655544054}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ecc875e539054c7a9ce7b4f641b3795f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ImportPopupUI
-  importPopup: {fileID: 389979208}
-  importFormPanel: {fileID: 0}
-  commanderPickerPanel: {fileID: 0}
-  deckNameField: {fileID: 1561041328}
-  importField: {fileID: 1858026615}
-  cardPickerListParent: {fileID: 0}
-  cardPickerRowPrefab: {fileID: 0}
-  commandZoneParent: {fileID: 0}
-  commandZoneEntryPrefab: {fileID: 0}
-  commandZoneLabel: {fileID: 0}
-  doneButton: {fileID: 0}
 --- !u!1 &1656919427
 GameObject:
   m_ObjectHideFlags: 0
@@ -3601,17 +3535,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9a6eb4012e99f3b4ea5c439937b0661d, type: 3}
---- !u!114 &1858026615 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3588259906207587300, guid: 66a260f3c9348534dae627932f47d39a, type: 3}
-  m_PrefabInstance: {fileID: 810442878920462315}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TMP_InputField
 --- !u!1 &1900993229 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6831943603748188484, guid: cb962520921d71340986c21080b7b463, type: 3}
@@ -4769,7 +4692,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 633008483}
   - {fileID: 1644554519}
-  - {fileID: 1655544056}
   - {fileID: 743659706}
   - {fileID: 241103737}
   - {fileID: 2106979740}
