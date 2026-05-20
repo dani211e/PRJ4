@@ -10,12 +10,14 @@ using UnityEngine;
 using UnityEngine.Networking;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using System.Text.Json;
+using UnityEngine.UI;
 
 
 public class APIManager : MonoBehaviour
 {
     public static APIManager Instance;
-    private string baseUrl = "http://localhost:5042/api/";
+    private const string baseUrl = "http://localhost:5042/api/";
+    private const string baseImageUrl = "http://localhost:5042";
 
     private void Awake()
     {
@@ -377,6 +379,24 @@ public class APIManager : MonoBehaviour
         else
         {
             onSuccess?.Invoke();
+        }
+    }
+
+    public IEnumerator LoadImage(string url, Image image)
+    {
+        var request = UnityWebRequestTexture.GetTexture( baseImageUrl + url);
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+            Debug.LogError("Failed to load card image: " + url);
+        else
+        {
+            var tex = DownloadHandlerTexture.GetContent(request);
+            image.sprite = Sprite.Create(
+                tex,
+                new Rect(0, 0, tex.width, tex.height),
+                new Vector2(0.5f, 0.5f)
+            );
         }
     }
 }

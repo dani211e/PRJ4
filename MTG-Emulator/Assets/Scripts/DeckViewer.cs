@@ -193,28 +193,11 @@ public class DeckViewer : MonoBehaviour
 
                     Image img = entry.transform.Find("CardImage")?.GetComponent<Image>();
                     if (img != null && !string.IsNullOrEmpty(commander.ImageUri))
-                        StartCoroutine(LoadImage(commander.ImageUri, img));
+                        StartCoroutine(APIManager.Instance.LoadImage(commander.ImageUri, img));
                 }
             },
             error => Debug.LogError("Failed to load cards from deck " + deck.DeckId + " " + error)
         ));
-    }
-
-    private IEnumerator LoadImage(string url, Image targetImage)
-    {
-        if (!url.StartsWith("http"))
-            url = "http://localhost:5042" + url;
-
-        UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
-        yield return request.SendWebRequest();
-
-        if (request.result != UnityWebRequest.Result.Success)
-            Debug.LogError("Image load failed: " + url);
-        else
-        {
-            Texture2D tex = DownloadHandlerTexture.GetContent(request);
-            targetImage.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-        }
     }
 
     public void OnClickBack()
