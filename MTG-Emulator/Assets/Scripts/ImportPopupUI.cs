@@ -93,10 +93,7 @@ public class ImportPopupUI : MonoBehaviour
     public void SubmitDeck()
     {
         string deckName = deckNameField.text.Trim();
-        string importText = importField.text
-            .Replace("\r\n", "\n")
-            .Replace("\r", "\n")
-            .Trim();
+        string importText = importField.text.Trim();
 
         if (string.IsNullOrEmpty(deckName) || string.IsNullOrEmpty(importText))
         {
