@@ -46,7 +46,7 @@ public class Card : MonoBehaviour
         if (!string.IsNullOrEmpty(card.ImageUri))
         {
             string fullImageUrl = "http://localhost:5042" + card.ImageUri;
-            StartCoroutine(LoadCardImage(fullImageUrl));
+            StartCoroutine(APIManager.Instance.LoadImage(fullImageUrl, cardImage));
         }
 
         // SignalRClient.Instance.OnMoveCardEvent += (_, e) =>
@@ -64,23 +64,7 @@ public class Card : MonoBehaviour
     }
 
 
-    private IEnumerator LoadCardImage(string url)
-    {
-        UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
-        yield return request.SendWebRequest();
-
-        if (request.result != UnityWebRequest.Result.Success)
-            Debug.LogError("Failed to load card image: " + url);
-        else
-        {
-            Texture2D tex = DownloadHandlerTexture.GetContent(request);
-            cardImage.sprite = Sprite.Create(
-                tex,
-                new Rect(0, 0, tex.width, tex.height),
-                new Vector2(0.5f, 0.5f)
-            );
-        }
-    }
+    
 
     private void Update()
     {

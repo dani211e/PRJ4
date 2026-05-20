@@ -135,6 +135,34 @@ PrefabInstance:
       propertyPath: m_Name
       value: RegisterButton
       objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 825705292}
+    - target: {fileID: 3012664198730993617, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnClickRegister
+      objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: RegisterUI, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 3364501436423483388, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -331,6 +359,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1737331226930854828, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
   m_PrefabInstance: {fileID: 382924422}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &382924426 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5130379769020013035, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
+  m_PrefabInstance: {fileID: 382924422}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TMP_InputField
 --- !u!1001 &702949745
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -437,6 +476,53 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3133522919950463024, guid: a0f8ab6b5ef1f0246bc912245b3bae27, type: 3}
   m_PrefabInstance: {fileID: 702949745}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &825705291
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 825705293}
+  - component: {fileID: 825705292}
+  m_Layer: 0
+  m_Name: Register
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &825705292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 825705291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d43fc0c35f84dfbb43433baf647073a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RegisterUI
+  usernameField: {fileID: 2060638705}
+  emailField: {fileID: 382924426}
+  passwordField: {fileID: 1314881788}
+--- !u!4 &825705293
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 825705291}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 818.23846, y: 493.455, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1059786430
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -452,6 +538,34 @@ PrefabInstance:
     - target: {fileID: 2469359424003154749, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
       propertyPath: m_text
       value: BACK
+      objectReference: {fileID: 0}
+    - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 825705292}
+    - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnClickBack
+      objectReference: {fileID: 0}
+    - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: RegisterUI, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 4288090987980126135, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
       propertyPath: m_Pivot.x
@@ -941,6 +1055,61 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1737331226930854828, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
   m_PrefabInstance: {fileID: 1314881786}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1314881788 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5130379769020013035, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
+  m_PrefabInstance: {fileID: 1314881786}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TMP_InputField
+--- !u!1 &1337933098
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1337933100}
+  - component: {fileID: 1337933099}
+  m_Layer: 0
+  m_Name: APIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1337933099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1337933098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0604194fe5574f98bb19102567feb980, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::APIManager
+--- !u!4 &1337933100
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1337933098}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 818.23846, y: 493.455, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1364033182
 GameObject:
   m_ObjectHideFlags: 0
@@ -1321,6 +1490,17 @@ Transform:
   - {fileID: 1140354180}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2060638705 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5130379769020013035, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
+  m_PrefabInstance: {fileID: 1726084797}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TMP_InputField
 --- !u!1001 &2127881905
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1429,3 +1609,5 @@ SceneRoots:
   m_Roots:
   - {fileID: 1869887554}
   - {fileID: 1364033185}
+  - {fileID: 825705293}
+  - {fileID: 1337933100}
