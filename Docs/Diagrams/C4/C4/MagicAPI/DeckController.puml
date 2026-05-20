@@ -1,7 +1,6 @@
 @startuml
 
 class ControllerBase
-
 class MTGContext
 
 class MtgController {
@@ -11,7 +10,6 @@ class MtgController {
 
 class DeckController {
     - context: MTGContext
-
     + CreateDeck(deckDto: CreateDeckDto) : Task<ActionResult<DeckDto>>
     + GetAllDecksByUsername(username: string) : Task<ActionResult<List<AllDecksDto>>>
     + GetDeckById(deckId: int) : Task<ActionResult<DeckDto>>
@@ -21,27 +19,32 @@ class DeckController {
 
 DeckController --|> MtgController
 MtgController --|> ControllerBase
-
 DeckController --> MTGContext : uses
 
-class Deck
-class DeckCard
+class Deck {
+    + DeckId: int
+    + DeckName: string
+}
+
+class DeckCard {
+    + DeckCardId: int
+    + Quantity: int
+}
+
 class Card
 class Player
+class CardFace
+class RelatedCard
 
 Deck "1" o-- "*" DeckCard
 Deck "1" --> "1" Player
-
 DeckCard "*" --> "1" Card
-
 Card "1" o-- "0..1" CardFace : AltFace
-Card "1" o-- "*" RelatedCard : Tokens
+Card "1" o-- "*" RelatedCard : RelatedCards
 
 class DeckDto {
     + DeckId: int
     + DeckName: string
-    + CommandZone: List<CardDto>
-    + Cards: List<CardDto>
 }
 
 class AllDecksDto {
@@ -72,7 +75,9 @@ class CardFaceDto
 class RelatedCardDto
 
 CardDto o-- "0..1" CardFaceDto : AltFace
-CardDto o-- "*" RelatedCardDto : Tokens
+CardDto o-- "*" RelatedCardDto : RelatedCards
+
+DeckDto ..> CardDto : CommandZone / Cards
 
 DeckController ..> DeckDto
 DeckController ..> AllDecksDto
@@ -80,11 +85,7 @@ DeckController ..> CreateDeckDto
 DeckController ..> UpdateDeckDto
 DeckController ..> InvalidCardsResponse
 
-DeckController ..> CardDto
-DeckController ..> Card
 DeckController ..> Deck
-DeckController ..> DeckCard
-DeckController ..> Player
 
 MtgController ..> Card
 MtgController ..> CardDto
