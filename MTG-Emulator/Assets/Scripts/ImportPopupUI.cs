@@ -64,8 +64,14 @@ public class ImportPopupUI : MonoBehaviour
             return;
         }
 
+        if (!ValidateCardList(importText, out string validationError))
+        {
+            Debug.LogError("Invalid card list format: " + validationError);
+            return;
+        }
+
         _originalCardList = importText;
-        
+
         CreateDeckDto dto = new CreateDeckDto
         {
             DeckName = deckName,
@@ -84,6 +90,28 @@ public class ImportPopupUI : MonoBehaviour
             },
             error => Debug.LogError("API ERROR: " + error)
         ));
+    }
+
+    private bool ValidateCardList(string cardList, out string errorMessage)
+    {
+        errorMessage = "";
+        string[] lines = cardList.Split('\n');
+
+        foreach (string line in lines)
+        {
+            string trimmed = line.Trim();
+            if (string.IsNullOrEmpty(trimmed)) continue;
+
+            string[] parts = trimmed.Split(' ');
+
+            if (parts.Length < 2 || !int.TryParse(parts[0], out int quantity) || quantity <= 0)
+            {
+                errorMessage = $"Invalid line: \"{trimmed}\"\nExpected format: 1 Card Name";
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void ShowCommanderPicker(DeckDto deck)

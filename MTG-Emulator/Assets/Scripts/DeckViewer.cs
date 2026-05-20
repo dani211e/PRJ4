@@ -88,7 +88,7 @@ public class DeckViewer : MonoBehaviour
         }
     }
 
-    // Called by DeckListBackButton — goes back to MenuPanel
+    // Called by DeckListBackButton goes back to MenuPanel
     public void ShowMenuPanel()
     {
         if (deckListPanel != null) deckListPanel.SetActive(false);
@@ -96,7 +96,7 @@ public class DeckViewer : MonoBehaviour
         if (menuPanel != null) menuPanel.SetActive(true);
     }
 
-    // Called by DeckDetailsBackButton — goes back to deck list
+    // Called by DeckDetailsBackButton  goes back to deck list
     public void ShowDeckList()
     {
         if (deckDetailsPanel != null) deckDetailsPanel.SetActive(false);
