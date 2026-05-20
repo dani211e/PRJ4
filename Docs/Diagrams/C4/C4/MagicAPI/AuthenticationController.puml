@@ -3,7 +3,7 @@
 class ControllerBase
 class IdentityUser
 class IdentityRole
-class IdentityDbContext_ApiUser_ApiRole_string
+class IdentityDbContext
 
 class ApiRole {
 }
@@ -82,7 +82,7 @@ class AuthenticationController {
 
 ApiUser --|> IdentityUser
 ApiRole --|> IdentityRole
-MTGContext --|> IdentityDbContext_ApiUser_ApiRole_string
+MTGContext --|> IdentityDbContext
 MtgController --|> ControllerBase
 AuthenticationController --|> MtgController
 
@@ -99,7 +99,7 @@ AuthenticationController ..> LoginDto
 AuthenticationController ..> ResetPasswordDto
 AuthenticationController ..> ApiUser
 AuthenticationController ..> Roles
-AuthenticationController --> MTGContext : uses
+AuthenticationController --> MTGContext
 AuthenticationController --> ApiUser : via UserManager
 
 @enduml

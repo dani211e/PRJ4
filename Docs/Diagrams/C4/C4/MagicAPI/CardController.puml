@@ -1,6 +1,8 @@
 @startuml
 
 class MTGContext
+class ControllerBase
+class IdentityDbContext
 
 class Card {
     + CardId: int
@@ -51,6 +53,8 @@ Card "1" o-- "0..1" CardFace : AltFace
 Card "1" o-- "*" RelatedCard : RelatedCards
 
 CardsController --|> MtgController
+MtgController --|> ControllerBase
+MTGContext --|> IdentityDbContext
 
 CardsController --> MTGContext : uses
 CardsController ..> Card : queries
