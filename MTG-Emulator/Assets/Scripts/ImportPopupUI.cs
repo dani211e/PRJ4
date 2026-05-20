@@ -44,9 +44,9 @@ public class ImportPopupUI : MonoBehaviour
     [SerializeField]
     private Button doneButton;
 
-    private DeckDto _createdDeck;
-    private List<string> _selectedCommanders = new();
-    private string _originalCardList = "";
+    private DeckDto createdDeck;
+    private List<string> selectedCommanders = new();
+    private string originalCardList = "";
 
 
     private void Start()
@@ -87,13 +87,13 @@ public class ImportPopupUI : MonoBehaviour
             return;
         }
 
-        if (!ValidateCardList(importText, out string validationError))
+        if (!validateCardList(importText, out string validationError))
         {
             Debug.LogError("Invalid card list format: " + validationError);
             return;
         }
 
-        _originalCardList = importText;
+        originalCardList = importText;
 
         CreateDeckDto dto = new CreateDeckDto
         {
@@ -107,15 +107,15 @@ public class ImportPopupUI : MonoBehaviour
             deck =>
             {
                 Debug.Log($"Deck created: ID={deck.DeckId}, Cards={deck.Cards?.Count ?? -1}");
-                _createdDeck = deck;
-                _selectedCommanders.Clear();
-                ShowCommanderPicker(deck);
+                createdDeck = deck;
+                selectedCommanders.Clear();
+                showCommanderPicker(deck);
             },
             error => Debug.LogError("API ERROR: " + error)
         ));
     }
 
-    private bool ValidateCardList(string cardList, out string errorMessage)
+    private bool validateCardList(string cardList, out string errorMessage)
     {
         errorMessage = "";
         string[] lines = cardList.Split('\n');
@@ -138,7 +138,7 @@ public class ImportPopupUI : MonoBehaviour
         return true;
     }
 
-    private void ShowCommanderPicker(DeckDto deck)
+    private void showCommanderPicker(DeckDto deck)
     {
         Debug.Log(
             $"ShowCommanderPicker called. importPopup={importPopup?.activeSelf}, importFormPanel={importFormPanel?.activeSelf}, commanderPickerPanel={commanderPickerPanel?.activeSelf}");
@@ -150,12 +150,12 @@ public class ImportPopupUI : MonoBehaviour
 
         Debug.Log(
             $"After set: commanderPickerPanel={commanderPickerPanel?.activeSelf}, parent={commanderPickerPanel?.transform.parent.gameObject.activeSelf}");
-        UpdateCommandZoneLabel();
+        updateCommandZoneLabel();
 
         foreach (Transform child in cardPickerListParent)
             Destroy(child.gameObject);
 
-        if (deck.Cards == null || deck.Cards.Count == 0)
+        if (deck.Cards.Count == 0)
         {
             Debug.LogWarning("No cards found in deck.");
             return;
@@ -176,7 +176,7 @@ public class ImportPopupUI : MonoBehaviour
             if (addButton != null)
             {
                 string cardName = group.Key;
-                addButton.onClick.AddListener(() => AddToCommandZone(cardName));
+                addButton.onClick.AddListener(() => addToCommandZone(cardName));
             }
         }
 
@@ -186,13 +186,13 @@ public class ImportPopupUI : MonoBehaviour
         doneButton.onClick.AddListener(OnDone);
     }
 
-    private void AddToCommandZone(string cardName)
+    private void addToCommandZone(string cardName)
     {
-        if (_selectedCommanders.Contains(cardName))
+        if (selectedCommanders.Contains(cardName))
             return;
 
-        _selectedCommanders.Add(cardName);
-        UpdateCommandZoneLabel();
+        selectedCommanders.Add(cardName);
+        updateCommandZoneLabel();
 
         GameObject entry = Instantiate(commandZoneEntryPrefab, commandZoneParent);
         TMP_Text entryText = entry.GetComponentInChildren<TMP_Text>();
@@ -201,29 +201,29 @@ public class ImportPopupUI : MonoBehaviour
 
         Button removeButton = entry.transform.Find("RemoveButton")?.GetComponent<Button>();
         if (removeButton != null)
-            removeButton.onClick.AddListener(() => RemoveFromCommandZone(cardName, entry));
+            removeButton.onClick.AddListener(() => removeFromCommandZone(cardName, entry));
 
-        SaveCommandersToBackend();
+        saveCommandersToBackend();
     }
 
-    private void RemoveFromCommandZone(string cardName, GameObject entry)
+    private void removeFromCommandZone(string cardName, GameObject entry)
     {
-        _selectedCommanders.Remove(cardName);
+        selectedCommanders.Remove(cardName);
         Destroy(entry);
-        UpdateCommandZoneLabel();
-        SaveCommandersToBackend();
+        updateCommandZoneLabel();
+        saveCommandersToBackend();
     }
 
-    private void SaveCommandersToBackend()
+    private void saveCommandersToBackend()
     {
-        if (_createdDeck == null)
+        if (createdDeck == null)
             return;
 
         StartCoroutine(APIManager.Instance.UpdateDeckCommander(
-            _createdDeck.DeckId,
-            new List<string>(_selectedCommanders),
-            _createdDeck.DeckName,
-            _originalCardList,
+            createdDeck.DeckId,
+            new List<string>(selectedCommanders),
+            createdDeck.DeckName,
+            originalCardList,
             result =>
             {
                 if (result != null)
@@ -235,21 +235,21 @@ public class ImportPopupUI : MonoBehaviour
         ));
     }
 
-    private void UpdateCommandZoneLabel()
+    private void updateCommandZoneLabel()
     {
         if (commandZoneLabel != null)
-            commandZoneLabel.text = $"Command Zone ({_selectedCommanders.Count})";
+            commandZoneLabel.text = $"Command Zone ({selectedCommanders.Count})";
     }
 
     private void OnDone()
     {
-        if (_createdDeck == null)
+        if (createdDeck == null)
             return;
-        StartCoroutine(LoadDeckScene(_createdDeck));
+        StartCoroutine(loadDeckScene(createdDeck));
         ClosePopup();
     }
 
-    private IEnumerator LoadDeckScene(DeckDto deck)
+    private IEnumerator loadDeckScene(DeckDto deck)
     {
         AsyncOperation op = SceneManager.LoadSceneAsync("Deck_Viewer");
         while (!op.isDone)

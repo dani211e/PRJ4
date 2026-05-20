@@ -52,7 +52,7 @@ public class DeckViewer : MonoBehaviour
     private GameObject deckDetailsPanel;
 
     private DeckDto currentDeck;
-    private List<CardDto> _selectedCommanders = new();
+    private List<CardDto> selectedCommanders = new();
 
     private void Awake() => Instance = this;
 
@@ -77,20 +77,20 @@ public class DeckViewer : MonoBehaviour
         foreach (Transform child in deckListParent)
             Destroy(child.gameObject);
 
-        string username = PlayerPrefs.GetString("username");
+        var username = PlayerPrefs.GetString("username");
 
         StartCoroutine(APIManager.Instance.GetDecksByUsername(
             username,
             result =>
             {
                 foreach (DeckDto item in result)
-                    AddDeckButton(item);
+                    addDeckButton(item);
             },
             error => Debug.LogError("Failed to load decks: " + error)
         ));
     }
 
-    public void AddDeckButton(DeckDto deck)
+    private void addDeckButton(DeckDto deck)
     {
         GameObject obj = Instantiate(deckButtonPrefab, deckListParent);
 
@@ -133,15 +133,15 @@ public class DeckViewer : MonoBehaviour
     {
         Debug.Log("ShowDeck called for: " + deck.DeckName);
         currentDeck = deck;
-        _selectedCommanders = deck.CommandZone?.ToList() ?? new List<CardDto>();
+        selectedCommanders = deck.CommandZone.ToList();
 
         if (deckListPanel != null)
             deckListPanel.SetActive(false);
         if (deckDetailsPanel != null)
             deckDetailsPanel.SetActive(true);
 
-        commanderNameText.text = _selectedCommanders.Count > 0
-            ? string.Join(", ", _selectedCommanders.Select(c => c.Name))
+        commanderNameText.text = selectedCommanders.Count > 0
+            ? string.Join(", ", selectedCommanders.Select(c => c.Name))
             : "Select Commander";
 
         if (commanderImage != null)
@@ -151,7 +151,7 @@ public class DeckViewer : MonoBehaviour
             deck.DeckId,
             result =>
             {
-                _selectedCommanders = result.CommandZone?.ToList() ?? new List<CardDto>();
+                selectedCommanders = result.CommandZone?.ToList() ?? new List<CardDto>();
 
                 foreach (Transform child in cardListParent)
                     Destroy(child.gameObject);
@@ -176,7 +176,7 @@ public class DeckViewer : MonoBehaviour
                     Destroy(child.gameObject);
 
                 float yOffset = 0f;
-                foreach (var commander in _selectedCommanders)
+                foreach (var commander in selectedCommanders)
                 {
                     GameObject entry = Instantiate(commanderEntryPrefab, commanderPanel);
                     RectTransform rt = entry.GetComponent<RectTransform>();
@@ -219,17 +219,17 @@ public class DeckViewer : MonoBehaviour
 
     public void SelectCommander(CardDto card)
     {
-        if (_selectedCommanders.Any(c => c.Name == card.Name))
-            _selectedCommanders.RemoveAll(c => c.Name == card.Name);
+        if (selectedCommanders.Any(c => c.Name == card.Name))
+            selectedCommanders.RemoveAll(c => c.Name == card.Name);
         else
-            _selectedCommanders.Add(card);
+            selectedCommanders.Add(card);
 
-        commanderNameText.text = _selectedCommanders.Count > 0
-            ? string.Join(", ", _selectedCommanders.Select(c => c.Name))
+        commanderNameText.text = selectedCommanders.Count > 0
+            ? string.Join(", ", selectedCommanders.Select(c => c.Name))
             : "No Commander";
 
-        if (_selectedCommanders.Count > 0 && !string.IsNullOrEmpty(_selectedCommanders[0].ImageUri))
-            StartCoroutine(LoadImage(_selectedCommanders[0].ImageUri, commanderImage));
+        if (selectedCommanders.Count > 0 && !string.IsNullOrEmpty(selectedCommanders[0].ImageUri))
+            StartCoroutine(LoadImage(selectedCommanders[0].ImageUri, commanderImage));
         else if (commanderImage != null)
         {
             commanderImage.sprite = null;
@@ -238,7 +238,7 @@ public class DeckViewer : MonoBehaviour
 
         StartCoroutine(APIManager.Instance.UpdateDeckCommander(
             currentDeck.DeckId,
-            _selectedCommanders.Select(c => c.Name).ToList(),
+            selectedCommanders.Select(c => c.Name).ToList(),
             currentDeck.DeckName,
             string.Join("\n", currentDeck.Cards.Select(c => $"1 {c.Name}")),
             result =>
