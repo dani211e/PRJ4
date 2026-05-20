@@ -51,26 +51,43 @@ public class ImportPopupUI : MonoBehaviour
 
     private void Start()
     {
-        if (importPopup != null)
-            importPopup.SetActive(false);
-        if (commanderPickerPanel != null)
-            commanderPickerPanel.SetActive(false);
+        if (!ensureValidUI())
+            Destroy(this);
+
+        importPopup.SetActive(false);
+        commanderPickerPanel.SetActive(false);
+    }
+
+    private bool ensureValidUI()
+    {
+        bool valid = true;
+
+        Validate(importPopup);
+        Validate(commanderPickerPanel);
+        Validate(importFormPanel);
+
+        return valid;
+
+        void Validate(GameObject obj)
+        {
+            if (obj)
+                return;
+
+            Debug.LogError($"{obj.name} was not set, ensure it is not null.");
+            valid = false;
+        }
     }
 
     public void OpenImportPopup()
     {
-        if (importPopup != null)
-            importPopup.SetActive(true);
-        if (importFormPanel != null)
-            importFormPanel.SetActive(true);
-        if (commanderPickerPanel != null)
-            commanderPickerPanel.SetActive(false);
+        importPopup.SetActive(true);
+        importFormPanel.SetActive(true);
+        commanderPickerPanel.SetActive(false);
     }
 
     public void ClosePopup()
     {
-        if (importPopup != null)
-            importPopup.SetActive(false);
+        importPopup.SetActive(false);
     }
 
     public void SubmitDeck()

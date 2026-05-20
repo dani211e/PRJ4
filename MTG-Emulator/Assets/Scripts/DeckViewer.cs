@@ -1,14 +1,11 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Unity.Db.DTO.CardDTO;
 using MTG_Emulator.Unity.Db.DTO.DeckDTO;
-using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
-using UnityEngine.Networking;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class DeckViewer : MonoBehaviour
 {
@@ -62,14 +59,35 @@ public class DeckViewer : MonoBehaviour
         Debug.Log("APIManager instance: " + APIManager.Instance);
         Debug.Log("Saved username: " + PlayerPrefs.GetString("username"));
 
-        if (menuPanel != null)
-            menuPanel.SetActive(true);
-        if (deckListPanel != null)
-            deckListPanel.SetActive(false);
-        if (deckDetailsPanel != null)
-            deckDetailsPanel.SetActive(false);
+        if (!ensureValidUI())
+            Destroy(this);
+
+        menuPanel.SetActive(true);
+        deckListPanel.SetActive(false);
+        deckDetailsPanel.SetActive(false);
 
         LoadDeckList();
+    }
+
+    private bool ensureValidUI()
+    {
+        bool valid = true;
+
+        Validate(deckDetailsPanel);
+        Validate(deckListPanel);
+        Validate(menuPanel);
+        Validate(commanderImage.gameObject);
+        
+        return valid;
+
+        void Validate(GameObject obj)
+        {
+            if (obj)
+                return;
+
+            Debug.LogError($"{obj.name} was not set, ensure it is not null.");
+            valid = false;
+        }
     }
 
     public void LoadDeckList()
@@ -112,21 +130,16 @@ public class DeckViewer : MonoBehaviour
     // Called by DeckListBackButton goes back to MenuPanel
     public void ShowMenuPanel()
     {
-        if (deckListPanel != null)
-            deckListPanel.SetActive(false);
-        if (deckDetailsPanel != null)
-            deckDetailsPanel.SetActive(false);
-        if (menuPanel != null)
-            menuPanel.SetActive(true);
+        deckListPanel.SetActive(false);
+        deckDetailsPanel.SetActive(false);
+        menuPanel.SetActive(true);
     }
 
     // Called by DeckDetailsBackButton  goes back to deck list
     public void ShowDeckList()
     {
-        if (deckDetailsPanel != null)
-            deckDetailsPanel.SetActive(false);
-        if (deckListPanel != null)
-            deckListPanel.SetActive(true);
+        deckDetailsPanel.SetActive(false);
+        deckListPanel.SetActive(true);
     }
 
     public void ShowDeck(DeckDto deck)
@@ -135,10 +148,8 @@ public class DeckViewer : MonoBehaviour
         currentDeck = deck;
         selectedCommanders = deck.CommandZone.ToList();
 
-        if (deckListPanel != null)
-            deckListPanel.SetActive(false);
-        if (deckDetailsPanel != null)
-            deckDetailsPanel.SetActive(true);
+        deckListPanel?.SetActive(false);
+        deckDetailsPanel.SetActive(true);
 
         commanderNameText.text = selectedCommanders.Count > 0
             ? string.Join(", ", selectedCommanders.Select(c => c.Name))
