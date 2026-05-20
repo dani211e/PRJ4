@@ -217,41 +217,6 @@ public class DeckViewer : MonoBehaviour
         }
     }
 
-    public void SelectCommander(CardDto card)
-    {
-        if (selectedCommanders.Any(c => c.Name == card.Name))
-            selectedCommanders.RemoveAll(c => c.Name == card.Name);
-        else
-            selectedCommanders.Add(card);
-
-        commanderNameText.text = selectedCommanders.Count > 0
-            ? string.Join(", ", selectedCommanders.Select(c => c.Name))
-            : "No Commander";
-
-        if (selectedCommanders.Count > 0 && !string.IsNullOrEmpty(selectedCommanders[0].ImageUri))
-            StartCoroutine(LoadImage(selectedCommanders[0].ImageUri, commanderImage));
-        else if (commanderImage != null)
-        {
-            commanderImage.sprite = null;
-            commanderImage.color = Color.white;
-        }
-
-        StartCoroutine(APIManager.Instance.UpdateDeckCommander(
-            currentDeck.DeckId,
-            selectedCommanders.Select(c => c.Name).ToList(),
-            currentDeck.DeckName,
-            string.Join("\n", currentDeck.Cards.Select(c => $"1 {c.Name}")),
-            result =>
-            {
-                if (result != null)
-                    Debug.Log("Commander updated: " + string.Join(", ", result.CommandZone.Select(c => c.Name)));
-                else
-                    Debug.Log("Commander updated successfully.");
-            },
-            error => Debug.LogError("Failed to update commander: " + error)
-        ));
-    }
-
     public void OnClickBack()
     {
         SceneManager.LoadScene("0");
