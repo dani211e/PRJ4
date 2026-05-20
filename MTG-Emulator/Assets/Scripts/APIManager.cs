@@ -253,6 +253,132 @@ public class APIManager : MonoBehaviour
         else
             onSuccess?.Invoke(request.downloadHandler.text);
     }
+    
+    public IEnumerator GetPlayerProfile(
+        Action<PlayerDto> onSuccess,
+        Action<string> onError)
+    {
+        string username = PlayerPrefs.GetString("username");
+        UnityWebRequest request = new UnityWebRequest(
+            baseUrl + "Player/" + UnityWebRequest.EscapeURL(username),
+            "GET"
+        );
+
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        string token = PlayerPrefs.GetString("jwtToken");
+        Debug.Log("Token: " + (string.IsNullOrEmpty(token) ? "EMPTY" : token));
+        
+        if (!string.IsNullOrEmpty(token))
+        {
+            request.SetRequestHeader(
+                "Authorization",
+                "Bearer " + token
+            );
+        }
+
+        yield return request.SendWebRequest();
+        Debug.Log("HTTP Status: " + request.responseCode); 
+        Debug.Log("Raw response: " + request.downloadHandler.text);
+        
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            onError?.Invoke(request.downloadHandler.text);
+        }
+        else
+        {
+            var result = JsonSerializer.Deserialize<PlayerDto>(
+                request.downloadHandler.text,
+                JsonOptions
+            );
+
+            onSuccess?.Invoke(result);
+        }
+    }
+    
+    public IEnumerator ResetPassword(
+        string newPassword,
+        string confirmPassword,
+        Action onSuccess,
+        Action<string> onError)
+    {
+        var dto = new ResetPasswordDto
+        {
+            NewPassword = newPassword,
+            ConfirmPassword = confirmPassword
+        };
+
+        string json = JsonSerializer.Serialize(dto);
+
+        UnityWebRequest request = new UnityWebRequest(
+            baseUrl + "Authentication/reset-password",
+            "PUT"
+        );
+
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        request.SetRequestHeader(
+            "Content-Type",
+            "application/json"
+        );
+
+        string token = PlayerPrefs.GetString("jwtToken");
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            request.SetRequestHeader(
+                "Authorization",
+                "Bearer " + token
+            );
+        }
+
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            onError?.Invoke(request.downloadHandler.text);
+        }
+        else
+        {
+            onSuccess?.Invoke();
+        }
+    }
+    public IEnumerator DeleteAccount(
+        Action onSuccess,
+        Action<string> onError)
+    {
+        string username = PlayerPrefs.GetString("username");
+        UnityWebRequest request = new UnityWebRequest(
+            baseUrl + "Player/" + UnityWebRequest.EscapeURL(username),
+            "DELETE"
+        );
+
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        string token = PlayerPrefs.GetString("jwtToken");
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            request.SetRequestHeader(
+                "Authorization",
+                "Bearer " + token
+            );
+        }
+
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            onError?.Invoke(request.downloadHandler.text);
+        }
+        else
+        {
+            onSuccess?.Invoke();
+        }
+    }
 }
 namespace MTG_Emulator.Unity.Db.DTO.DeckDTO
 {
