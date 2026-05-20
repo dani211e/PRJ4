@@ -2,6 +2,7 @@
 
 class ControllerBase
 class MTGContext
+class IdentityDbContext
 
 class MtgController {
     + IsOwnerOrAdmin(resourceApiUserId: string) : bool
@@ -20,6 +21,7 @@ class DeckController {
 DeckController --|> MtgController
 MtgController --|> ControllerBase
 DeckController --> MTGContext : uses
+MTGContext --|> IdentityDbContext
 
 class Deck {
     + DeckId: int
