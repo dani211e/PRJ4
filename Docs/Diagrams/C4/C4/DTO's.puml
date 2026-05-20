@@ -1,0 +1,111 @@
+﻿@startuml
+title DTOs
+
+' Auth DTOs
+class RegisterDto {
+    + Username : string
+    + Email : string
+    + Password : string
+    + Role : string
+}
+
+class LoginDto {
+    + Email : string
+    + Password : string
+}
+
+class LoginResponseDto {
+    + Username : string
+    + Token : string
+}
+
+class ResetPasswordDto {
+    + NewPassword : string
+    + ConfirmPassword : string
+}
+
+' Player DTOs
+class PlayerDto {
+    + Username : string
+    + GamesWon : int
+    + GamesLost : int
+    + GamesDrawed : int
+}
+
+' Card DTOs
+class CardDto {
+    + CardId : int
+    + ScryfallId : Guid
+    + Name : string
+    + OracleText : string
+    + ImageUri : string
+}
+
+class CardFaceDto {
+    + Name : string
+    + OracleText : string
+    + ImageUri : string
+}
+
+class RelatedCardDto {
+    + RelatedCardId : int
+    + Name : string
+    + ImageUri : string
+}
+
+' Deck DTOs
+class DeckDto {
+    + DeckId : int
+    + DeckName : string
+}
+
+class AllDecksDto {
+    + DeckId : int
+    + DeckName : string
+    + DeckImageUri : string
+}
+
+class CreateDeckDto {
+    + DeckName : string
+    + CardList : string
+    + CommandZone : List<string>
+}
+
+class UpdateDeckDto {
+    + DeckName : string
+    + CardList : string
+    + CommandZone : List<string>
+}
+
+class InvalidCardsResponse {
+    + Error : string
+    + InvalidCards : List<string>
+}
+
+' Game DTOs
+class CreateGameDto {
+    + MaxPlayers : int
+    + HostName : string
+}
+
+class GameResponseDto {
+    + Success : bool
+    + GameCode : string
+    + MaxPlayers : int
+    + CurrentPlayers : int
+    + Message : string
+    + PlayerNames : List<string>
+    + CurrentPlayerName : string
+}
+
+class JoinGameDto {
+    + GameCode : string
+    + PlayerName : string
+}
+
+' Relationships
+CardDto o-- "0..1" CardFaceDto : AltFace
+CardDto o-- "*" RelatedCardDto : RelatedCards
+DeckDto ..> CardDto : CommandZone / Cards
+
+@enduml

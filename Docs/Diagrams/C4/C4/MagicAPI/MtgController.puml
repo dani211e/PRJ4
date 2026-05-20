@@ -56,9 +56,10 @@ class RelatedCardDto {
 Card "1" o-- "0..1" CardFace : AltFace
 Card "1" o-- "*" RelatedCard : RelatedCards
 
+CardDto "1" o-- "0..1" CardFaceDto : AltFace
+CardDto "1" o-- "*" RelatedCardDto : RelatedCards
+
 MtgController ..> Card
 MtgController ..> CardDto
-MtgController ..> CardFaceDto
-MtgController ..> RelatedCardDto
 
 @enduml

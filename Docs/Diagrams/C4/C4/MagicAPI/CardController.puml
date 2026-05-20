@@ -4,20 +4,6 @@ class MTGContext
 class ControllerBase
 class IdentityDbContext
 
-class CardFaceDto{
-    + CardFaceId: int
-    + Name: string
-    + OracleText: string
-    + ImageUri: string
-    + CardId: int
-}
-
-class RelatedCardDto{
-    + RelatedCardId: int
-    + Name: string
-    + ImageUri: string
-}
-
 
 class Card {
     + CardId: int
@@ -46,6 +32,20 @@ class CardDto {
     + ScryfallId: Guid
     + Name: string
     + OracleText: string
+    + ImageUri: string
+}
+
+class CardFaceDto{
+    + CardFaceId: int
+    + Name: string
+    + OracleText: string
+    + ImageUri: string
+    + CardId: int
+}
+
+class RelatedCardDto{
+    + RelatedCardId: int
+    + Name: string
     + ImageUri: string
 }
 

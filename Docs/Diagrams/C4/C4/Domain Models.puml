@@ -1,0 +1,107 @@
+﻿@startuml
+title Domain Models
+
+' Identity base classes
+class IdentityUser
+class IdentityRole
+class IdentityDbContext
+
+' Identity-derived
+class ApiUser {
+}
+
+class ApiRole {
+}
+
+class Roles <<static>> {
+    + Admin : string
+    + Player : string
+}
+
+' Domain models
+class Player {
+    + PlayerId : int
+    + Username : string
+    + GamesWon : int
+    + GamesLost : int
+    + GamesDrawn : int
+    + ApiUserId : string
+}
+
+class Deck {
+    + DeckId : int
+    + DeckName : string
+}
+
+class DeckCard {
+    + DeckCardId : int
+    + DeckId : int
+    + CardId : int
+    + Quantity : int
+}
+
+class Card {
+    + CardId : int
+    + ScryfallId : Guid
+    + Name : string
+    + OracleText : string
+    + ImageUri : string
+}
+
+class CardFace {
+    + CardFaceId : int
+    + Name : string
+    + OracleText : string
+    + ImageUri : string
+    + CardId : int
+}
+
+class RelatedCard {
+    + RelatedCardId : int
+    + Name : string
+    + ImageUri : string
+}
+
+class Game {
+    + GameId : int
+    + GameCode : string
+    + MaxPlayers : int
+    + CurrentPlayers : int
+    + HostName : string
+    + Status : string
+    + PlayerNames : List<string>
+}
+
+class MTGContext {
+    + Cards : DbSet<Card>
+    + Decks : DbSet<Deck>
+    + RelatedCards : DbSet<RelatedCard>
+    + Players : DbSet<Player>
+    + AltFaces : DbSet<CardFace>
+    + Games : DbSet<Game>
+}
+
+' Identity hierarchy
+ApiUser --|> IdentityUser
+ApiRole --|> IdentityRole
+MTGContext --|> IdentityDbContext
+
+' Relationships
+ApiUser "1" --> "0..1" Player
+Player "1" o-- "*" Deck
+Deck "1" o-- "*" DeckCard
+DeckCard "*" --> "1" Card
+Deck "*" --> "*" Card : CommandZone
+Card "1" o-- "0..1" CardFace : AltFace
+Card "1" o-- "*" RelatedCard : RelatedCards
+
+MTGContext --> ApiUser
+MTGContext --> ApiRole
+MTGContext --> Player
+MTGContext --> Deck
+MTGContext --> Card
+MTGContext --> CardFace
+MTGContext --> RelatedCard
+MTGContext --> Game
+
+@enduml
