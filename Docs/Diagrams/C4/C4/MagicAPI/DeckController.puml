@@ -85,7 +85,8 @@ DeckController ..> CreateDeckDto
 DeckController ..> UpdateDeckDto
 DeckController ..> InvalidCardsResponse
 
-DeckController ..> Deck
+DeckController ..> Deck : queries
+DeckController ..> Player : queries
 
 MtgController ..> Card
 MtgController ..> CardDto
