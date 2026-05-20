@@ -7,4 +7,8 @@ public class GameResponseDto
     public int    maxPlayers     { get; set; }
     public int    currentPlayers { get; set; }
     public string message        { get; set; } = string.Empty;
+    
+    public List<string> playerNames { get; set; } = new();
+    
+    public string currentPlayerName  { get; set; } = string.Empty;
 }

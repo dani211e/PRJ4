@@ -137,6 +137,48 @@ namespace UnitTests.Backend.Controllers
                 Assert.That(deck.CommandZone.Count,                       Is.EqualTo(1));
             });
         }
+        
+        [Test]
+        public async Task CreateDeck_CommandZoneCardAlsoInCardList_IsExcludedFromDeckCards()
+        {
+            await InsertPlayerAsync();
+            await InsertCardAsync("Test commander");
+            await InsertCardAsync("Test card");
+
+            var dto  = createDeckDto(
+                cardList:    "1 Test commander\n1 Test card\n",
+                commandZone: ["Test commander"]);
+            var deck = extractOkDto(await uut.CreateDeck(dto));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(deck?.CommandZone.Count,   Is.EqualTo(1));
+                Assert.That(deck?.Cards.Count,         Is.EqualTo(1));
+                Assert.That(deck?.Cards[0].Name,       Is.EqualTo("Test card"));
+                Assert.That(deck?.Cards.Select(c => c.Name), Does.Not.Contain("Test commander"));
+            });
+        }
+        
+        [Test]
+        public async Task CreateDeck_CommandZoneCardWithMultipleCopiesInCardList_RemovesOnlyOneCopy()
+        {
+            await InsertPlayerAsync();
+            await InsertCardAsync("Test commander");
+            await InsertCardAsync("Test card");
+
+            var dto  = createDeckDto(
+                cardList:    "3 Test commander\n1 Test card\n",
+                commandZone: ["Test commander"]);
+            var deck = extractOkDto(await uut.CreateDeck(dto));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(deck?.CommandZone.Count,                                            Is.EqualTo(1));
+                Assert.That(deck?.Cards.Count,                                                  Is.EqualTo(3)); 
+                Assert.That(deck?.Cards.Count(c => c.Name == "Test commander"),   Is.EqualTo(2));
+                Assert.That(deck?.Cards.Count(c => c.Name == "Test card"),        Is.EqualTo(1));
+            });
+        }
 
         // GetDeckById
 
@@ -304,6 +346,7 @@ namespace UnitTests.Backend.Controllers
             var player = await InsertPlayerAsync();
             var card1  = await InsertCardAsync("Test Card1");
             var card2  = await InsertCardAsync("Test Card2");
+            var card3  = await InsertCardAsync("Test Card3");
 
             var deck = new Deck
             {
@@ -318,7 +361,7 @@ namespace UnitTests.Backend.Controllers
             var result = await uut.UpdateDeck(deck.DeckId, createUpdateDeckDto(
                 deckName:    "NewName",
                 cardList:    "2 Test Card2\n",
-                commandZone: ["Test Card2"]
+                commandZone: ["Test Card3"]
             ));
 
             Assert.That(result.Result, Is.TypeOf<NoContentResult>());
@@ -332,7 +375,7 @@ namespace UnitTests.Backend.Controllers
             {
                 Assert.That(dbDeck!.DeckName,                              Is.EqualTo("NewName"));
                 Assert.That(dbDeck.DeckCards.Sum(dc => dc.Quantity), Is.EqualTo(2));
-                Assert.That(dbDeck.CommandZone.First().Name,               Is.EqualTo("Test Card2"));
+                Assert.That(dbDeck.CommandZone.First().Name,               Is.EqualTo("Test Card3"));
             });
         }
 
@@ -426,6 +469,72 @@ namespace UnitTests.Backend.Controllers
                 createUpdateDeckDto(cardList: "X ValidCard"));
 
             Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
+        }
+        
+        [Test]
+        public async Task UpdateDeck_CommandZoneCardAlsoInCardList_IsExcludedFromDeckCards()
+        {
+            var player      = await InsertPlayerAsync();
+            var commander   = await InsertCardAsync("Test commander");
+            var card        = await InsertCardAsync("Test card");
+
+            var deck = new Deck
+            {
+                DeckName  = "OldDeck",
+                Player    = player,
+                DeckCards = [new DeckCard { Card = card, Quantity = 1 }],
+            };
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
+
+            await uut.UpdateDeck(deck.DeckId, createUpdateDeckDto(
+                cardList:    "1 Test commander\n1 Test card\n",
+                commandZone: ["Test commander"]));
+
+            var dbDeck = await Context.Decks
+                .Include(d => d.DeckCards).ThenInclude(dc => dc.Card)
+                .Include(d => d.CommandZone)
+                .FirstOrDefaultAsync(d => d.DeckId == deck.DeckId);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(dbDeck!.CommandZone.Count,                         Is.EqualTo(1));
+                Assert.That(dbDeck.DeckCards.Sum(dc => dc.Quantity),           Is.EqualTo(1));
+                Assert.That(dbDeck.DeckCards.Select(dc => dc.Card.Name), Does.Not.Contain("Test commander"));
+            });
+        }
+        
+        [Test]
+        public async Task UpdateDeck_CommandZoneCardWithMultipleCopiesInCardList_RemovesOnlyOneCopy()
+        {
+            var player    = await InsertPlayerAsync();
+            var commander = await InsertCardAsync("Test commander");
+            var card      = await InsertCardAsync("Test card");
+
+            var deck = new Deck
+            {
+                DeckName  = "OldDeck",
+                Player    = player,
+                DeckCards = [new DeckCard { Card = card, Quantity = 1 }],
+            };
+            Context.Decks.Add(deck);
+            await Context.SaveChangesAsync();
+
+            await uut.UpdateDeck(deck.DeckId, createUpdateDeckDto(
+                cardList:    "3 Test commander\n1 Test card\n",
+                commandZone: ["Test commander"]));
+
+            var dbDeck = await Context.Decks
+                .Include(d => d.DeckCards).ThenInclude(dc => dc.Card)
+                .Include(d => d.CommandZone)
+                .FirstOrDefaultAsync(d => d.DeckId == deck.DeckId);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(dbDeck!.CommandZone.Count,                                               Is.EqualTo(1));
+                Assert.That(dbDeck.DeckCards.Sum(dc => dc.Quantity),                           Is.EqualTo(3));
+                Assert.That(dbDeck.DeckCards.First(dc => dc.Card.Name == "Test commander").Quantity, Is.EqualTo(2));
+            });
         }
 
         // Helpers

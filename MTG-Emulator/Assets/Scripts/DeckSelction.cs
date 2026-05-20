@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using MTG_Emulator.Unity.Db.DTO.DeckDTO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,15 +10,13 @@ public class DeckSelectPopup : MonoBehaviour
     [SerializeField] private GameObject deckSelectionPopup;
     [SerializeField] private Transform deckListParent;
     [SerializeField] private GameObject deckButtonPrefab;
-    [SerializeField] private List<string> deckNames = new();
     [SerializeField] private Deck gameplayDeck;
+
 
     public void OpenSettingsPopup()
     {
         if (settingsPopup != null)
             settingsPopup.SetActive(true);
-
-        LoadDeckList();
     }
 
     public void OpenDeckSelectionPopup()
@@ -38,19 +37,29 @@ public class DeckSelectPopup : MonoBehaviour
 
     }
 
-    private void LoadDeckList()
+    public void LoadDeckList()
     {
         foreach (Transform child in deckListParent)
-            Destroy(child.gameObject);
-
-        foreach (string deckName in deckNames)
         {
-            StartCoroutine(APIManager.Instance.GetDeckByName(
-                deckName,
-                deck => AddDeckButton(deck),
-                error => Debug.LogError("Failed to load deck '" + deckName + "': " + error)
-            ));
+            Destroy(child.gameObject);
         }
+        
+        string username = PlayerPrefs.GetString("username");
+
+        StartCoroutine(APIManager.Instance.GetDecksByUsername(
+            username,
+            result =>
+            {
+                foreach (DeckDto item in result)
+                {
+                    AddDeckButton(item);
+                }
+            },
+            error =>
+            {
+                Debug.LogError("Failed to load decks " + error);
+            }
+        ));
     }
 
     private void AddDeckButton(DeckDto deck)
@@ -59,7 +68,7 @@ public class DeckSelectPopup : MonoBehaviour
 
         TMP_Text text = obj.GetComponentInChildren<TMP_Text>(true);
         if (text != null)
-            text.text = deck.deckName;
+            text.text = deck.DeckName;
 
         Button button = obj.GetComponent<Button>();
         if (button != null)

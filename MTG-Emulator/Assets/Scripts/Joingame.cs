@@ -1,4 +1,5 @@
 using MTG_Emulator.Unity.Db.DTO.GameDTO;
+using MTG_Emulator.Unity.Synchronization.Events;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -44,7 +45,7 @@ public class JoinGame : MonoBehaviour
     {
         string code = codeInputField.text.Trim().ToUpper();
 
-        if (code.Length == 6)
+        if (code.Length != 6)
         {
             SetStatus("Please enter a valid 6-character code.");
             return;
@@ -70,9 +71,28 @@ public class JoinGame : MonoBehaviour
             GameSession.GameCode = response.gameCode;
             GameSession.MaxPlayers = response.maxPlayers;
             GameSession.IsHost = false;
+            GameSession.PlayerId = response.currentPlayers - 1;
             
             SetStatus($"Joined! ({response.currentPlayers}/{response.maxPlayers} players)");
             Debug.Log($"[JoinGame] Joined room {response.gameCode}");
+
+
+            if (response.currentPlayers == response.maxPlayers)
+            {
+                TurnOrderEvent turnOrderEvent = new TurnOrderEvent
+                {
+                    PlayersNames = response.playerNames,
+                    CurrentPlayerName = response.currentPlayerName,
+                };
+
+                if (SignalRClient.Instance == null)
+                {
+                    return;
+                }
+                
+                SignalRClient.Instance.Broadcast(turnOrderEvent);
+                SceneManager.LoadScene("InGame");
+            }
         },
         onError: error =>
         {

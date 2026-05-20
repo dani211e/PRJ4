@@ -38,6 +38,7 @@ namespace MTG_Emulator.Backend.Controllers
                 MaxPlayers = dto.MaxPlayers,
                 CurrentPlayers = 1,
                 HostName = dto.HostName,
+                PlayerNames = new List<string> {dto.HostName},
                 Status = "Waiting"
             };
 
@@ -69,10 +70,17 @@ namespace MTG_Emulator.Backend.Controllers
             if (game.CurrentPlayers >= game.MaxPlayers)
                 return Conflict(new GameResponseDto { success = false, message = "Game is full." });
 
+            game.PlayerNames.Add(dto.PlayerName);
             game.CurrentPlayers++;
 
+
             if (game.CurrentPlayers == game.MaxPlayers)
+            {
                 game.Status = "InProgress";
+                game.PlayerNames = game.PlayerNames.OrderBy(n => Random.Shared.Next()).ToList();
+            }
+
+            
 
             await context.SaveChangesAsync();
 
@@ -82,6 +90,8 @@ namespace MTG_Emulator.Backend.Controllers
                 gameCode = game.GameCode,
                 maxPlayers = game.MaxPlayers,
                 currentPlayers = game.CurrentPlayers,
+                playerNames = game.PlayerNames,
+                currentPlayerName = game.PlayerNames.FirstOrDefault(),
                 message = "Joined successfully."
             });
         }

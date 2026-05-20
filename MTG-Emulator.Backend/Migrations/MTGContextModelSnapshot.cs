@@ -269,6 +269,10 @@ namespace MTG_Emulator.Backend.Migrations
                     b.Property<int>("MaxPlayers")
                         .HasColumnType("int");
 
+                    b.PrimitiveCollection<string>("PlayerNames")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(32)

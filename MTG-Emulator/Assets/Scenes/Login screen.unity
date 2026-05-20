@@ -237,6 +237,7 @@ GameObject:
   - component: {fileID: 145256013}
   - component: {fileID: 145256015}
   - component: {fileID: 145256014}
+  - component: {fileID: 145256016}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -308,6 +309,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 145256012}
   m_CullTransparentMesh: 1
+--- !u!114 &145256016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 145256012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcd39d03d4b54269b7b35948ea40ba8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LoginUI
+  usernameField: {fileID: 997465108}
+  passwordField: {fileID: 1308414672}
 --- !u!1 &215846901
 GameObject:
   m_ObjectHideFlags: 0
@@ -514,6 +529,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3133522919950463024, guid: a0f8ab6b5ef1f0246bc912245b3bae27, type: 3}
   m_PrefabInstance: {fileID: 1064502955}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &997465108 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5130379769020013035, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
+  m_PrefabInstance: {fileID: 5793364275294551939}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TMP_InputField
 --- !u!1001 &1064502955
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -625,6 +651,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1737331226930854828, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
   m_PrefabInstance: {fileID: 221304579}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1308414672 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5130379769020013035, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
+  m_PrefabInstance: {fileID: 221304579}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TMP_InputField
 --- !u!224 &1562971168 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3626963285495805024, guid: 9a6eb4012e99f3b4ea5c439937b0661d, type: 3}
@@ -786,6 +823,34 @@ PrefabInstance:
     - target: {fileID: 2469359424003154749, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
       propertyPath: m_text
       value: back
+      objectReference: {fileID: 0}
+    - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 145256016}
+    - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnClickBack
+      objectReference: {fileID: 0}
+    - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: LoginUI, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3456349095563586718, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 4288090987980126135, guid: cdece15b1d692774e8e07f1b4bc8e09a, type: 3}
       propertyPath: m_Pivot.x
@@ -1178,6 +1243,34 @@ PrefabInstance:
     - target: {fileID: 598053830303778662, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
       propertyPath: m_Name
       value: LoginButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 145256016}
+    - target: {fileID: 3012664198730993617, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnClickLogin
+      objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: LoginUI, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 3364501436423483388, guid: d4280575afd36d4429320d7f579be6b6, type: 3}
       propertyPath: m_Pivot.x

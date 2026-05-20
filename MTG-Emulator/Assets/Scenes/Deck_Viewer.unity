@@ -565,9 +565,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21d79c0d70b7f554884f00f2dfb5d9d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneLoader
-  deckNames:
-  - Gisa
-  - gisa
   deckListParent: {fileID: 1154105224}
   deckButtonPrefab: {fileID: 2265996149204443538, guid: 5bc34fbd10730d44eb50b295a2a8f4be, type: 3}
   commanderNameText: {fileID: 1420921627}
