@@ -59,7 +59,7 @@ Card "1" o-- "*" RelatedCard : RelatedCards
 CardDto "1" o-- "0..1" CardFaceDto : AltFace
 CardDto "1" o-- "*" RelatedCardDto : RelatedCards
 
-MtgController ..> Card
-MtgController ..> CardDto
+MtgController ..> Card : maps
+MtgController ..> CardDto : returns
 
 @enduml
