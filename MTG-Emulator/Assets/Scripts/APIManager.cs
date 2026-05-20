@@ -380,10 +380,3 @@ public class APIManager : MonoBehaviour
         }
     }
 }
-namespace MTG_Emulator.Unity.Db.DTO.DeckDTO
-{
-    public class UpdateDeckDto
-    {
-        public List<string> CommandZone { get; set; } = new();
-    }
-}
