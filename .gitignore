@@ -488,5 +488,8 @@ scryfall-data/
 
 # Ignore the build dll's that get copied to unity's asset folder
 **/MTG-Emulator.Backend.dll
+**/MTG-Emulator.Backend.dll.meta
 **/MTG-Emulator.Unity.dll
 **/MTG-Emulator.Unity.dll.meta
+**/MTG-Emulator.Shared.dll
+**/MTG-Emulator.Shared.dll.meta
