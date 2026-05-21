@@ -34,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MTG-Emulator.Unity\MTG-Emulator.Unity.csproj" />
+    <ProjectReference Include="..\MTG-Emulator.Shared\MTG-Emulator.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

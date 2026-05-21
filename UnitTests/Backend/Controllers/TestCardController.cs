@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MTG_Emulator.Backend.Controllers;
 using MTG_Emulator.Backend.DB.Models;
-using MTG_Emulator.Unity.Db.DTO.CardDTO;
+using MTG_Emulator.Shared.Db.DTO.CardDTO;
 
 namespace UnitTests.Backend.Controllers
 {

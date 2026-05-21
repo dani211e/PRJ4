@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.Controllers;
 using MTG_Emulator.Backend.DB.Models;
-using MTG_Emulator.Unity.Db.DTO.DeckDTO;
+using MTG_Emulator.Shared.Db.DTO.DeckDTO;
 
 namespace UnitTests.Backend.Controllers
 {

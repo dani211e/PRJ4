@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using MTG_Emulator.Unity.Db.DTO.CardFaceDTO;
-using MTG_Emulator.Unity.Db.DTO.RelatedCardDTO;
+using MTG_Emulator.Shared.Db.DTO.CardFaceDTO;
+using MTG_Emulator.Shared.Db.DTO.RelatedCardDTO;
 
-namespace MTG_Emulator.Unity.Db.DTO.CardDTO
+namespace MTG_Emulator.Shared.Db.DTO.CardDTO
 {
     public class CardDto
     {

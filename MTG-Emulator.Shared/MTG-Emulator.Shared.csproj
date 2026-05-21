@@ -3,7 +3,7 @@
   <PropertyGroup>
 	<TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latestMajor</LangVersion>
-    <RootNamespace>MTG_Emulator.Unity</RootNamespace>
+    <RootNamespace>MTG_Emulator.Shared</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>

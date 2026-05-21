@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MTG_Emulator.Unity.Synchronization.Events
+namespace MTG_Emulator.Shared.Synchronization.Events
 {
     public abstract class SyncEvent : EventArgs
     {

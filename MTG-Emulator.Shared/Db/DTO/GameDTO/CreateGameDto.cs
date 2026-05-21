@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MTG_Emulator.Unity.Db.DTO.GameDTO;
+namespace MTG_Emulator.Shared.Db.DTO.GameDTO;
 
 public class CreateGameDto
 {

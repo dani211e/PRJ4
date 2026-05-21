@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace MTG_Emulator.Unity.Synchronization.Events
+namespace MTG_Emulator.Shared.Synchronization.Events
 {
     public class MoveCardEvent : ObjectEvent
     {

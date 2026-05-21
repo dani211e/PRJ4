@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MTG_Emulator.Unity.Db.DTO.RelatedCardDTO
+namespace MTG_Emulator.Shared.Db.DTO.RelatedCardDTO
 {
     public class RelatedCardDto
     {

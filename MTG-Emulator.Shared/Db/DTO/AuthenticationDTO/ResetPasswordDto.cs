@@ -1,4 +1,4 @@
-﻿namespace MTG_Emulator.Unity.Db.DTO.AuthenticationDTO
+﻿namespace MTG_Emulator.Shared.Db.DTO.AuthenticationDTO
 {
     public class ResetPasswordDto
     {

@@ -1,7 +1,7 @@
-﻿using MTG_Emulator.Unity.Synchronization.Events;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using MTG_Emulator.Shared.Synchronization.Events;
 
-namespace MTG_Emulator.Unity.Synchronization;
+namespace MTG_Emulator.Shared.Synchronization;
 
 public interface ISyncEventListener
 {

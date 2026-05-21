@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MTG_Emulator.Unity.Db.DTO.DeckDTO
+namespace MTG_Emulator.Shared.Db.DTO.DeckDTO
 {
     public class AllDecksDto
     {

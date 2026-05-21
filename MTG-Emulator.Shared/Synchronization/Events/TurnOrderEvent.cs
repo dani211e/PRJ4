@@ -1,4 +1,4 @@
-﻿namespace MTG_Emulator.Unity.Synchronization.Events;
+﻿namespace MTG_Emulator.Shared.Synchronization.Events;
 
 public class TurnOrderEvent : SyncEvent
 {

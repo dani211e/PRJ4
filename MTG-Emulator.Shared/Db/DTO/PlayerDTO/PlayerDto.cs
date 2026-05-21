@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MTG_Emulator.Unity.Db.DTO.PlayerDTO
+namespace MTG_Emulator.Shared.Db.DTO.PlayerDTO
 {
     public class PlayerDto
     {

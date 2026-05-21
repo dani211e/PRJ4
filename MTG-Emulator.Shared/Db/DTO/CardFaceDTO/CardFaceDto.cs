@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MTG_Emulator.Unity.Db.DTO.CardFaceDTO
+namespace MTG_Emulator.Shared.Db.DTO.CardFaceDTO
 {
     public class CardFaceDto
     {

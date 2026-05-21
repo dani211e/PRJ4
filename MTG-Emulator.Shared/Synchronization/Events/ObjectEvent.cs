@@ -1,6 +1,6 @@
-﻿using MTG_Emulator.Unity.Synchronization.Events;
+﻿using MTG_Emulator.Shared.Synchronization.Events;
 
-namespace MTG_Emulator.Unity.Synchronization.Events;
+namespace MTG_Emulator.Shared.Synchronization.Events;
 
 public abstract class ObjectEvent : SyncEvent
 {
