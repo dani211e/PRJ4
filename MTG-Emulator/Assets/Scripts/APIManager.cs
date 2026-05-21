@@ -298,6 +298,31 @@ public class APIManager : MonoBehaviour
         }
     }
     
+    public IEnumerator UpdatePlayerStats(int gameResult, Action<string> onSuccess, Action<string> onError)
+    {
+        string username = PlayerPrefs.GetString("username");
+        UnityWebRequest request = new UnityWebRequest(
+            baseUrl + "Player/" + UnityWebRequest.EscapeURL(username) + "?result=" + gameResult,
+            "PUT"
+        );
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.uploadHandler = new UploadHandlerRaw(Array.Empty<byte>());
+    
+        string token = PlayerPrefs.GetString("jwtToken");
+    
+        if (!string.IsNullOrEmpty(token))
+        {
+            request.SetRequestHeader("Authorization", "Bearer " + token);
+        }
+
+        yield return request.SendWebRequest();
+    
+        if (request.result != UnityWebRequest.Result.Success)
+            onError?.Invoke(request.downloadHandler.text);
+        else
+            onSuccess?.Invoke(request.downloadHandler.text);
+    }
+    
     public IEnumerator ResetPassword(
         string newPassword,
         string confirmPassword,
