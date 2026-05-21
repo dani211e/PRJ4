@@ -400,7 +400,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &229863894
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -414,7 +414,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.046842277, g: 0.061644465, b: 0.4867924, a: 1}
+  m_Color: {r: 0.101960786, g: 0.101960786, b: 0.18039216, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2200,7 +2200,7 @@ MonoBehaviour:
     m_Top: 20
     m_Bottom: 0
   m_ChildAlignment: 1
-  m_Spacing: 0
+  m_Spacing: 20
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
@@ -2725,6 +2725,34 @@ PrefabInstance:
     - target: {fileID: 598053830303778662, guid: 28cf263707fe1f347bc72f9a79ed16fb, type: 3}
       propertyPath: m_Name
       value: DangerButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: 28cf263707fe1f347bc72f9a79ed16fb, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: 28cf263707fe1f347bc72f9a79ed16fb, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: 28cf263707fe1f347bc72f9a79ed16fb, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2106979739}
+    - target: {fileID: 3012664198730993617, guid: 28cf263707fe1f347bc72f9a79ed16fb, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: 28cf263707fe1f347bc72f9a79ed16fb, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ConfirmDeleteDeck
+      objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: 28cf263707fe1f347bc72f9a79ed16fb, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: DeckViewer, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3012664198730993617, guid: 28cf263707fe1f347bc72f9a79ed16fb, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 3364501436423483388, guid: 28cf263707fe1f347bc72f9a79ed16fb, type: 3}
       propertyPath: m_Pivot.x
@@ -5602,7 +5630,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11234659474211687, guid: cb962520921d71340986c21080b7b463, type: 3}
       propertyPath: m_ChildForceExpandHeight
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1567187577854350375, guid: cb962520921d71340986c21080b7b463, type: 3}
       propertyPath: m_AnchorMax.x
@@ -5764,12 +5792,12 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6831943603748188484, guid: cb962520921d71340986c21080b7b463, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1900993231}
     - targetCorrespondingSourceObject: {fileID: 2579069628521159948, guid: cb962520921d71340986c21080b7b463, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2144163544}
+    - targetCorrespondingSourceObject: {fileID: 6831943603748188484, guid: cb962520921d71340986c21080b7b463, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1900993231}
   m_SourcePrefab: {fileID: 100100000, guid: cb962520921d71340986c21080b7b463, type: 3}
 --- !u!1001 &5491198997764189677
 PrefabInstance:
