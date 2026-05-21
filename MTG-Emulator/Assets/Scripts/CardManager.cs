@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using MTG_Emulator.Cards;
+using MTG_Emulator.Extensions;
 using MTG_Emulator.Unity.Db.DTO.CardDTO;
 using MTG_Emulator.Unity.Db.DTO.CardFaceDTO;
 using MTG_Emulator.Unity.Db.DTO.RelatedCardDTO;
