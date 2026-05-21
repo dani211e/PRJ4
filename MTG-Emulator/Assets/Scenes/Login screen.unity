@@ -514,6 +514,18 @@ PrefabInstance:
       propertyPath: m_text
       value: Enter password...
       objectReference: {fileID: 0}
+    - target: {fileID: 6427940242881632592, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
+      propertyPath: m_fontColor.g
+      value: 0.627451
+      objectReference: {fileID: 0}
+    - target: {fileID: 6427940242881632592, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
+      propertyPath: m_fontColor.r
+      value: 0.76862746
+      objectReference: {fileID: 0}
+    - target: {fileID: 6427940242881632592, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 2150801604
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1230,6 +1242,18 @@ PrefabInstance:
     - target: {fileID: 6427940242881632592, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
       propertyPath: m_text
       value: Enter Email...
+      objectReference: {fileID: 0}
+    - target: {fileID: 6427940242881632592, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
+      propertyPath: m_fontColor.g
+      value: 0.627451
+      objectReference: {fileID: 0}
+    - target: {fileID: 6427940242881632592, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
+      propertyPath: m_fontColor.r
+      value: 0.76862746
+      objectReference: {fileID: 0}
+    - target: {fileID: 6427940242881632592, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 2150801604
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
