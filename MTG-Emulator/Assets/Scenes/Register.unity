@@ -345,6 +345,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: EmailInput
       objectReference: {fileID: 0}
+    - target: {fileID: 5130379769020013035, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
+      propertyPath: m_ContentType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5130379769020013035, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
+      propertyPath: m_KeyboardType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5130379769020013035, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
+      propertyPath: m_CharacterValidation
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6427940242881632592, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
       propertyPath: m_text
       value: Enter email...
@@ -1053,6 +1065,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PasswordInput
       objectReference: {fileID: 0}
+    - target: {fileID: 5130379769020013035, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
+      propertyPath: m_InputType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5130379769020013035, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
+      propertyPath: m_ContentType
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 6427940242881632592, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
       propertyPath: m_text
       value: Enter password...
@@ -1413,11 +1433,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5130379769020013035, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
       propertyPath: m_InputType
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5130379769020013035, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
       propertyPath: m_ContentType
-      value: 7
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6427940242881632592, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
       propertyPath: m_fontColor.g
