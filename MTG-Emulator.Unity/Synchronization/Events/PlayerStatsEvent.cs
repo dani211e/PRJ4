@@ -4,6 +4,7 @@ public class PlayerStatsEvent : ObjectEvent
 {
     public PlayerStatsEvent(int playerIndex)
     {
+        Identifier = Guid.Empty;
         PlayerIndex = playerIndex;
         Method = nameof(ISyncEventListener.UpdatePlayerStats);
     }

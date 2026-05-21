@@ -14,7 +14,7 @@ namespace MTG_Emulator.Backend.Controllers
         private readonly MTGContext context;
         private readonly HashSet<string> gameCodes = new HashSet<string>();
 
-        public GameController(MTGContext context)
+        public GameController(MTGContext context) 
         {
             this.context = context;
         }
