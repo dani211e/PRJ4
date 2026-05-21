@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Threading.Tasks;
 using MTG_Emulator.Unity.Db.DTO.GameDTO;
 using MTG_Emulator.Unity.Synchronization.Events;
 using TMPro;
@@ -31,6 +32,8 @@ public class CreateGame : MonoBehaviour
 
     private bool codeVisible = true;
 
+    private bool unityIsStupid = false;
+
     private void Start()
     {
         maxPlayersSlider.minValue = 2;
@@ -48,15 +51,22 @@ public class CreateGame : MonoBehaviour
             Debug.Log("SignalR is null");
             return;
         }
-        else
-        {
-            SignalRClient.Instance.OnTurnOrderCreatedEvent += HandleTurnOrderCreated;
-            Debug.Log("Host subscribed to OnTurnOrderCreatedEvent");
-        }
 
+		SignalRClient.Instance.OnTurnOrderCreatedEvent += HandleTurnOrderCreated;
 
         refreshCode();
         setStatus("");
+    }
+
+    private void Update()
+    {
+        // Scene loading has to happen on unity's main thread,
+		// if this does not happen it will simply silently fail and refuse loading.
+        // Since we want to essentially do it from an event response
+        // (which would run on a background thread)
+        // we have to use an incredibly stupid workaround like this:
+        if(unityIsStupid)
+            SceneManager.LoadScene("InGame");
     }
 
     private void OnDestroy()
@@ -135,11 +145,5 @@ public class CreateGame : MonoBehaviour
     }
 
 
-    private void HandleTurnOrderCreated(object sender, TurnOrderEvent e)
-    {
-        var a = new LoadSceneParameters(LoadSceneMode.Single);
-        var b = SceneManager.LoadScene("InGame", a);
-        Debug.Log(b.name + b.buildIndex);
-        Debug.Log("swtich to ingame from create game screen");
-    }
+    private void HandleTurnOrderCreated(object sender, TurnOrderEvent e) => unityIsStupid = true;
 }

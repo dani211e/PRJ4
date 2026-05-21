@@ -29,21 +29,28 @@ using UnityEngine.SceneManagement;
             StartCoroutine(APIManager.Instance.Login(
                 email,
                 password,
-                SuccessMessage =>
+                successMessage =>
                 {
-                    SceneManager.LoadScene("0");
-                    Debug.Log(SuccessMessage);
+                    StartCoroutine(APIManager.Instance.GetPlayerProfile(
+                        player => SceneManager.LoadScene("0"),
+                        error =>
+                        {
+                            if (error.Contains("404") || error.Contains("Not Found"))
+                            {
+                                Debug.LogError("Account no longer exists.");
+                                PlayerPrefs.DeleteAll();
+                                PlayerPrefs.Save();
+                            }
+                        }
+                    ));
                 },
-                error =>
-                {
-                    Debug.LogError(error);
-                }
-                ));
+                error => Debug.LogError(error)
+            ));
         }
         
-        public void OnClickBack()
+        public void OnClickRegister()
         {
-            SceneManager.LoadScene("0");
+            SceneManager.LoadScene("Register");
         }
     }
 
