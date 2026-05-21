@@ -3,6 +3,13 @@ using System.Collections;
 using MTG_Emulator.Cards;
 using TMPro;
 using UnityEngine;
+using MTG_Emulator.Backend.DB.Models;
+using MTG_Emulator.Unity.Db.DTO.CardDTO;
+using UnityEngine.EventSystems;
+using MTG_Emulator.Backend.DB.Models;
+using MTG_Emulator.Unity.Db.DTO.CardDTO;
+using MTG_Emulator.Unity.Db.DTO.RelatedCardDTO;
+using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
@@ -16,7 +23,8 @@ public class Card : MonoBehaviour
 
     public Guid Identifier => cardData.Identifier;
 
-    private CardInfo cardData;
+
+    public CardInfo cardData;
     private Button button;
     private bool Istapped = false;
     private CardZonesTypes currentzone;
@@ -37,6 +45,8 @@ public class Card : MonoBehaviour
         }
 
         button.onClick.RemoveAllListeners();
+        button.onClick.AddListener(OnCardClicked);
+        
 
         if (onClick != null)
         {
@@ -76,5 +86,10 @@ public class Card : MonoBehaviour
             transform.Rotate(0, 0, Istapped ? 90.0f : -90.0f);
             Istapped = !Istapped;
         }
+    }
+    
+    public void OnCardClicked()
+    {
+        CardMenu.Instance.Open(this);
     }
 }

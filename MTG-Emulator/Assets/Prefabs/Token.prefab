@@ -86,9 +86,9 @@ GameObject:
   - component: {fileID: 4034409473532625047}
   - component: {fileID: 8823582741496359860}
   - component: {fileID: 4139180508345094679}
-  - component: {fileID: 928076111792501348}
+  - component: {fileID: 1079779795320491456}
   m_Layer: 5
-  m_Name: Card
+  m_Name: Token
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -134,7 +134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79d1451aa5e387b4ba5d0d003bdac235, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Drag
---- !u!114 &928076111792501348
+--- !u!114 &1079779795320491456
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -143,7 +143,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7015738966440023518}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf31e54b74796c640990d96917cdedc3, type: 3}
+  m_Script: {fileID: 11500000, guid: e79aa03dfda24dd5a627412d83ef0876, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Card
-  cardImage: {fileID: 6355155304952932726}
+  m_EditorClassIdentifier: Assembly-CSharp::Token
+  tokenImage: {fileID: 6355155304952932726}
