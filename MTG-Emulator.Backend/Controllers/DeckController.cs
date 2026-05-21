@@ -51,9 +51,7 @@ namespace MTG_Emulator.Backend.Controllers
                 });
 
             var commandZoneIds = commandResult.Cards.Select(c => c.CardId).ToHashSet();
-            var filteredDeckCards = mainResult.Cards
-                .Where(dc => !commandZoneIds.Contains(dc.Card.CardId))
-                .ToList();
+            var filteredDeckCards = removeOneCommandZoneCopy(mainResult.Cards, commandZoneIds);
 
             var deck = new Deck
             {
@@ -188,9 +186,7 @@ namespace MTG_Emulator.Backend.Controllers
             var commandZoneIds = commandResult.Cards.Select(c => c.CardId).ToHashSet();
 
             deck.DeckName    = deckDto.DeckName;
-            deck.DeckCards   = mainResult.Cards
-                .Where(dc => !commandZoneIds.Contains(dc.Card.CardId))
-                .ToList(); 
+            deck.DeckCards = removeOneCommandZoneCopy(mainResult.Cards, commandZoneIds);
             deck.CommandZone = commandResult.Cards;
 
             await context.SaveChangesAsync();
@@ -259,6 +255,25 @@ namespace MTG_Emulator.Backend.Controllers
         {
             int slashIndex = name.IndexOf(" // ", StringComparison.Ordinal);
             return slashIndex != -1 ? name[..slashIndex] : name;
+        }
+        
+        private static List<DeckCard> removeOneCommandZoneCopy(
+            List<DeckCard> deckCards, HashSet<int> commandZoneIds)
+        {
+            var result = new List<DeckCard>();
+            foreach (var dc in deckCards)
+            {
+                if (commandZoneIds.Contains(dc.Card.CardId) && dc.Quantity > 0)
+                {
+                    if (dc.Quantity > 1)
+                        result.Add(new DeckCard { Card = dc.Card, Quantity = dc.Quantity - 1 });
+                }
+                else
+                {
+                    result.Add(dc);
+                }
+            }
+            return result;
         }
     }
 }

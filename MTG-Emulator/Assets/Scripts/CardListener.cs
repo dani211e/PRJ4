@@ -1,8 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Runtime.Serialization;
+﻿using System.Linq;
 using MTG_Emulator.Cards;
 using MTG_Emulator.Cards.Extensions;
+using MTG_Emulator.Extensions;
 using MTG_Emulator.Unity.Synchronization.Events;
 using UnityEngine;
 
@@ -41,8 +40,7 @@ namespace MTG_Emulator
                 return;
             var obj = Instantiate(cardPrefab, handZone);
 
-            //Why is there no remove component ?!
-            Destroy(obj.GetComponent<Drag>());
+            obj.RemoveComponent<Drag>();
 
             var cardInfo = new CardInfo
             {

@@ -1,4 +1,6 @@
-﻿namespace MTG_Emulator.Unity.Synchronization.Events
+﻿using System;
+
+namespace MTG_Emulator.Unity.Synchronization.Events
 {
     public abstract class SyncEvent : EventArgs
     {
