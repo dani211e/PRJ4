@@ -9,5 +9,5 @@ public interface ISyncEventHandler
     void OnUpdatePlayerStats(PlayerStatsEvent e);
     void OnTurnChanged(TurnChangedEvent e);
     void OnTurnOrderCreated(TurnOrderEvent e);
-    void OnPlayerLeaveEvent(PlayerLeaveEvent e);
+    void OnPlayerLeave(PlayerLeaveEvent e);
 }

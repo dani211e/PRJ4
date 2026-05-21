@@ -31,9 +31,9 @@ namespace MTG_Emulator.Backend.Controllers.Hubs
             await Clients.All.SendAsync(nameof(ISyncEventHandler.OnTurnOrderCreated), e);
         }
 
-        public async Task PlayerLeaveEvent(PlayerLeaveEvent e)
+        public async Task PlayerLeave(PlayerLeaveEvent e)
         {
-            await Clients.Others.SendAsync(nameof(ISyncEventHandler.OnPlayerLeaveEvent));
+            await Clients.All.SendAsync(nameof(ISyncEventHandler.OnPlayerLeave), e);
         }
     }
 }

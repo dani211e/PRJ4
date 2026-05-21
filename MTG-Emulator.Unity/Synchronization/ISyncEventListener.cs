@@ -10,5 +10,5 @@ public interface ISyncEventListener
     Task UpdatePlayerStats(PlayerStatsEvent e);
     Task TurnChanged(TurnChangedEvent e);
     Task TurnOrderCreated(TurnOrderEvent e);
-    Task PlayerLeaveEvent(PlayerLeaveEvent e);
+    Task PlayerLeave(PlayerLeaveEvent e);
 }

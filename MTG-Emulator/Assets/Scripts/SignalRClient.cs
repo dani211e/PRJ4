@@ -19,6 +19,7 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
     public event EventHandler<PlayerStatsEvent> OnPlayerStatsEvent;
     public event EventHandler<TurnChangedEvent> OnTurnChangedEvent;
     public event EventHandler<TurnOrderEvent> OnTurnOrderCreatedEvent; 
+    public event EventHandler<PlayerLeaveEvent> OnPlayerLeaveEvent;
 
     public void Awake()
     {
@@ -44,6 +45,7 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
             connection.On<PlayerStatsEvent>(nameof(ISyncEventHandler.OnUpdatePlayerStats), OnUpdatePlayerStats);
             connection.On<TurnChangedEvent>(nameof(ISyncEventHandler.OnTurnChanged), OnTurnChanged);
             connection.On<TurnOrderEvent>(nameof(ISyncEventHandler.OnTurnOrderCreated), OnTurnOrderCreated);
+            connection.On<PlayerLeaveEvent>(nameof(ISyncEventHandler.OnPlayerLeave), OnPlayerLeave);
 
             var t = connection.StartAsync();
             t.Wait();
@@ -89,6 +91,9 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
     {
         OnTurnOrderCreatedEvent?.Invoke(this, e);
     }
-    
-    
+
+    public void OnPlayerLeave(PlayerLeaveEvent e)
+    {
+        OnPlayerLeaveEvent?.Invoke(this, e);
+    }
 }

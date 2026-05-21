@@ -6,7 +6,7 @@ public class PlayerLeaveEvent : ObjectEvent
     {
         Identifier = Guid.Empty;
         PlayerIndex = playerIndex;
-        Method = nameof(ISyncEventListener.PlayerLeaveEvent);
+        Method = nameof(ISyncEventListener.PlayerLeave);
     }
 
     public List<string> PlayersNames { get; set; } = new();
