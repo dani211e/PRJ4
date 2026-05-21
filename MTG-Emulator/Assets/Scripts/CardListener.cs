@@ -1,7 +1,6 @@
-﻿using System.Linq;
-using MTG_Emulator.Cards;
-using MTG_Emulator.Cards.Extensions;
+﻿using MTG_Emulator.Cards.Extensions;
 using MTG_Emulator.Extensions;
+using MTG_Emulator.Threading;
 using MTG_Emulator.Unity.Synchronization.Events;
 using UnityEngine;
 
@@ -36,39 +35,45 @@ namespace MTG_Emulator
 
         private void spawnNewCard(object _, NewCardEvent e)
         {
-            if (e.Card == null)
-                return;
-            var obj = Instantiate(cardPrefab, handZone);
-
-            obj.RemoveComponent<Drag>();
-
-            var cardInfo = new CardInfo
+            MainThreadDispatcher.Enqueue(() =>
             {
-                Identifier = e.Identifier,
-                ScryfallId = e.Card.ScryfallId,
-                Name = e.Card.Name,
-                ImageUri = e.Card.ImageUri,
-                AltFace = e.Card.AltFace.ToCardInfo(),
-                RelatedCards = e.Card.RelatedCards.Select(rc => rc.ToCardInfo()).ToList()
-            };
-            var c = obj.GetComponent<Card>();
+                if (e.Card == null)
+                    return;
+                var obj = Instantiate(cardPrefab, handZone);
 
-            c.Setup(cardInfo);
-            CardManager.AddObject(e.PlayerIndex, cardInfo, obj);
+                obj.RemoveComponent<Drag>();
+
+                var cardInfo = new CardInfo
+                {
+                    Identifier = e.Identifier,
+                    ScryfallId = e.Card.ScryfallId,
+                    Name = e.Card.Name,
+                    ImageUri = e.Card.ImageUri,
+                    AltFace = e.Card.AltFace.ToCardInfo(),
+                    RelatedCards = e.Card.RelatedCards.Select(rc => rc.ToCardInfo()).ToList()
+                };
+                var c = obj.GetComponent<Card>();
+
+                c.Setup(cardInfo);
+                CardManager.AddObject(e.PlayerIndex, cardInfo, obj);
+            });
         }
 
         private void moveCard(object _, MoveCardEvent e)
         {
-            Debug.Log($"move event rec {e.Identifier}");
-            if (!e.Position.HasValue)
-                return;
+            MainThreadDispatcher.Enqueue(() =>
+            {
+                Debug.Log($"move event rec {e.Identifier}");
+                if (!e.Position.HasValue)
+                    return;
 
-            var c = CardManager.Get(e.PlayerIndex, e.Identifier);
-            //this is wrong i cba, but we need to move the card from handzone to other zone somehow idk
-            c.transform.parent = battlefield;
+                var c = CardManager.Get(e.PlayerIndex, e.Identifier);
+                //this is wrong i cba, but we need to move the card from handzone to other zone somehow idk
+                c.transform.parent = battlefield;
 
-            var newPos = e.Position.Value.ToUnity3();
-            c.transform.position = new Vector3(newPos.x, newPos.y - 100, 0);
+                var newPos = e.Position.Value.ToUnity3();
+                c.transform.position = new Vector3(newPos.x, newPos.y - 100, 0);
+            });
         }
     }
 }
