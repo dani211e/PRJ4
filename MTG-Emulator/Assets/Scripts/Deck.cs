@@ -42,6 +42,8 @@ public class Deck : MonoBehaviour
                 {
                     drawPile.AddRange(result.Cards.Select(c => c.ToCardInfo()));
                 }
+                
+                Shuffle();
 
                 UpdateCountText();
 
@@ -109,5 +111,26 @@ public class Deck : MonoBehaviour
     {
         if (countText != null)
             countText.text = drawPile.Count.ToString();
+    }
+    
+    public void Shuffle()
+    {
+        System.Random rng = new System.Random();
+        int n = drawPile.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            CardInfo temp = drawPile[k];
+            drawPile[k] = drawPile[n];
+            drawPile[n] = temp;
+        }
+        Debug.Log("Deck shuffled.");
+    }
+    
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.V))
+            Shuffle();
     }
 }
