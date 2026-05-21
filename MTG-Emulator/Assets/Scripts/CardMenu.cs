@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using MTG_Emulator.Backend.DB.Models;
+using MTG_Emulator.Cards;
 using MTG_Emulator.Unity.Db.DTO.CardDTO;
 using MTG_Emulator.Unity.Db.DTO.RelatedCardDTO;
 using UnityEngine.EventSystems;
@@ -34,7 +35,7 @@ public class CardMenu : MonoBehaviour
         
         for(int i = 0; i < currentCard.cardData.RelatedCards.Count; i++)
         {
-            RelatedCardDto relatedCard = currentCard.cardData.RelatedCards[i];
+            RelatedCardInfo relatedCard = currentCard.cardData.RelatedCards[i];
             var button = Instantiate(createToken, cardMenuParent);
             RectTransform buttonRect = button.GetComponent<RectTransform>();
             buttonRect.anchoredPosition = new Vector2(0, -i * (buttonHeight + spacing));
@@ -64,7 +65,7 @@ public class CardMenu : MonoBehaviour
             Debug.Log("This card has no tokens to spawn.");
             return;
         }
-        RelatedCardDto token = currentCard.cardData.RelatedCards[index];
+        RelatedCardInfo token = currentCard.cardData.RelatedCards[index];
         GameObject tokenObj = Instantiate(cardPrefab, battlefieldParent);
         Token tokenScript = tokenObj.GetComponent<Token>();
         Debug.Log(token.ImageUri);
