@@ -92,7 +92,6 @@ public class Card : MonoBehaviour, IPointerClickHandler
         if (eventData.button == PointerEventData.InputButton.Right)
         {
             CardMenu.Instance.Open(this);
-            
         }
     }
 }
