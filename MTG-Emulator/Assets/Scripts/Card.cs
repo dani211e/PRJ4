@@ -1,17 +1,9 @@
 using System;
-using System.Collections;
 using MTG_Emulator.Cards;
+using MTG_Emulator.Unity.Synchronization.Enums;
 using TMPro;
 using UnityEngine;
-using MTG_Emulator.Backend.DB.Models;
-using MTG_Emulator.Unity.Db.DTO.CardDTO;
 using UnityEngine.EventSystems;
-using MTG_Emulator.Backend.DB.Models;
-using MTG_Emulator.Unity.Db.DTO.CardDTO;
-using MTG_Emulator.Unity.Db.DTO.RelatedCardDTO;
-using MTG_Emulator.Unity.Synchronization.Enums;
-using UnityEngine.EventSystems;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class Card : MonoBehaviour, IPointerClickHandler
@@ -28,7 +20,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
     public CardInfo cardData;
     private Button button;
     private bool Istapped = false;
-    private ZoneType currentzone;
+    public ZoneType CurrentZone { get; private set; }
 
     public void Setup(CardInfo card, Action<CardInfo> onClick = null)
     {
@@ -67,7 +59,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
 
     public void SetZones(ZoneType zone)
     {
-        currentzone = zone;
+        CurrentZone = zone;
     }
 
 
@@ -77,7 +69,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (currentzone != ZoneType.Bf)
+            if (CurrentZone != ZoneType.Bf)
             {
                 return;
             }
