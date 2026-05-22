@@ -2,6 +2,7 @@
 {
     public class ResetPasswordDto
     {
+        public string? TargetUserId { get; set; }
         public string NewPassword { get; set; } = string.Empty;
         public string ConfirmPassword { get; set; } = string.Empty;
     }

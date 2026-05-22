@@ -113,15 +113,20 @@ namespace MTG_Emulator.Backend.Controllers
             if (dto.NewPassword != dto.ConfirmPassword)
                 return BadRequest("Passwords do not match.");
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrWhiteSpace(userId))
+            var callerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(callerId))
                 return Unauthorized();
-            var user = await userManager.FindByIdAsync(userId);
             
-            if (user == null) 
+            var targetId = User.IsInRole(Roles.Admin) && !string.IsNullOrWhiteSpace(dto.TargetUserId)
+                ? dto.TargetUserId
+                : callerId;
+
+            var user = await userManager.FindByIdAsync(targetId);
+            if (user == null)
                 return NotFound();
 
-            if (!IsOwnerOrAdmin(user.Id)) return Forbid();
+            if (!IsOwnerOrAdmin(user.Id))
+                return Forbid();
 
             var token = await userManager.GeneratePasswordResetTokenAsync(user);
             var result = await userManager.ResetPasswordAsync(user, token, dto.NewPassword);
@@ -134,11 +139,15 @@ namespace MTG_Emulator.Backend.Controllers
         
         [HttpDelete("delete-account")]
         [Authorize]
-        public async Task<IActionResult> DeleteAccount()
+        public async Task<IActionResult> DeleteAccount([FromQuery] string? targetUserId = null)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var callerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var user = await userManager.FindByIdAsync(userId!);
+            var targetId = User.IsInRole(Roles.Admin) && !string.IsNullOrWhiteSpace(targetUserId)
+                ? targetUserId
+                : callerId;
+
+            var user = await userManager.FindByIdAsync(targetId!);
             if (user == null)
                 return NotFound();
 
@@ -147,7 +156,7 @@ namespace MTG_Emulator.Backend.Controllers
 
             var player = await context.Players
                 .Include(p => p.Decks)
-                .FirstOrDefaultAsync(p => p.ApiUserId == userId);
+                .FirstOrDefaultAsync(p => p.ApiUserId == targetId);
 
             if (player != null)
             {
