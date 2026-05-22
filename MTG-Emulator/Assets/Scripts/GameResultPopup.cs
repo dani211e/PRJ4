@@ -35,6 +35,8 @@ namespace DefaultNamespace
         private void handlePlayerLeaveEvent(object sender, PlayerLeaveEvent e)
         {
             Debug.Log("HandlePlayerLeaveEvent fired");
+            
+            
         }
     }
 }
