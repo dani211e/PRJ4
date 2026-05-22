@@ -1,10 +1,12 @@
+using MTG_Emulator.Unity.Synchronization.Enums;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class FreeDropZone : MonoBehaviour, IDropHandler
 {
+    [SerializeField]
+    private ZoneType zoneType;
 
-    [SerializeField] private CardZonesTypes zoneType;
     public void OnDrop(PointerEventData eventData)
     {
         GameObject dragged = eventData.pointerDrag;
@@ -12,7 +14,7 @@ public class FreeDropZone : MonoBehaviour, IDropHandler
             return;
 
         Drag dragScript = dragged.GetComponent<Drag>();
-        var card =  dragged.GetComponent<Card>();
+        var card = dragged.GetComponent<Card>();
         if (dragScript != null)
         {
             dragScript.WasDropped = true;
@@ -22,11 +24,10 @@ public class FreeDropZone : MonoBehaviour, IDropHandler
         {
             card.SetZones(zoneType);
         }
-        
+
         dragged.transform.SetParent(transform, true);
         dragged.transform.SetAsLastSibling();
         dragged.transform.localScale = Vector3.one;
         dragged.transform.localRotation = Quaternion.identity;
-        
     }
 }

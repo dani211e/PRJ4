@@ -7,6 +7,7 @@ using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Cards;
 using MTG_Emulator.Unity.Db.DTO.CardDTO;
 using MTG_Emulator.Unity.Db.DTO.RelatedCardDTO;
+using MTG_Emulator.Unity.Synchronization.Enums;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 
@@ -22,7 +23,7 @@ public class Token : MonoBehaviour, IPointerClickHandler
     private Card card;
     private Button button;
     private bool Istapped = false;
-    private CardZonesTypes currentzone;
+    private ZoneType currentzone;
 
     public void Setup(RelatedCardInfo token, Action<CardDto> onClick = null)
     {
