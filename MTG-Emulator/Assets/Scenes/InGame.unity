@@ -4211,6 +4211,7 @@ GameObject:
   - component: {fileID: 1394508647}
   - component: {fileID: 1394508646}
   - component: {fileID: 1394508645}
+  - component: {fileID: 1394508648}
   m_Layer: 5
   m_Name: CommanderSlot
   m_TagString: Untagged
@@ -4301,6 +4302,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1394508643}
   m_CullTransparentMesh: 1
+--- !u!114 &1394508648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1394508643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7f375d29d5e49109397c1df8dff5fad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CommanderSlot
+  commanderCardPrefab: {fileID: 7015738966440023518, guid: bc11d992d5ec23842bb2a12dd3c8d774, type: 3}
+  slotParent: {fileID: 1394508644}
 --- !u!1 &1402176237
 GameObject:
   m_ObjectHideFlags: 0
@@ -5008,6 +5023,7 @@ MonoBehaviour:
   countText: {fileID: 924529880}
   handParent: {fileID: 1899433327}
   cardPrefab: {fileID: 7015738966440023518, guid: bc11d992d5ec23842bb2a12dd3c8d774, type: 3}
+  commanderSlot: {fileID: 0}
 --- !u!1 &1555623677
 GameObject:
   m_ObjectHideFlags: 0
@@ -6688,6 +6704,7 @@ MonoBehaviour:
   countText: {fileID: 772447532}
   handParent: {fileID: 760591802}
   cardPrefab: {fileID: 7015738966440023518, guid: bc11d992d5ec23842bb2a12dd3c8d774, type: 3}
+  commanderSlot: {fileID: 1394508648}
 --- !u!224 &2001070782
 RectTransform:
   m_ObjectHideFlags: 0

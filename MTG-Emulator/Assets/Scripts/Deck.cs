@@ -18,6 +18,9 @@ public class Deck : MonoBehaviour
 
     [SerializeField]
     private GameObject cardPrefab;
+    
+    [SerializeField] 
+    private CommanderSlot commanderSlot;
 
 
     private List<CardInfo> drawPile = new();
@@ -41,6 +44,12 @@ public class Deck : MonoBehaviour
                 if (result.Cards != null)
                 {
                     drawPile.AddRange(result.Cards.Select(c => c.ToCardInfo()));
+                }
+                if (result.CommandZone != null && result.CommandZone.Count > 0)
+                {
+                    var commanders = result.CommandZone.Select(c => c.ToCardInfo()).ToList();
+                    drawPile.RemoveAll(c => commanders.Any(cmd => cmd.Name == c.Name));
+                    commanderSlot?.PlaceCommander(commanders);
                 }
                 
                 shuffle();
