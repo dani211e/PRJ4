@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using MTG_Emulator.Unity.Synchronization;
-using MTG_Emulator.Unity.Synchronization.Events;
+using MTG_Emulator.Shared.Synchronization;
+using MTG_Emulator.Shared.Synchronization.Events;
 
 namespace MTG_Emulator.Backend.Controllers.Hubs
 {

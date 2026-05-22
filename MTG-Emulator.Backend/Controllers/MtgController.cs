@@ -1,9 +1,9 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using MTG_Emulator.Backend.DB.Models;
-using MTG_Emulator.Unity.Db.DTO.CardDTO;
-using MTG_Emulator.Unity.Db.DTO.CardFaceDTO;
-using MTG_Emulator.Unity.Db.DTO.RelatedCardDTO;
+using MTG_Emulator.Shared.Db.DTO.CardDTO;
+using MTG_Emulator.Shared.Db.DTO.CardFaceDTO;
+using MTG_Emulator.Shared.Db.DTO.RelatedCardDTO;
 
 namespace MTG_Emulator.Backend.Controllers
 {
