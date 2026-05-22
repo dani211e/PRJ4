@@ -39,24 +39,6 @@ namespace MTG_Emulator.Backend.Controllers
             return Ok(dto);
         }
 
-        [HttpDelete("{username}")]
-        public async Task<ActionResult> DeleteProfile(string username)
-        {
-            var player = await context.Players
-                .FirstOrDefaultAsync(p => p.Username == username);
-
-            if (player == null)
-                return NotFound();
-            
-            if (!IsOwnerOrAdmin(player.ApiUserId)) 
-                return Forbid();
-
-            context.Players.Remove(player);
-            await context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
         // Update player's game stats
         [HttpPut("{username}")]
         public async Task<ActionResult<Player>> UpdatePlayerStats(string username, GameResults result)
