@@ -116,12 +116,17 @@ namespace MTG_Emulator.Backend.Controllers
             var callerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrWhiteSpace(callerId))
                 return Unauthorized();
-            
-            var targetId = User.IsInRole(Roles.Admin) && !string.IsNullOrWhiteSpace(dto.TargetUserId)
-                ? dto.TargetUserId
-                : callerId;
 
-            var user = await userManager.FindByIdAsync(targetId);
+            ApiUser? user;
+            if (User.IsInRole(Roles.Admin) && !string.IsNullOrWhiteSpace(dto.TargetUsername))
+            {
+                user = await userManager.FindByNameAsync(dto.TargetUsername);
+            }
+            else
+            {
+                user = await userManager.FindByIdAsync(callerId);
+            }
+
             if (user == null)
                 return NotFound();
 
@@ -139,15 +144,20 @@ namespace MTG_Emulator.Backend.Controllers
         
         [HttpDelete("delete-account")]
         [Authorize]
-        public async Task<IActionResult> DeleteAccount([FromQuery] string? targetUserId = null)
+        public async Task<IActionResult> DeleteAccount([FromQuery] string? targetUsername = null)
         {
             var callerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var targetId = User.IsInRole(Roles.Admin) && !string.IsNullOrWhiteSpace(targetUserId)
-                ? targetUserId
-                : callerId;
+            ApiUser? user;
+            if (User.IsInRole(Roles.Admin) && !string.IsNullOrWhiteSpace(targetUsername))
+            {
+                user = await userManager.FindByNameAsync(targetUsername);
+            }
+            else
+            {
+                user = await userManager.FindByIdAsync(callerId!);
+            }
 
-            var user = await userManager.FindByIdAsync(targetId!);
             if (user == null)
                 return NotFound();
 
@@ -156,7 +166,7 @@ namespace MTG_Emulator.Backend.Controllers
 
             var player = await context.Players
                 .Include(p => p.Decks)
-                .FirstOrDefaultAsync(p => p.ApiUserId == targetId);
+                .FirstOrDefaultAsync(p => p.ApiUserId == user.Id);
 
             if (player != null)
             {

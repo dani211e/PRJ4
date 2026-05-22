@@ -4,7 +4,7 @@ namespace MTG_Emulator.Unity.Db.DTO.AuthenticationDTO
 {
     public class ResetPasswordDto
     {
-        public string? TargetUserId { get; set; }
+        public string? TargetUsername { get; set; }
 
         [Required]
         [MinLength(8)]
