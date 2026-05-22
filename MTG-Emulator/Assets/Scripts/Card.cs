@@ -14,7 +14,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class Card : MonoBehaviour, IPointerClickHandler
+public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("Visible UI")]
     [SerializeField]
@@ -28,6 +28,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
     public CardInfo cardData;
     private Button button;
     private bool Istapped = false;
+    private bool isHovered = false;
     private ZoneType currentzone;
 
     public void Setup(CardInfo card, Action<CardInfo> onClick = null)
@@ -77,7 +78,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (currentzone != ZoneType.Bf)
+            if (currentzone != ZoneType.Bf || !isHovered)
             {
                 return;
             }
@@ -94,5 +95,15 @@ public class Card : MonoBehaviour, IPointerClickHandler
         {
             CardMenu.Instance.Open(this);
         }
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        isHovered = true;
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        isHovered = false;
     }
 }
