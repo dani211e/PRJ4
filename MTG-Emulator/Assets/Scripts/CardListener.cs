@@ -41,6 +41,7 @@ namespace MTG_Emulator
             var obj = Instantiate(cardPrefab, handZone);
 
             obj.RemoveComponent<Drag>();
+            obj.RemoveComponent<Tapable>();
 
             var cardInfo = new CardInfo
             {

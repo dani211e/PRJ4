@@ -14,7 +14,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+public class Card : MonoBehaviour, IPointerClickHandler
 {
     [Header("Visible UI")]
     [SerializeField]
@@ -27,8 +27,7 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
 
     public CardInfo cardData;
     private Button button;
-    private bool Istapped = false;
-    private bool isHovered = false;
+    private Tapable tapable;
     private ZoneType currentzone;
 
     public void Setup(CardInfo card, Action<CardInfo> onClick = null)
@@ -56,6 +55,12 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
 
         if (!string.IsNullOrEmpty(card.ImageUri))
             StartCoroutine(APIManager.Instance.LoadImage(card.ImageUri, cardImage));
+        
+        tapable = GetComponent<Tapable>();
+        if (tapable == null)
+        {
+            tapable = gameObject.AddComponent<Tapable>();
+        }
 
         // SignalRClient.Instance.OnMoveCardEvent += (_, e) =>
         // {
@@ -69,41 +74,12 @@ public class Card : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     public void SetZones(ZoneType zone)
     {
         currentzone = zone;
-    }
-
-
-    
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (currentzone != ZoneType.Bf || !isHovered)
-            {
-                return;
-            }
-
-            Debug.Log("Q is pressed");
-            transform.Rotate(0, 0, Istapped ? 90.0f : -90.0f);
-            Istapped = !Istapped;
-        }
+        tapable?.SetZone(zone);
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Right)
-        {
             CardMenu.Instance.Open(this);
-        }
-    }
-
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        isHovered = true;
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        isHovered = false;
     }
 }
