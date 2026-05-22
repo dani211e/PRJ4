@@ -14,6 +14,7 @@ public class CardMenu : MonoBehaviour
 {
     public static CardMenu Instance;
     private Card currentCard;
+    private Token currentToken;
     [SerializeField] private GameObject toggleCardMenu;
     [SerializeField] private GameObject cardPrefab;
     [SerializeField] private GameObject createToken;
@@ -46,6 +47,12 @@ public class CardMenu : MonoBehaviour
             int index = i;
             buttonTransform.onClick.AddListener(() => OnSpawnTokenClicked(index));
         }
+        toggleCardMenu.SetActive(true);
+    }
+    public void Open(Token token)
+    {
+        currentToken = token;
+        
         toggleCardMenu.SetActive(true);
     }
 

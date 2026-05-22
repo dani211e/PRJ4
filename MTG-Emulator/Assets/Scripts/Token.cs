@@ -10,7 +10,7 @@ using MTG_Emulator.Unity.Db.DTO.RelatedCardDTO;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 
-public class Token : MonoBehaviour
+public class Token : MonoBehaviour, IPointerClickHandler
 {
     [Header("Visible UI")] [SerializeField]
     private Image tokenImage;
@@ -29,6 +29,14 @@ public class Token : MonoBehaviour
         if (!string.IsNullOrEmpty(token.ImageUri))
         {
             StartCoroutine(APIManager.Instance.LoadImage(token.ImageUri, tokenImage));
+        }
+    }
+    
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            CardMenu.Instance.Open(this);
         }
     }
 }

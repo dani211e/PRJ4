@@ -13,7 +13,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class Card : MonoBehaviour
+public class Card : MonoBehaviour, IPointerClickHandler
 {
     [Header("Visible UI")]
     [SerializeField]
@@ -45,7 +45,6 @@ public class Card : MonoBehaviour
         }
 
         button.onClick.RemoveAllListeners();
-        button.onClick.AddListener(OnCardClicked);
         
 
         if (onClick != null)
@@ -87,9 +86,12 @@ public class Card : MonoBehaviour
             Istapped = !Istapped;
         }
     }
-    
-    public void OnCardClicked()
+
+    public void OnPointerClick(PointerEventData eventData)
     {
-        CardMenu.Instance.Open(this);
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            CardMenu.Instance.Open(this);
+        }
     }
 }
