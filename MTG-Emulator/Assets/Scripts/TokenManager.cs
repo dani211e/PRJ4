@@ -6,6 +6,7 @@ using System.Collections;
 using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Unity.Db.DTO.CardDTO;
 using MTG_Emulator.Unity.Db.DTO.RelatedCardDTO;
+using MTG_Emulator.Unity.Synchronization.Enums;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 
@@ -19,7 +20,7 @@ public class TokenManager : MonoBehaviour
     private CardDto cardData;
     private Button button;
     private bool Istapped = false;
-    private CardZonesTypes currentzone;
+    private ZoneType currentzone;
     /*private void OnGUI()
     {
         Event rightClick =  Event.current;
