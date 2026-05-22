@@ -83,9 +83,7 @@ public class CreateGame : MonoBehaviour
 
     private void refreshCode()
     {
-        Debug.Log("refreshCode called, value: " + GameSession.GameCode);
         gameCodeText.text = GameSession.GameCode;
-        Debug.Log("gameCodeText.text is now: " + gameCodeText.text);
     }
 
     public void OnClickToggleCode()
@@ -119,10 +117,7 @@ public class CreateGame : MonoBehaviour
 
         StartCoroutine(APIManager.Instance.CreateGame(dto, onSuccess: response =>
             {
-                Debug.Log("Game code from response: " + response.gameCode);
                 GameSession.GameCode = response.gameCode;
-                Debug.Log("GameSession.GameCode after set: " + GameSession.GameCode);
-
                 GameSession.MaxPlayers = response.maxPlayers;
                 GameSession.IsHost = true;
                 GameSession.PlayerId = response.currentPlayers - 1;
