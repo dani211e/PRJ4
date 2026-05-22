@@ -28,11 +28,14 @@ namespace MTG_Emulator.Backend.DB.Models
                 return;
             }
 
+            
             SignalRClient.Instance.OnTurnChangedEvent += HandleTurnChanged;
             SignalRClient.Instance.OnTurnOrderCreatedEvent += HandleTurnOrderCreated;
             
             turnText.text = "waiting for players";
             endTurnButton.interactable = false;
+            
+            
         }
 
         private void OnDestroy()
@@ -61,23 +64,27 @@ namespace MTG_Emulator.Backend.DB.Models
             players = e.PlayersNames;
             currentPlayerTurn = e.CurrentPlayerName;
             currentPlayerIndex = players.IndexOf(currentPlayerTurn);
-
+    
             UpdateTurnUI();
         }
-
-        private void UpdateTurnUI()
-        {
-            turnText.text = "Turn: " + currentPlayerTurn;
-
-            bool isMyTurn = IsMyTurn();
-            endTurnButton.interactable = isMyTurn;
-
-            Debug.Log(isMyTurn ? "It is my turn" : "Waiting for " + currentPlayerTurn);
-        }
+        
         
 
-        private void EndTurnToNextPlayer()
+        public void EndTurnToNextPlayer()
         {
+
+            if (!IsMyTurn())
+            {
+                Debug.Log("not your turn");
+                return;
+            }
+
+            currentPlayerIndex++;
+
+            if (currentPlayerIndex >= players.Count)
+            {
+                currentPlayerIndex = 0;
+            }
             
             string nextPlayer = players[currentPlayerIndex];
 
@@ -94,6 +101,16 @@ namespace MTG_Emulator.Backend.DB.Models
         public bool IsMyTurn()
         {
             return currentPlayerTurn == localPlayerName;
+        }
+        
+        private void UpdateTurnUI()
+        {
+            turnText.text = "Turn: " + currentPlayerTurn;
+
+            bool isMyTurn = IsMyTurn();
+            endTurnButton.interactable = isMyTurn;
+
+            Debug.Log(isMyTurn ? "It is my turn" : "Waiting for " + currentPlayerTurn);
         }
     }
 }

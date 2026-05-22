@@ -36,6 +36,7 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
         try
         {
             connection = new HubConnectionBuilder().WithUrl(apiURL + hubName)
+                .WithAutomaticReconnect()
                 .AddNewtonsoftJsonProtocol()
                 .Build();
 
