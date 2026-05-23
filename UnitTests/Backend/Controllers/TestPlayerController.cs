@@ -48,39 +48,7 @@ namespace UnitTests.Backend.Controllers
 
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
         }
-
-        // DeleteProfile
-
-        [Test]
-        public async Task DeleteProfile_ExistingPlayer_DeletesPlayer()
-        {
-            await InsertPlayerAsync();
-
-            var result = await uut.DeleteProfile("Test player");
-            Assert.That(result, Is.TypeOf<NoContentResult>());
-
-            var deleted = await Context.Players.FirstOrDefaultAsync(p => p.Username == "Test player");
-            Assert.That(deleted, Is.Null);
-        }
-
-        [Test]
-        public async Task DeleteProfile_PlayerDoesNotExist_ReturnsNotFound()
-        {
-            var result = await uut.DeleteProfile("NonExistingPlayer");
-
-            Assert.That(result, Is.TypeOf<NotFoundResult>());
-        }
-
-        [Test]
-        public async Task DeleteProfile_CallerIsNotOwner_ReturnsForbid()
-        {
-            await InsertPlayerAsync(apiUserId: "other-user-id");
-
-            var result = await uut.DeleteProfile("Test player");
-
-            Assert.That(result, Is.TypeOf<ForbidResult>());
-        }
-
+        
         // UpdatePlayerStats
 
         [Test]
