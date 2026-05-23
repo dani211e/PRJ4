@@ -152,7 +152,7 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpPut("{deckId:int}")]
-        public async Task<ActionResult<DeckDto>> UpdateDeck(int deckId, [FromBody] UpdateDeckDto? deckDto)
+        public async Task<IActionResult> UpdateDeck(int deckId, [FromBody] UpdateDeckDto? deckDto)
         {
             if (deckDto == null)
                 return BadRequest();

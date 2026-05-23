@@ -40,7 +40,7 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpDelete("{username}")]
-        public async Task<ActionResult> DeleteProfile(string username)
+        public async Task<IActionResult> DeleteProfile(string username)
         {
             var player = await context.Players
                 .FirstOrDefaultAsync(p => p.Username == username);
