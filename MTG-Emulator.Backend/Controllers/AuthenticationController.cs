@@ -74,7 +74,7 @@ namespace MTG_Emulator.Backend.Controllers
             var token = generateJwt(user, roles);
             var resp = new LoginResponseDto
             {
-                Username = user.UserName,
+                Username = user.UserName!, // Can never be null since UserName is a [required] field in the register DTO
                 Token = token
             };
             return Ok(resp);
