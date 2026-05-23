@@ -33,8 +33,7 @@ class PlayerController {
     - context: MTGContext
 
     + GetProfile(username: string) : Task<ActionResult<PlayerDto>>
-    + DeleteProfile(username: string) : Task<ActionResult>
-    + UpdatePlayerStats(username: string, result: GameResults) : Task<ActionResult<Player>>
+    + UpdatePlayerStats(username: string, result: GameResults) : Task<IActionResult>
 }
 
 PlayerController --|> MtgController
@@ -44,7 +43,5 @@ PlayerController --> MTGContext : uses
 PlayerController ..> Player : queries
 PlayerController ..> PlayerDto : returns
 PlayerController ..> GameResults : input
-
-Player --> GameResults
 
 @enduml

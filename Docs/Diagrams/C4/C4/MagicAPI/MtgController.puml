@@ -26,7 +26,7 @@ class RelatedCard {
 
 class MtgController {
     + IsOwnerOrAdmin(resourceApiUserId: string) : bool
-    # ToCardDto(card: Card) : CardDto
+    # {static} ToCardDto(card: Card) : CardDto
 }
 
 MtgController --|> ControllerBase

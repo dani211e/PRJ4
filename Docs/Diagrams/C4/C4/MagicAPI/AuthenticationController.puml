@@ -58,14 +58,20 @@ class LoginDto {
     + Password : string
 }
 
+class LoginResponseDto {
+    + Username : string
+    + Token : string
+}
+
 class ResetPasswordDto {
+    + TargetUsername : string?
     + NewPassword : string
     + ConfirmPassword : string
 }
 
 class MtgController {
     + IsOwnerOrAdmin(resourceApiUserId: string) : bool
-    # ToCardDto(card: Card) : CardDto
+    # {static} ToCardDto(card: Card) : CardDto
 }
 
 class AuthenticationController {
@@ -76,7 +82,7 @@ class AuthenticationController {
     + Register(dto: RegisterDto) : Task<IActionResult>
     + Login(dto: LoginDto) : Task<IActionResult>
     + ResetPassword(dto: ResetPasswordDto) : Task<IActionResult>
-    + DeleteAccount() : Task<IActionResult>
+    + DeleteAccount(targetUsername: string?) : Task<IActionResult>
     - generateJwt(user: ApiUser, roles: IList<string>) : string
 }
 
@@ -96,6 +102,7 @@ MTGContext --> Deck
 
 AuthenticationController ..> RegisterDto
 AuthenticationController ..> LoginDto
+AuthenticationController ..> LoginResponseDto
 AuthenticationController ..> ResetPasswordDto
 AuthenticationController ..> ApiUser
 AuthenticationController ..> Roles

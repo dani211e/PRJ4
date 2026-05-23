@@ -6,7 +6,7 @@ class IdentityDbContext
 
 class MtgController {
     + IsOwnerOrAdmin(resourceApiUserId: string) : bool
-    # ToCardDto(card: Card) : CardDto
+    # {static} ToCardDto(card: Card) : CardDto
 }
 
 class DeckController {
@@ -15,7 +15,7 @@ class DeckController {
     + GetAllDecksByUsername(username: string) : Task<ActionResult<List<AllDecksDto>>>
     + GetDeckById(deckId: int) : Task<ActionResult<DeckDto>>
     + DeleteDeckByName(deckId: int) : Task<IActionResult>
-    + UpdateDeck(deckId: int, deckDto: UpdateDeckDto?) : Task<ActionResult<DeckDto>>
+    + UpdateDeck(deckId: int, deckDto: UpdateDeckDto?) : Task<IActionResult>
 }
 
 DeckController --|> MtgController
