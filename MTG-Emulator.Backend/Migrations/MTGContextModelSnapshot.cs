@@ -296,6 +296,9 @@ namespace MTG_Emulator.Backend.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int?>("CurrentGameId")
+                        .HasColumnType("int");
+
                     b.Property<int>("GamesDrawn")
                         .HasColumnType("int");
 
@@ -314,6 +317,8 @@ namespace MTG_Emulator.Backend.Migrations
 
                     b.HasIndex("ApiUserId")
                         .IsUnique();
+
+                    b.HasIndex("CurrentGameId");
 
                     b.ToTable("Players");
                 });
@@ -516,7 +521,13 @@ namespace MTG_Emulator.Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("MTG_Emulator.Backend.DB.Models.Game", "CurrentGame")
+                        .WithMany("Players")
+                        .HasForeignKey("CurrentGameId");
+
                     b.Navigation("ApiUser");
+
+                    b.Navigation("CurrentGame");
                 });
 
             modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.RelatedCard", b =>
@@ -598,6 +609,11 @@ namespace MTG_Emulator.Backend.Migrations
             modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.Deck", b =>
                 {
                     b.Navigation("DeckCards");
+                });
+
+            modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.Game", b =>
+                {
+                    b.Navigation("Players");
                 });
 
             modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.Player", b =>
