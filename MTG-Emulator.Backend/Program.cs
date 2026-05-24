@@ -103,6 +103,9 @@ namespace MTG_Emulator.Backend
 
                 options.AddPolicy("PlayerOrAdmin", policy =>
                     policy.RequireRole(Roles.Player, Roles.Admin));
+                
+                options.AddPolicy("PlayerOnly", policy =>
+                    policy.RequireRole(Roles.Player));
             });
 
             builder.Services.AddHttpLogging(logging =>
