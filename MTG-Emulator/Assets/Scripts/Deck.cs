@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using MTG_Emulator;
@@ -7,6 +6,7 @@ using MTG_Emulator.Cards.Extensions;
 using MTG_Emulator.Unity.Db.DTO.DeckDTO;
 using TMPro;
 using UnityEngine;
+using Random = System.Random;
 
 public class Deck : MonoBehaviour
 {
@@ -18,6 +18,9 @@ public class Deck : MonoBehaviour
 
     [SerializeField]
     private GameObject cardPrefab;
+    
+    [SerializeField] 
+    private CommanderSlot commanderSlot;
 
 
     private List<CardInfo> drawPile = new();
@@ -42,6 +45,14 @@ public class Deck : MonoBehaviour
                 {
                     drawPile.AddRange(result.Cards.Select(c => c.ToCardInfo()));
                 }
+                if (result.CommandZone != null && result.CommandZone.Count > 0)
+                {
+                    var commanders = result.CommandZone.Select(c => c.ToCardInfo()).ToList();
+                    drawPile.RemoveAll(c => commanders.Any(cmd => cmd.Name == c.Name));
+                    commanderSlot?.PlaceCommander(commanders);
+                }
+                
+                shuffle();
 
                 UpdateCountText();
 
@@ -109,5 +120,24 @@ public class Deck : MonoBehaviour
     {
         if (countText != null)
             countText.text = drawPile.Count.ToString();
+    }
+
+    private void shuffle()
+    {
+        var rng = new Random();
+        var n = drawPile.Count;
+        while (n > 1)
+        {
+            n--;
+            var k = rng.Next(n + 1);
+            (drawPile[k], drawPile[n]) = (drawPile[n], drawPile[k]);
+        }
+        Debug.Log("Deck shuffled.");
+    }
+    
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.V))
+            shuffle();
     }
 }

@@ -90,6 +90,4 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
     {
         OnTurnOrderCreatedEvent?.Invoke(this, e);
     }
-    
-    
 }

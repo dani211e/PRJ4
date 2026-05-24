@@ -1,11 +1,13 @@
-﻿using System.Linq;
-using MTG_Emulator.Cards;
-using MTG_Emulator.Cards.Extensions;
+﻿using MTG_Emulator.Cards.Extensions;
 using MTG_Emulator.Extensions;
+using MTG_Emulator.Threading;
+using MTG_Emulator.Unity.Synchronization.Enums;
 using MTG_Emulator.Unity.Synchronization.Events;
+using MTG_Emulator.Zones;
 using UnityEngine;
+using UnityEngine.Assertions;
 
-namespace MTG_Emulator
+namespace MTG_Emulator.Cards
 {
     public class CardListener : MonoBehaviour
     {
@@ -16,16 +18,19 @@ namespace MTG_Emulator
         private GameObject cardPrefab;
 
         [SerializeField]
-        private Transform handZone;
-
-        [SerializeField]
         private Transform battlefield;
+
+        private ZoneMapping zones;
 
         private void Awake()
         {
             signalRClient = FindFirstObjectByType<SignalRClient>();
             signalRClient.OnNewCardEvent += spawnNewCard;
             signalRClient.OnMoveCardEvent += moveCard;
+
+            zones = GetComponent<ZoneMapping>();
+            if(!zones)
+                Debug.LogError("Failed to get zone mappings");
         }
 
         private void OnDestroy()
@@ -36,39 +41,40 @@ namespace MTG_Emulator
 
         private void spawnNewCard(object _, NewCardEvent e)
         {
-            if (e.Card == null)
-                return;
-            var obj = Instantiate(cardPrefab, handZone);
-
-            obj.RemoveComponent<Drag>();
-
-            var cardInfo = new CardInfo
+            MainThreadDispatcher.Enqueue(() =>
             {
-                Identifier = e.Identifier,
-                ScryfallId = e.Card.ScryfallId,
-                Name = e.Card.Name,
-                ImageUri = e.Card.ImageUri,
-                AltFace = e.Card.AltFace.ToCardInfo(),
-                RelatedCards = e.Card.RelatedCards.Select(rc => rc.ToCardInfo()).ToList()
-            };
-            var c = obj.GetComponent<Card>();
+                if (e.Card == null)
+                    return;
+                var obj = Instantiate(cardPrefab, zones.GetTransformFor(ZoneType.Hand));
 
-            c.Setup(cardInfo);
-            CardManager.AddObject(e.PlayerIndex, cardInfo, obj);
+                obj.RemoveComponent<Drag>();
+                
+                var cardInfo = e.Card.ToCardInfo();
+                cardInfo.Identifier = e.Identifier;
+                var c = obj.GetComponent<Card>();
+
+                c.Setup(cardInfo);
+                CardManager.AddObject(e.PlayerIndex, cardInfo, obj);
+            });
         }
 
         private void moveCard(object _, MoveCardEvent e)
         {
-            Debug.Log($"move event rec {e.Identifier}");
-            if (!e.Position.HasValue)
-                return;
+            MainThreadDispatcher.Enqueue(() =>
+            {
+                Debug.Log($"move event rec {e.Identifier}");
+                if (!e.Position.HasValue)
+                    return;
 
-            var c = CardManager.Get(e.PlayerIndex, e.Identifier);
-            //this is wrong i cba, but we need to move the card from handzone to other zone somehow idk
-            c.transform.parent = battlefield;
+                var c = CardManager.Get(e.PlayerIndex, e.Identifier);
+                var zone = zones.GetTransformFor(e.Zone);
+                Assert.IsNotNull(c);
+                Assert.IsNotNull(zone);
+                c.transform.SetParent(zone, false);
 
-            var newPos = e.Position.Value.ToUnity3();
-            c.transform.position = new Vector3(newPos.x, newPos.y - 100, 0);
+                //var newPos = e.Position.Value.ToUnity3();
+                //c.transform.position = new Vector3(newPos.x, newPos.y - 100, 0);
+            });
         }
     }
 }

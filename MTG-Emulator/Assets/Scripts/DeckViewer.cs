@@ -48,6 +48,9 @@ public class DeckViewer : MonoBehaviour
     [SerializeField]
     private GameObject deckDetailsPanel;
 
+    [Header("Delete Deck")]
+    [SerializeField] private GameObject deleteDeckConfirmationPopup;
+    
     private DeckDto currentDeck;
     private List<CardDto> selectedCommanders = new();
 
@@ -208,6 +211,30 @@ public class DeckViewer : MonoBehaviour
                 }
             },
             error => Debug.LogError("Failed to load cards from deck " + deck.DeckId + " " + error)
+        ));
+    }
+
+    public void OnClickDeleteDec()
+    {
+        deleteDeckConfirmationPopup.SetActive(true);
+    }
+    public void CancelDeleteDeck()
+    {
+        deleteDeckConfirmationPopup.SetActive(false);
+    }
+
+    public void ConfirmDeleteDeck()
+    {
+        StartCoroutine(APIManager.Instance.DeleteDeck(
+            currentDeck.DeckId,
+            () =>
+            {
+                deleteDeckConfirmationPopup.SetActive(false);
+                currentDeck = null;
+                LoadDeckList();
+                ShowDeckList();
+            },
+            error => Debug.LogError("Failed to delete deck: " + error)
         ));
     }
 

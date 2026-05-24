@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
@@ -9,7 +11,7 @@ namespace MTG_Emulator.Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GameController : ControllerBase
+    public class GameController : MtgController
     {
         private readonly MTGContext context;
         private readonly HashSet<string> gameCodes = new HashSet<string>();
@@ -19,16 +21,19 @@ namespace MTG_Emulator.Backend.Controllers
             this.context = context;
         }
 
-        // POST api/Game
-        // Unity sends: { gameCode, maxPlayers, hostName }
         [HttpPost]
+        [Authorize(Policy = "PlayerOrAdmin")]
         public async Task<ActionResult<GameResponseDto>> CreateGame([FromBody] CreateGameDto dto)
         {
+            var player = await context.Players
+                .FirstOrDefaultAsync(p => p.Username == dto.HostName);
+
+            if (player == null)
+                return NotFound("Player not found.");
+
             string code = generateCode();
-            while (gameCodes.Contains(code))
-            {
+            while (await context.Games.AnyAsync(g => g.GameCode == code))
                 code = generateCode();
-            }
 
             gameCodes.Add(code);
 
@@ -38,41 +43,53 @@ namespace MTG_Emulator.Backend.Controllers
                 MaxPlayers = dto.MaxPlayers,
                 CurrentPlayers = 1,
                 HostName = dto.HostName,
-                PlayerNames = new List<string> {dto.HostName},
+                PlayerNames = new List<string> { dto.HostName },
                 Status = "Waiting"
             };
 
             context.Games.Add(game);
             await context.SaveChangesAsync();
 
+            player.CurrentGameId = game.GameId;
+            game.Players.Add(player);
+            await context.SaveChangesAsync();
+
             return Ok(new GameResponseDto
             {
-                success = true,
-                gameCode = code,
-                maxPlayers = game.MaxPlayers,
-                currentPlayers = game.CurrentPlayers,
-                message = "Game created."
+                Success = true,
+                GameCode = code,
+                MaxPlayers = game.MaxPlayers,
+                CurrentPlayers = game.CurrentPlayers,
+                Message = "Game created."
             });
         }
 
-        // POST api/Game/join
-        // Unity sends: { gameCode, playerName }
         [HttpPost("join")]
+        [Authorize(Policy = "PlayerOnly")]
         public async Task<ActionResult<GameResponseDto>> JoinGame([FromBody] JoinGameDto dto)
         {
             var game = await context.Games
-                .FirstAsync(g => g.GameCode == dto.GameCode && g.Status == "Waiting");
+                .Include(g => g.Players)
+                .FirstOrDefaultAsync(g => g.GameCode == dto.GameCode && g.Status == "Waiting");
 
             if (game == null)
                 return NotFound(new GameResponseDto
-                    { success = false, message = "Game not found or already started." });
+                    { Success = false, Message = "Game not found or already started." });
 
             if (game.CurrentPlayers >= game.MaxPlayers)
-                return Conflict(new GameResponseDto { success = false, message = "Game is full." });
+                return Conflict(new GameResponseDto { Success = false, Message = "Game is full." });
 
-            game.PlayerNames.Add(dto.PlayerName);
+            var callerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var player = await context.Players
+                .FirstOrDefaultAsync(p => p.ApiUserId == callerId);
+
+            if (player == null)
+                return NotFound("Player not found.");
+
+            game.Players.Add(player);
+            player.CurrentGameId = game.GameId;
+            game.PlayerNames.Add(player.Username);
             game.CurrentPlayers++;
-
 
             if (game.CurrentPlayers == game.MaxPlayers)
             {
@@ -80,23 +97,51 @@ namespace MTG_Emulator.Backend.Controllers
                 game.PlayerNames = game.PlayerNames.OrderBy(n => Random.Shared.Next()).ToList();
             }
 
-            
-
             await context.SaveChangesAsync();
 
             return Ok(new GameResponseDto
             {
-                success = true,
-                gameCode = game.GameCode,
-                maxPlayers = game.MaxPlayers,
-                currentPlayers = game.CurrentPlayers,
-                playerNames = game.PlayerNames,
-                currentPlayerName = game.PlayerNames.FirstOrDefault(),
-                message = "Joined successfully."
+                Success = true,
+                GameCode = game.GameCode,
+                MaxPlayers = game.MaxPlayers,
+                CurrentPlayers = game.CurrentPlayers,
+                PlayerNames = game.PlayerNames,
+                CurrentPlayerName = game.PlayerNames.FirstOrDefault(),
+                Message = "Joined successfully."
             });
         }
 
-        // GET api/Game/{code}
+        [HttpDelete("{code}/leave")]
+        [Authorize(Policy = "PlayerOnly")]
+        public async Task<ActionResult> LeaveGame(string code)
+        {
+            var callerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var player = await context.Players
+                .FirstOrDefaultAsync(p => p.ApiUserId == callerId);
+
+            if (player == null)
+                return NotFound("Player not found.");
+
+            var game = await context.Games
+                .Include(g => g.Players)
+                .FirstOrDefaultAsync(g => g.GameCode == code);
+
+            if (game == null)
+                return NotFound("Game not found.");
+
+            game.Players.Remove(player);
+            game.PlayerNames.Remove(player.Username);
+            game.CurrentPlayers--;
+            player.CurrentGameId = null;
+
+            if (game.CurrentPlayers <= 0)
+                context.Games.Remove(game);
+
+            await context.SaveChangesAsync();
+            return NoContent();
+        }
+
         [HttpGet("{code}")]
         public async Task<ActionResult<GameResponseDto>> GetGame(string code)
         {
@@ -104,27 +149,34 @@ namespace MTG_Emulator.Backend.Controllers
                 .FirstOrDefaultAsync(g => g.GameCode == code);
 
             if (game == null)
-                return NotFound(new GameResponseDto { success = false, message = "Game not found." });
+                return NotFound(new GameResponseDto { Success = false, Message = "Game not found." });
 
             return Ok(new GameResponseDto
             {
-                success = true,
-                gameCode = game.GameCode,
-                maxPlayers = game.MaxPlayers,
-                currentPlayers = game.CurrentPlayers,
-                message = game.Status
+                Success = true,
+                GameCode = game.GameCode,
+                MaxPlayers = game.MaxPlayers,
+                CurrentPlayers = game.CurrentPlayers,
+                Message = game.Status
             });
         }
 
         [HttpDelete("{code}")]
-        public async Task<ActionResult<GameResponseDto>> DeleteGame(string code)
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<ActionResult> DeleteGame(string code)
         {
             var game = await context.Games
-                .FirstAsync(g => g.GameCode == code);
+                .Include(g => g.Players)
+                .FirstOrDefaultAsync(g => g.GameCode == code);
+
+            if (game == null)
+                return NotFound("Game not found.");
+
+            foreach (var player in game.Players)
+                player.CurrentGameId = null;
 
             context.Games.Remove(game);
             await context.SaveChangesAsync();
-
             return NoContent();
         }
 

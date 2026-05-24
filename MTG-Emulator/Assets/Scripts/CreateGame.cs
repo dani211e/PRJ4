@@ -1,11 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using MTG_Emulator.UI;
 using MTG_Emulator.Unity.Db.DTO.GameDTO;
 using MTG_Emulator.Unity.Synchronization.Events;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class CreateGame : MonoBehaviour
 {
@@ -25,13 +24,9 @@ public class CreateGame : MonoBehaviour
     [SerializeField]
     private TMP_Text statusText;
 
-    [Header("Streamer Mode")]
     [SerializeField]
-    private Button toggleCodeButton;
-
-
-    private bool codeVisible = true;
-
+    private ToggleableButton toggleCodeButton;
+    
     private bool unityIsStupid = false;
 
     private void Start()
@@ -44,7 +39,10 @@ public class CreateGame : MonoBehaviour
 
         maxPlayersSlider.onValueChanged.AddListener(updateSliderLabel);
         createButton.onClick.AddListener(OnClickCreate);
-        toggleCodeButton.onClick.AddListener(OnClickToggleCode);
+        toggleCodeButton.Button.onClick.AddListener(refreshCode);
+        
+        refreshCode();
+        setStatus("");
 
         if (SignalRClient.Instance == null)
         {
@@ -52,20 +50,17 @@ public class CreateGame : MonoBehaviour
             return;
         }
 
-		SignalRClient.Instance.OnTurnOrderCreatedEvent += HandleTurnOrderCreated;
-
-        refreshCode();
-        setStatus("");
+        SignalRClient.Instance.OnTurnOrderCreatedEvent += HandleTurnOrderCreated;
     }
 
     private void Update()
     {
         // Scene loading has to happen on unity's main thread,
-		// if this does not happen it will simply silently fail and refuse loading.
+        // if this does not happen it will simply silently fail and refuse loading.
         // Since we want to essentially do it from an event response
         // (which would run on a background thread)
         // we have to use an incredibly stupid workaround like this:
-        if(unityIsStupid)
+        if (unityIsStupid)
             SceneManager.LoadScene("InGame");
     }
 
@@ -78,20 +73,10 @@ public class CreateGame : MonoBehaviour
 
         maxPlayersSlider.onValueChanged.RemoveListener(updateSliderLabel);
         createButton.onClick.RemoveListener(OnClickCreate);
-        toggleCodeButton.onClick.RemoveListener(OnClickToggleCode);
+        toggleCodeButton.Button.onClick.RemoveListener(refreshCode);
     }
 
-    private void refreshCode()
-    {
-        gameCodeText.text = GameSession.GameCode;
-    }
-
-    public void OnClickToggleCode()
-    {
-        codeVisible = !codeVisible;
-        gameCodeText.text = codeVisible ? GameSession.GameCode : "******";
-    }
-
+    private void refreshCode() => gameCodeText.text = toggleCodeButton.State ? GameSession.GameCode : "******";
 
     private void updateSliderLabel(float value)
     {
@@ -122,6 +107,7 @@ public class CreateGame : MonoBehaviour
                 GameSession.IsHost = true;
                 GameSession.PlayerId = response.currentPlayers - 1;
 
+                refreshCode();
                 setStatus($"Game Created! Code:\n{response.gameCode}");
                 Debug.Log($"[CreateGame] Room {response.gameCode} ready for {response.maxPlayers} players.");
             },
