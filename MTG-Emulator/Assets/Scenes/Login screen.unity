@@ -658,6 +658,50 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3133522919950463024, guid: a0f8ab6b5ef1f0246bc912245b3bae27, type: 3}
   m_PrefabInstance: {fileID: 5121870521417913003}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1292857305
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1292857307}
+  - component: {fileID: 1292857306}
+  m_Layer: 0
+  m_Name: MainThreadDispatcher
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1292857306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292857305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 851bafa3d20b45c2bbb509e3d0ef71fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MTG_Emulator.Threading.MainThreadDispatcher
+--- !u!4 &1292857307
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292857305}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 454.25366, y: 262.7835, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &1308414671 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1737331226930854828, guid: a4dc0b91a5238dc48ba52710236d8509, type: 3}
@@ -1397,3 +1441,4 @@ SceneRoots:
   - {fileID: 144807542}
   - {fileID: 215846904}
   - {fileID: 2135026328}
+  - {fileID: 1292857307}

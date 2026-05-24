@@ -31,8 +31,8 @@ public class CardMenu : MonoBehaviour
     public void Open(Card card)
     {
         currentCard = card;
-        float buttonHeight = 30f;
-        float spacing = 10f;
+        float buttonHeight = 20f;
+        float spacing = 5f;
         
         for(int i = 0; i < currentCard.cardData.RelatedCards.Count; i++)
         {
@@ -43,6 +43,7 @@ public class CardMenu : MonoBehaviour
             var buttonTransform = button.GetComponent<Button>();
             
             buttonTransform.GetComponentInChildren<TextMeshProUGUI>().text = relatedCard.Name;
+            
 
             int index = i;
             buttonTransform.onClick.AddListener(() => OnSpawnTokenClicked(index));
@@ -52,7 +53,6 @@ public class CardMenu : MonoBehaviour
     public void Open(Token token)
     {
         currentToken = token;
-        
         toggleCardMenu.SetActive(true);
     }
 

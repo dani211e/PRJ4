@@ -47,11 +47,11 @@ namespace MTG_Emulator.Backend.Controllers
 
             return Ok(new GameResponseDto
             {
-                success = true,
-                gameCode = code,
-                maxPlayers = game.MaxPlayers,
-                currentPlayers = game.CurrentPlayers,
-                message = "Game created."
+                Success = true,
+                GameCode = code,
+                MaxPlayers = game.MaxPlayers,
+                CurrentPlayers = game.CurrentPlayers,
+                Message = "Game created."
             });
         }
 
@@ -65,10 +65,10 @@ namespace MTG_Emulator.Backend.Controllers
 
             if (game == null)
                 return NotFound(new GameResponseDto
-                    { success = false, message = "Game not found or already started." });
+                    { Success = false, Message = "Game not found or already started." });
 
             if (game.CurrentPlayers >= game.MaxPlayers)
-                return Conflict(new GameResponseDto { success = false, message = "Game is full." });
+                return Conflict(new GameResponseDto { Success = false, Message = "Game is full." });
 
             game.PlayerNames.Add(dto.PlayerName);
             game.CurrentPlayers++;
@@ -86,13 +86,13 @@ namespace MTG_Emulator.Backend.Controllers
 
             return Ok(new GameResponseDto
             {
-                success = true,
-                gameCode = game.GameCode,
-                maxPlayers = game.MaxPlayers,
-                currentPlayers = game.CurrentPlayers,
-                playerNames = game.PlayerNames,
-                currentPlayerName = game.PlayerNames.FirstOrDefault(),
-                message = "Joined successfully."
+                Success = true,
+                GameCode = game.GameCode,
+                MaxPlayers = game.MaxPlayers,
+                CurrentPlayers = game.CurrentPlayers,
+                PlayerNames = game.PlayerNames,
+                CurrentPlayerName = game.PlayerNames.FirstOrDefault(),
+                Message = "Joined successfully."
             });
         }
 
@@ -104,15 +104,15 @@ namespace MTG_Emulator.Backend.Controllers
                 .FirstOrDefaultAsync(g => g.GameCode == code);
 
             if (game == null)
-                return NotFound(new GameResponseDto { success = false, message = "Game not found." });
+                return NotFound(new GameResponseDto { Success = false, Message = "Game not found." });
 
             return Ok(new GameResponseDto
             {
-                success = true,
-                gameCode = game.GameCode,
-                maxPlayers = game.MaxPlayers,
-                currentPlayers = game.CurrentPlayers,
-                message = game.Status
+                Success = true,
+                GameCode = game.GameCode,
+                MaxPlayers = game.MaxPlayers,
+                CurrentPlayers = game.CurrentPlayers,
+                Message = game.Status
             });
         }
 

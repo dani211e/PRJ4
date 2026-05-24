@@ -1,17 +1,9 @@
 using System;
-using System.Collections;
 using MTG_Emulator.Cards;
+using MTG_Emulator.Unity.Synchronization.Enums;
 using TMPro;
 using UnityEngine;
-using MTG_Emulator.Backend.DB.Models;
-using MTG_Emulator.Unity.Db.DTO.CardDTO;
 using UnityEngine.EventSystems;
-using MTG_Emulator.Backend.DB.Models;
-using MTG_Emulator.Unity.Db.DTO.CardDTO;
-using MTG_Emulator.Unity.Db.DTO.RelatedCardDTO;
-using MTG_Emulator.Unity.Synchronization.Enums;
-using UnityEngine.EventSystems;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class Card : MonoBehaviour, IPointerClickHandler
@@ -27,8 +19,8 @@ public class Card : MonoBehaviour, IPointerClickHandler
 
     public CardInfo cardData;
     private Button button;
-    private Tapable tapable;
-    private ZoneType currentzone;
+    private bool Istapped = false;
+    public ZoneType CurrentZone { get; private set; }
 
     public void Setup(CardInfo card, Action<CardInfo> onClick = null)
     {
@@ -55,12 +47,6 @@ public class Card : MonoBehaviour, IPointerClickHandler
 
         if (!string.IsNullOrEmpty(card.ImageUri))
             StartCoroutine(APIManager.Instance.LoadImage(card.ImageUri, cardImage));
-        
-        tapable = GetComponent<Tapable>();
-        if (tapable == null)
-        {
-            tapable = gameObject.AddComponent<Tapable>();
-        }
 
         // SignalRClient.Instance.OnMoveCardEvent += (_, e) =>
         // {
@@ -73,13 +59,32 @@ public class Card : MonoBehaviour, IPointerClickHandler
 
     public void SetZones(ZoneType zone)
     {
-        currentzone = zone;
-        tapable?.SetZone(zone);
+        CurrentZone = zone;
+    }
+
+
+    
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (CurrentZone != ZoneType.Bf)
+            {
+                return;
+            }
+
+            Debug.Log("Q is pressed");
+            transform.Rotate(0, 0, Istapped ? 90.0f : -90.0f);
+            Istapped = !Istapped;
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Right)
+        {
             CardMenu.Instance.Open(this);
+        }
     }
 }
