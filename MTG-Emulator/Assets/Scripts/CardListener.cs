@@ -45,8 +45,9 @@ namespace MTG_Emulator.Cards
             {
                 if (e.Card == null)
                     return;
-                var obj = Instantiate(cardPrefab, zones.GetTransformFor(ZoneType.Hand));
 
+                var zone = zones.GetTransformFor(ZoneType.Hand);
+                var obj = Instantiate(cardPrefab, zone);
                 obj.RemoveComponent<Drag>();
 
                 var cardInfo = e.Card.ToCardInfo();
@@ -62,14 +63,17 @@ namespace MTG_Emulator.Cards
         {
             MainThreadDispatcher.Enqueue(() =>
             {
-                Debug.Log($"move event rec {e.Identifier}");
                 var c = CardManager.Get(e.PlayerIndex, e.Identifier);
 
                 var zone = zones.GetTransformFor(e.Zone);
                 c.transform.SetParent(zone, false);
 
-                //var newPos = e.Position.Value.ToUnity3();
-                //c.transform.position = new Vector3(newPos.x, newPos.y - 100, 0);
+                if (!e.Position.HasValue)
+                    return;
+
+                var newPos = e.Position.Value.ToUnity2();
+                //We need to mirror the y coord to match the flipped enemy side
+                c.transform.localPosition = new Vector3(newPos.x, -newPos.y, 0);
             });
         }
     }

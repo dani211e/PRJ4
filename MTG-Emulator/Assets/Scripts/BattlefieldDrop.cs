@@ -32,9 +32,11 @@ public class FreeDropZone : MonoBehaviour, IDropHandler
         if (card != null)
         {
             card.SetZones(zoneType);
+
+            var relPos = dragged.transform.localPosition;
             SignalRClient.Instance.Broadcast(new MoveCardEvent(GameSession.PlayerId, card.Identifier)
             {
-                Position = transform.position.ToSystem2(),
+                Position = relPos.ToSystem2(),
                 Zone = card.CurrentZone,
             });
         }
