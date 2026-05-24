@@ -35,9 +35,8 @@ public class ZonesDrop : MonoBehaviour, IDropHandler
         {
             card.SetZones(zoneType);
             SignalRClient.Instance.Broadcast(new MoveCardEvent(GameSession.PlayerId, card.Identifier)
-            {
-                Position = transform.position.ToSystem2(),
-                Zone = card.CurrentZone,
+            { 
+                Zone = zoneType,
             });
         }
 

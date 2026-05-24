@@ -29,7 +29,7 @@ namespace MTG_Emulator.Cards
             signalRClient.OnMoveCardEvent += moveCard;
 
             zones = GetComponent<ZoneMapping>();
-            if(!zones)
+            if (!zones)
                 Debug.LogError("Failed to get zone mappings");
         }
 
@@ -48,7 +48,7 @@ namespace MTG_Emulator.Cards
                 var obj = Instantiate(cardPrefab, zones.GetTransformFor(ZoneType.Hand));
 
                 obj.RemoveComponent<Drag>();
-                
+
                 var cardInfo = e.Card.ToCardInfo();
                 cardInfo.Identifier = e.Identifier;
                 var c = obj.GetComponent<Card>();
@@ -63,13 +63,9 @@ namespace MTG_Emulator.Cards
             MainThreadDispatcher.Enqueue(() =>
             {
                 Debug.Log($"move event rec {e.Identifier}");
-                if (!e.Position.HasValue)
-                    return;
-
                 var c = CardManager.Get(e.PlayerIndex, e.Identifier);
+
                 var zone = zones.GetTransformFor(e.Zone);
-                Assert.IsNotNull(c);
-                Assert.IsNotNull(zone);
                 c.transform.SetParent(zone, false);
 
                 //var newPos = e.Position.Value.ToUnity3();
