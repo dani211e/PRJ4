@@ -420,7 +420,7 @@ public class APIManager : MonoBehaviour
 
     public IEnumerator LeaveGame(string gameCode, Action onSuccess, Action<string> onError)
     {
-        UnityWebRequest request = new UnityWebRequest(baseUrl + $"Game/leave/{gameCode}", "POST");
+        UnityWebRequest request = new UnityWebRequest(baseUrl + $"Game/{gameCode}/leave", "DELETE");
         request.downloadHandler = new DownloadHandlerBuffer();
 
         string token = PlayerPrefs.GetString("jwtToken");

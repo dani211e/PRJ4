@@ -111,7 +111,7 @@ namespace MTG_Emulator.Backend.Controllers
             });
         }
 
-        [HttpPost("leave/{code}")]
+        [HttpDelete("{code}/leave")]
         [Authorize(Policy = "PlayerOnly")]
         public async Task<ActionResult> LeaveGame(string code)
         {
