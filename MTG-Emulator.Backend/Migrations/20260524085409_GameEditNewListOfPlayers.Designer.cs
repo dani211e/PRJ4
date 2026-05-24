@@ -4,6 +4,7 @@ using MTG_Emulator.Backend.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MTG_Emulator.Backend.Migrations
 {
     [DbContext(typeof(MTGContext))]
-    partial class MTGContextModelSnapshot : ModelSnapshot
+    [Migration("20260524085409_GameEditNewListOfPlayers")]
+    partial class GameEditNewListOfPlayers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -296,7 +299,7 @@ namespace MTG_Emulator.Backend.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("CurrentGameId")
+                    b.Property<int?>("GameId")
                         .HasColumnType("int");
 
                     b.Property<int>("GamesDrawn")
@@ -318,7 +321,7 @@ namespace MTG_Emulator.Backend.Migrations
                     b.HasIndex("ApiUserId")
                         .IsUnique();
 
-                    b.HasIndex("CurrentGameId");
+                    b.HasIndex("GameId");
 
                     b.ToTable("Players");
                 });
@@ -521,13 +524,11 @@ namespace MTG_Emulator.Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MTG_Emulator.Backend.DB.Models.Game", "CurrentGame")
+                    b.HasOne("MTG_Emulator.Backend.DB.Models.Game", null)
                         .WithMany("Players")
-                        .HasForeignKey("CurrentGameId");
+                        .HasForeignKey("GameId");
 
                     b.Navigation("ApiUser");
-
-                    b.Navigation("CurrentGame");
                 });
 
             modelBuilder.Entity("MTG_Emulator.Backend.DB.Models.RelatedCard", b =>
