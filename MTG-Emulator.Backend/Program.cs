@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpLogging;
@@ -13,6 +14,8 @@ using MTG_Emulator.Backend.DB;
 using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Backend.Scalar;
 using MTG_Emulator.Backend.Scryfall;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -32,7 +35,6 @@ namespace MTG_Emulator.Backend
 
             builder.Host.UseSerilog();
 
-            
             builder.Services.AddControllers().AddJsonOptions(opt =>
             {
                 // Unity deserialization expects case sensitive property names
@@ -47,7 +49,12 @@ namespace MTG_Emulator.Backend
 
             if (builder.Environment.IsDevelopment())
                 builder.Configuration.AddUserSecrets<Program>();
-            builder.Services.AddSignalR().AddNewtonsoftJsonProtocol();
+            builder.Services.AddSignalR().AddNewtonsoftJsonProtocol(opt =>
+            {
+                opt.PayloadSerializerSettings.Converters.Add(
+                    new StringEnumConverter(new DefaultNamingStrategy())
+                    );
+            });
 
             builder.Services.AddDbContext<MTGContext>(options =>
                 options.UseSqlServer(
