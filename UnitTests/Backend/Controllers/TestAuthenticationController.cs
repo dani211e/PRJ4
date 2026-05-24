@@ -8,6 +8,7 @@ using MTG_Emulator.Backend.Controllers;
 using MTG_Emulator.Backend.DB.Models;
 using MTG_Emulator.Unity.Db.DTO.AuthenticationDTO;
 using MTG_Emulator.Unity.Db.DTO.PlayerDTO;
+using Microsoft.EntityFrameworkCore;
 
 namespace UnitTests.Backend.Controllers
 {
@@ -131,7 +132,9 @@ namespace UnitTests.Backend.Controllers
                 Role     = Roles.Player,
             });
 
-            Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
+            var bad = result as BadRequestObjectResult;
+            Assert.That(bad, Is.Not.Null);
+            Assert.That(bad!.Value as IEnumerable<string>, Contains.Item("Password too short."));
         }
 
         // Login
@@ -290,7 +293,31 @@ namespace UnitTests.Backend.Controllers
                 ConfirmPassword = "weak",
             });
 
-            Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
+            var bad = result as BadRequestObjectResult;
+            Assert.That(bad, Is.Not.Null);
+            Assert.That(bad!.Value as IEnumerable<string>, Contains.Item("Password too weak."));
+        }
+        
+        [Test]
+        public async Task ResetPassword_AdminResetsOtherUser_ReturnsNoContent()
+        {
+            SetControllerUser(uut, "admin-id", isAdmin: true);
+
+            var target = new ApiUser { Id = "target-id", UserName = "TargetUser", Email = "target@example.com" };
+
+            userManagerMock.Setup(m => m.FindByNameAsync("TargetUser")).ReturnsAsync(target);
+            userManagerMock.Setup(m => m.GeneratePasswordResetTokenAsync(target)).ReturnsAsync("reset-token");
+            userManagerMock.Setup(m => m.ResetPasswordAsync(target, "reset-token", "Password1!"))
+                .ReturnsAsync(IdentityResult.Success);
+
+            var result = await uut.ResetPassword(new ResetPasswordDto
+            {
+                TargetUsername  = "TargetUser",
+                NewPassword     = "Password1!",
+                ConfirmPassword = "Password1!",
+            });
+
+            Assert.That(result, Is.TypeOf<NoContentResult>());
         }
         
         // DeleteAccount
@@ -398,9 +425,9 @@ namespace UnitTests.Backend.Controllers
 
             var user = new ApiUser
             {
-                Id = "user-id",
+                Id       = "user-id",
                 UserName = "TestUser",
-                Email = "test@example.com"
+                Email    = "test@example.com"
             };
 
             userManagerMock
@@ -409,16 +436,37 @@ namespace UnitTests.Backend.Controllers
 
             userManagerMock
                 .Setup(m => m.DeleteAsync(user))
-                .ReturnsAsync(
-                    IdentityResult.Failed(
-                        new IdentityError { Description = "Delete failed." }
-                    )
-                );
+                .ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "Delete failed." }));
 
             var result = await uut.DeleteAccount();
 
-            Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
+            var bad = result as BadRequestObjectResult;
+            Assert.That(bad, Is.Not.Null);
+            Assert.That(bad!.Value as IEnumerable<string>, Contains.Item("Delete failed."));
         }
         
+        [Test]
+        public async Task DeleteAccount_AdminDeletesOtherUser_ReturnsNoContent()
+        {
+            SetControllerUser(uut, "admin-id", isAdmin: true);
+
+            var target = new ApiUser { Id = "target-id", UserName = "TargetUser", Email = "target@example.com" };
+
+            var player = new Player { Username = "TargetUser", ApiUserId = "target-id" };
+            Context.Players.Add(player);
+            await Context.SaveChangesAsync();
+
+            userManagerMock.Setup(m => m.FindByNameAsync("TargetUser")).ReturnsAsync(target);
+            userManagerMock.Setup(m => m.DeleteAsync(target)).ReturnsAsync(IdentityResult.Success);
+
+            var result = await uut.DeleteAccount(targetUsername: "TargetUser");
+
+            Assert.That(result, Is.TypeOf<NoContentResult>());
+
+            var deletedPlayer = await Context.Players.FirstOrDefaultAsync(p => p.ApiUserId == "target-id");
+            Assert.That(deletedPlayer, Is.Null);
+
+            userManagerMock.Verify(m => m.DeleteAsync(target), Times.Once);
+        }
     }
 }
