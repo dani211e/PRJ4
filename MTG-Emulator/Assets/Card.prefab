@@ -160,3 +160,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcd56a0f952a4f6d9fdc32e6d7988d32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MTG_Emulator.Cards.Flipable
+  mtgBackImg: {fileID: -6488111450889185985, guid: 5922a7598f4fc214ea2b99020e5ed2dc, type: 3}

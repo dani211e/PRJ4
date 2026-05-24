@@ -6,6 +6,8 @@ namespace MTG_Emulator.Cards
 {
     public class Flipable : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
+        [SerializeField] private Sprite mtgBackImg;
+
         private Card card;
         private Image image;
         private string frontImgUri;
@@ -24,35 +26,72 @@ namespace MTG_Emulator.Cards
 
         private void Update()
         {
-            if (mouseOver && Input.GetKeyDown(KeyCode.F))
-                Flip();
-        }
-
-        private void Flip()
-        {
-            if (card == null || card.cardData == null)
+            if (!mouseOver)
             {
-                Debug.Log("Cant flip the card ");
                 return;
             }
 
-            if (card.cardData.AltFace == null || string.IsNullOrEmpty(card.cardData.AltFace.ImageUri))
+            if (Input.GetKeyDown(KeyCode.F))
             {
-                Debug.Log("Cant flip since the card has no alt face");
+                Flip(false);
+            }
+            else if (Input.GetKeyDown(KeyCode.B))
+            {
+                Flip(true);
+            }
+        }
+
+        private void Flip(bool useMtgBack)
+        {
+            if (card == null || card.cardData == null)
+            {
+                Debug.Log("Cant flip the card");
                 return;
             }
 
             if (string.IsNullOrEmpty(frontImgUri))
             {
                 frontImgUri = card.cardData.ImageUri;
-                altImgUri = card.cardData.AltFace.ImageUri;
+
+                if (card.cardData.AltFace != null)
+                {
+                    altImgUri = card.cardData.AltFace.ImageUri;
+                }
             }
 
             showingBack = !showingBack;
+
+            if (useMtgBack)
+            {
+                if (mtgBackImg == null)
+                {
+                    Debug.Log("cant flip to mtg back image");
+                    return;
+                }
+
+                if (showingBack)
+                {
+                    image.sprite = mtgBackImg;
+                }
+                else
+                {
+                    card.cardData.ImageUri = frontImgUri;
+                    StartCoroutine(APIManager.Instance.LoadImage(frontImgUri, image));
+                }
+
+                return;
+            }
+
+            if (string.IsNullOrEmpty(altImgUri))
+            {
+                Debug.Log("Cant flip since the card has no alt face");
+                return;
+            }
+
             string targetUri = showingBack ? altImgUri : frontImgUri;
             card.cardData.ImageUri = targetUri;
 
-            StartCoroutine(APIManager.Instance.LoadImage(card.cardData.ImageUri, image));
+            StartCoroutine(APIManager.Instance.LoadImage(targetUri, image));
         }
     }
 }
