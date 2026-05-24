@@ -25,7 +25,7 @@ public class SelectionManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && HasSelection)
         {
             foreach (Tapable t in new List<Tapable>(selectedCards))
-                t.TapToggle();
+                t.TapToggle(broadcast: true);
         }
 
         if (Input.GetMouseButtonDown(0))

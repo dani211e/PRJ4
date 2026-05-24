@@ -1,4 +1,7 @@
+using System;
+using MTG_Emulator.Threading;
 using MTG_Emulator.Unity.Synchronization.Enums;
+using MTG_Emulator.Unity.Synchronization.Events;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -10,6 +13,7 @@ public class Tapable : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
     private bool isSelected = false;
     private ZoneType currentZone;
     private Outline selectionOutline;
+    private Guid identifier;
 
     private void Awake()
     {
@@ -22,9 +26,26 @@ public class Tapable : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
         selectionOutline.effectDistance = new Vector2(3, 3);
     }
 
+    private void OnEnable()
+    {
+        if (SignalRClient.Instance != null)
+            SignalRClient.Instance.OnTapCardEvent += OnTapCardReceived;
+    }
+
+    private void OnDisable()
+    {
+        if (SignalRClient.Instance != null)
+            SignalRClient.Instance.OnTapCardEvent -= OnTapCardReceived;
+    }
+
     public void SetZone(ZoneType zone)
     {
         currentZone = zone;
+    }
+
+    public void SetIdentifier(Guid id)
+    {
+        identifier = id;
     }
 
     private void Update()
@@ -40,14 +61,31 @@ public class Tapable : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
             if (!isHovered)
                 return;
 
-            TapToggle();
+            TapToggle(broadcast: true);
         }
     }
 
-    public void TapToggle()
+    public void TapToggle(bool broadcast = false)
     {
         transform.Rotate(0, 0, isTapped ? 90.0f : -90.0f);
         isTapped = !isTapped;
+
+        if (broadcast && SignalRClient.Instance != null)
+            SignalRClient.Instance.Broadcast(
+                new TapCardEvent(GameSession.PlayerId, identifier, isTapped)
+            );
+    }
+
+    private void OnTapCardReceived(object sender, TapCardEvent e)
+    {
+        if (e.Identifier != identifier)
+            return;
+
+        MainThreadDispatcher.Enqueue(() =>
+        {
+            if (isTapped != e.IsTapped)
+                TapToggle(broadcast: false);
+        });
     }
 
     public void HighLight()

@@ -30,5 +30,9 @@ namespace MTG_Emulator.Backend.Controllers.Hubs
         {
             await Clients.All.SendAsync(nameof(ISyncEventHandler.OnTurnOrderCreated), e);
         }
+        public async Task TapCard(TapCardEvent e)
+        {
+            await Clients.Others.SendAsync(nameof(ISyncEventHandler.OnTapCard), e);
+        }
     }
 }
