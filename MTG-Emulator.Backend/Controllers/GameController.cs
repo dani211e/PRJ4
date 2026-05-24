@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
@@ -9,6 +10,7 @@ namespace MTG_Emulator.Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "PlayerOnly")]
     public class GameController : ControllerBase
     {
         private readonly MTGContext context;
@@ -117,6 +119,7 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpDelete("{code}")]
+        [Authorize(Policy = "PlayerOrAdmin")]
         public async Task<ActionResult<GameResponseDto>> DeleteGame(string code)
         {
             var game = await context.Games
