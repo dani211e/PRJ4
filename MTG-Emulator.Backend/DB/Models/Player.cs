@@ -18,5 +18,8 @@ namespace MTG_Emulator.Backend.DB.Models
         public ApiUser ApiUser { get; set; } = null!;
         
         public List<Deck> Decks { get; set; } = [];
+        
+        public int? CurrentGameId { get; set; }
+        public Game? CurrentGame { get; set; }
     }
 }
