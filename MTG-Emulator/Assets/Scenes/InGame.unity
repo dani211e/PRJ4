@@ -606,8 +606,8 @@ GameObject:
   - component: {fileID: 87865248}
   - component: {fileID: 87865246}
   m_Layer: 5
-  m_Name: ExileZone
-  m_TagString: Untagged
+  m_Name: GraveyardZone
+  m_TagString: GraveyardZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1836,7 +1836,7 @@ GameObject:
   - component: {fileID: 414315791}
   m_Layer: 5
   m_Name: Battlefield
-  m_TagString: Untagged
+  m_TagString: BattlefieldZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2396,7 +2396,7 @@ GameObject:
   - component: {fileID: 535046082}
   m_Layer: 5
   m_Name: Deckzone
-  m_TagString: Untagged
+  m_TagString: DeckZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5607,8 +5607,8 @@ MonoBehaviour:
   hand: {fileID: 1899433327}
   battlefield: {fileID: 414315789}
   library: {fileID: 535046081}
-  graveyard: {fileID: 1818310916}
-  exile: {fileID: 87865245}
+  graveyard: {fileID: 87865245}
+  exile: {fileID: 1818310916}
 --- !u!1 &1558066682
 GameObject:
   m_ObjectHideFlags: 0
@@ -6985,8 +6985,8 @@ GameObject:
   - component: {fileID: 1818310919}
   - component: {fileID: 1818310917}
   m_Layer: 5
-  m_Name: GraveyardZone
-  m_TagString: Untagged
+  m_Name: ExileZone
+  m_TagString: ExileZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7263,7 +7263,7 @@ GameObject:
   - component: {fileID: 1899433329}
   m_Layer: 5
   m_Name: HandZone
-  m_TagString: Untagged
+  m_TagString: HandZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
