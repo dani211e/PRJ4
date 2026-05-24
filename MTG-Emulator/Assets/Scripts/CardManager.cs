@@ -40,11 +40,13 @@ namespace MTG_Emulator
                     ScryfallId = card.ScryfallId,
                     Name = card.Name,
                     ImageUri = card.ImageUri,
-                    AltFace = card.AltFace == null ? null : new CardFaceDto
-                    {
-                        Name = card.AltFace.Name,
-                        ImageUri = card.AltFace.ImageUri
-                    },
+                    AltFace = card.AltFace == null
+                        ? null
+                        : new CardFaceDto
+                        {
+                            Name = card.AltFace.Name,
+                            ImageUri = card.AltFace.ImageUri
+                        },
                     RelatedCards = card.RelatedCards.Select(rc => new RelatedCardDto
                     {
                         Name = rc.Name,
