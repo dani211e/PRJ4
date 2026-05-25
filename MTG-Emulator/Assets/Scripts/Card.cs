@@ -1,12 +1,12 @@
 using System;
-using System.Collections;
 using MTG_Emulator.Cards;
+using MTG_Emulator.Unity.Synchronization.Enums;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Card : MonoBehaviour
+public class Card : MonoBehaviour, IPointerClickHandler
 {
     [Header("Visible UI")]
     [SerializeField]
@@ -16,10 +16,11 @@ public class Card : MonoBehaviour
 
     public Guid Identifier => cardData.Identifier;
 
-    private CardInfo cardData;
+
+    public CardInfo cardData;
     private Button button;
     private bool Istapped = false;
-    private CardZonesTypes currentzone;
+    public ZoneType CurrentZone { get; private set; }
 
     public void Setup(CardInfo card, Action<CardInfo> onClick = null)
     {
@@ -37,6 +38,7 @@ public class Card : MonoBehaviour
         }
 
         button.onClick.RemoveAllListeners();
+        
 
         if (onClick != null)
         {
@@ -55,9 +57,9 @@ public class Card : MonoBehaviour
         // };
     }
 
-    public void SetZones(CardZonesTypes zone)
+    public void SetZones(ZoneType zone)
     {
-        currentzone = zone;
+        CurrentZone = zone;
     }
 
 
@@ -67,7 +69,7 @@ public class Card : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (currentzone != CardZonesTypes.Bf)
+            if (CurrentZone != ZoneType.Bf)
             {
                 return;
             }
@@ -75,6 +77,14 @@ public class Card : MonoBehaviour
             Debug.Log("Q is pressed");
             transform.Rotate(0, 0, Istapped ? 90.0f : -90.0f);
             Istapped = !Istapped;
+        }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            CardMenu.Instance.Open(this);
         }
     }
 }

@@ -423,5 +423,40 @@ public class APIManager : MonoBehaviour
                 new Vector2(0.5f, 0.5f)
             );
         }
+        
+    }
+
+    public IEnumerator DeleteDeck(int deckId, Action onSuccess, Action<string> onError)
+    {
+        UnityWebRequest request = new UnityWebRequest(baseUrl + $"Deck/{deckId}", "DELETE");
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        string token = PlayerPrefs.GetString("jwtToken");
+        if (!string.IsNullOrEmpty(token))
+            request.SetRequestHeader("Authorization", "Bearer " + token);
+
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+            onError?.Invoke(request.downloadHandler.text);
+        else
+            onSuccess?.Invoke();
+    }
+
+    public IEnumerator LeaveGame(string gameCode, Action onSuccess, Action<string> onError)
+    {
+        UnityWebRequest request = new UnityWebRequest(baseUrl + $"Game/{gameCode}/leave", "DELETE");
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        string token = PlayerPrefs.GetString("jwtToken");
+        if (!string.IsNullOrEmpty(token))
+            request.SetRequestHeader("Authorization", "Bearer " + token);
+
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+            onError?.Invoke(request.downloadHandler.text);
+        else
+            onSuccess?.Invoke();
     }
 }

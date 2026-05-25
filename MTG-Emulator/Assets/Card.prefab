@@ -86,7 +86,7 @@ GameObject:
   - component: {fileID: 4034409473532625047}
   - component: {fileID: 8823582741496359860}
   - component: {fileID: 4139180508345094679}
-  - component: {fileID: 1493212923512602186}
+  - component: {fileID: 928076111792501348}
   m_Layer: 5
   m_Name: Card
   m_TagString: Untagged
@@ -134,7 +134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79d1451aa5e387b4ba5d0d003bdac235, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Drag
---- !u!114 &1493212923512602186
+--- !u!114 &928076111792501348
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
