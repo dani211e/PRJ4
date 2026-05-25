@@ -65,6 +65,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
     public void SetZones(ZoneType zone)
     {
         CurrentZone = zone;
+        Debug.Log($"SetZones called: {zone}, tapable is null: {tapable == null}");
         tapable?.SetZone(zone);
     }
 

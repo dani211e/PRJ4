@@ -28,14 +28,11 @@ public class Token : MonoBehaviour, IPointerClickHandler
     public void Setup(RelatedCardInfo token, Action<CardDto> onClick = null)
     {
         if (!string.IsNullOrEmpty(token.ImageUri))
-        {
             StartCoroutine(APIManager.Instance.LoadImage(token.ImageUri, tokenImage));
-        }
+
         tapable = GetComponent<Tapable>();
         if (tapable == null)
-            {
-            tapable = GetComponent<Tapable>();
-            }
+            tapable = gameObject.AddComponent<Tapable>();
     }
 
     public void SetZones(ZoneType zone)

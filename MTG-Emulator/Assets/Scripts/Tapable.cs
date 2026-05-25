@@ -17,9 +17,20 @@ public class Tapable : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
 
     private void Awake()
     {
-        selectionOutline = GetComponent<Outline>();
-        if (selectionOutline == null)
-            selectionOutline = gameObject.AddComponent<Outline>();
+        var graphic = GetComponent<Graphic>() ?? GetComponentInChildren<Graphic>();
+    
+        if (graphic != null)
+        {
+            selectionOutline = graphic.gameObject.GetComponent<Outline>();
+            if (selectionOutline == null)
+                selectionOutline = graphic.gameObject.AddComponent<Outline>();
+        }
+        else
+        {
+            selectionOutline = GetComponent<Outline>();
+            if (selectionOutline == null)
+                selectionOutline = gameObject.AddComponent<Outline>();
+        }
 
         selectionOutline.enabled = false;
         selectionOutline.effectColor = Color.yellow;
@@ -52,10 +63,12 @@ public class Tapable : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            Debug.Log($"Space pressed. Zone: {currentZone}, SelectionManager null: {SelectionManager.Instance == null}, HasSelection: {SelectionManager.Instance?.HasSelection}, isHovered: {isHovered}");
+        
             if (currentZone != ZoneType.Bf)
                 return;
 
-            if (SelectionManager.Instance.HasSelection)
+            if (SelectionManager.Instance != null && SelectionManager.Instance.HasSelection)
                 return;
 
             if (!isHovered)
@@ -107,14 +120,14 @@ public class Tapable : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
         isSelected = true;
         selectionOutline.enabled = true;
         selectionOutline.effectColor = Color.yellow;
-        SelectionManager.Instance.Register(this);
+        SelectionManager.Instance?.Register(this);
     }
 
     public void Deselect()
     {
         isSelected = false;
         selectionOutline.enabled = false;
-        SelectionManager.Instance.Unregister(this);
+        SelectionManager.Instance?.Unregister(this);
     }
 
     public void OnPointerEnter(PointerEventData eventData) => isHovered = true;
