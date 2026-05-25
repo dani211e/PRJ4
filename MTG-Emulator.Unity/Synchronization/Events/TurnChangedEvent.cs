@@ -4,8 +4,8 @@ namespace MTG_Emulator.Unity.Synchronization.Events
 {
     public class TurnChangedEvent : SyncEvent
     {
-        public string  currentPlayerName { get; set; }
-        public int turnNumber { get; set; }
+        public string  CurrentPlayerName { get; set; } = string.Empty;
+        public int TurnNumber { get; set; }
         
         public TurnChangedEvent()
         {
