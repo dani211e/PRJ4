@@ -62,8 +62,7 @@ public class JoinGame : MonoBehaviour
 
         var dto = new JoinGameDto
         {
-            GameCode = code,
-            PlayerName = GameSession.PlayerName
+            GameCode = code
         };
         
         StartCoroutine(APIManager.Instance.JoinGame(dto, onSuccess: response =>

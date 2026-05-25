@@ -214,6 +214,7 @@ public class APIManager : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
+        string token = PlayerPrefs.GetString((""));
         yield return request.SendWebRequest();
 
         if (request.result != UnityWebRequest.Result.Success)

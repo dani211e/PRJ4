@@ -22,14 +22,19 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "PlayerOrAdmin")]
+        [Authorize(Policy = "PlayerOnly")]
         public async Task<ActionResult<GameResponseDto>> CreateGame([FromBody] CreateGameDto dto)
         {
+            var callerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var player = await context.Players
-                .FirstOrDefaultAsync(p => p.Username == dto.HostName);
+                .FirstOrDefaultAsync(p => p.ApiUserId == callerId);
 
             if (player == null)
                 return NotFound("Player not found.");
+            
+            if (player.CurrentGameId != null)
+                return Conflict(new GameResponseDto { Success = false, Message = "You are already in a game." });
+            
 
             string code = generateCode();
             while (await context.Games.AnyAsync(g => g.GameCode == code))
@@ -42,8 +47,8 @@ namespace MTG_Emulator.Backend.Controllers
                 GameCode = code,
                 MaxPlayers = dto.MaxPlayers,
                 CurrentPlayers = 1,
-                HostName = dto.HostName,
-                PlayerNames = new List<string> { dto.HostName },
+                HostName = player.Username,
+                PlayerNames = new List<string> { player.Username },
                 Status = "Waiting"
             };
 
@@ -64,10 +69,20 @@ namespace MTG_Emulator.Backend.Controllers
             });
         }
 
-        [HttpPost("join")]
+       [HttpPost("join")]
         [Authorize(Policy = "PlayerOnly")]
         public async Task<ActionResult<GameResponseDto>> JoinGame([FromBody] JoinGameDto dto)
         {
+            var callerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var player = await context.Players
+                .FirstOrDefaultAsync(p => p.ApiUserId == callerId);
+
+            if (player == null)
+                return NotFound("Player not found.");
+
+            if (player.CurrentGameId != null)
+                return Conflict(new GameResponseDto { Success = false, Message = "You are already in a game." });
+
             var game = await context.Games
                 .Include(g => g.Players)
                 .FirstOrDefaultAsync(g => g.GameCode == dto.GameCode && g.Status == "Waiting");
@@ -79,12 +94,8 @@ namespace MTG_Emulator.Backend.Controllers
             if (game.CurrentPlayers >= game.MaxPlayers)
                 return Conflict(new GameResponseDto { Success = false, Message = "Game is full." });
 
-            var callerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var player = await context.Players
-                .FirstOrDefaultAsync(p => p.ApiUserId == callerId);
-
-            if (player == null)
-                return NotFound("Player not found.");
+            if (game.HostName == player.Username)
+                return Conflict(new GameResponseDto { Success = false, Message = "You cannot join your own game." });
 
             game.Players.Add(player);
             player.CurrentGameId = game.GameId;
@@ -122,6 +133,9 @@ namespace MTG_Emulator.Backend.Controllers
 
             if (player == null)
                 return NotFound("Player not found.");
+            
+            if (player.CurrentGameId == null)
+                return BadRequest("You are not in a game.");
 
             var game = await context.Games
                 .Include(g => g.Players)
@@ -129,6 +143,9 @@ namespace MTG_Emulator.Backend.Controllers
 
             if (game == null)
                 return NotFound("Game not found.");
+            
+            if (player.CurrentGameId != game.GameId)
+                return BadRequest("You are not in this game.");
 
             game.Players.Remove(player);
             game.PlayerNames.Remove(player.Username);
@@ -157,7 +174,10 @@ namespace MTG_Emulator.Backend.Controllers
                 GameCode = game.GameCode,
                 MaxPlayers = game.MaxPlayers,
                 CurrentPlayers = game.CurrentPlayers,
-                Message = game.Status
+                Message = game.Status,
+                PlayerNames = game.PlayerNames,
+                CurrentPlayerName = game.PlayerNames.FirstOrDefault() ?? string.Empty
+                
             });
         }
 

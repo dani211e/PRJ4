@@ -96,8 +96,7 @@ public class CreateGame : MonoBehaviour
 
         var dto = new CreateGameDto
         {
-            MaxPlayers = (int)maxPlayersSlider.value,
-            HostName = GameSession.PlayerName
+            MaxPlayers = (int)maxPlayersSlider.value
         };
 
         StartCoroutine(APIManager.Instance.CreateGame(dto, onSuccess: response =>
