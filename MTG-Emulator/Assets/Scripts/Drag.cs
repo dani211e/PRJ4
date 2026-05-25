@@ -107,7 +107,6 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 
                     t.transform.SetParent(dropZone, true);
 
-                    // Apply same visual logic as ZonesDrop
                     if (zonesDrop != null && zonesDrop.DownScale)
                     {
                         t.transform.localScale = zonesDrop.DroppedScale;
@@ -127,7 +126,7 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
                             SignalRClient.Instance.Broadcast(new MoveCardEvent(
                                 GameSession.PlayerId, cardComp.Identifier)
                             {
-                                Position = dropZone.position.ToSystem2(),
+                                Position = t.transform.position.ToSystem2(),
                                 Zone = cardComp.CurrentZone,
                             });
                     }
