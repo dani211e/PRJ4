@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MTG_Emulator.Backend.DB;
@@ -41,8 +42,10 @@ namespace MTG_Emulator.Backend.Controllers
 
         // Update player's game stats
         [HttpPut("{username}")]
-        public async Task<ActionResult<Player>> UpdatePlayerStats(string username, GameResults result)
+        public async Task<ActionResult<Player>> UpdatePlayerStats(string username,[Required] [FromQuery] GameResults result)
         {
+            if (!ModelState.IsValid)
+                return BadRequest();
             var player = await context.Players
                 .FirstOrDefaultAsync(p => p.Username == username);
 

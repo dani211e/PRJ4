@@ -221,6 +221,7 @@ public class APIManager : MonoBehaviour
             request.SetRequestHeader("Authorization", "Bearer " + token);
         }
 
+        string token = PlayerPrefs.GetString((""));
         yield return request.SendWebRequest();
 
         if (request.result != UnityWebRequest.Result.Success)
