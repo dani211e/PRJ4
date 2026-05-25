@@ -62,27 +62,26 @@ public class JoinGame : MonoBehaviour
 
         var dto = new JoinGameDto
         {
-            GameCode = code,
-            PlayerName = GameSession.PlayerName
+            GameCode = code
         };
         
         StartCoroutine(APIManager.Instance.JoinGame(dto, onSuccess: response =>
         {
-            GameSession.GameCode = response.gameCode;
-            GameSession.MaxPlayers = response.maxPlayers;
+            GameSession.GameCode = response.GameCode;
+            GameSession.MaxPlayers = response.MaxPlayers;
             GameSession.IsHost = false;
-            GameSession.PlayerId = response.currentPlayers - 1;
+            GameSession.PlayerId = response.CurrentPlayers - 1;
             
-            SetStatus($"Joined! ({response.currentPlayers}/{response.maxPlayers} players)");
-            Debug.Log($"[JoinGame] Joined room {response.gameCode}");
+            SetStatus($"Joined! ({response.CurrentPlayers}/{response.MaxPlayers} players)");
+            Debug.Log($"[JoinGame] Joined room {response.GameCode}");
 
 
-            if (response.currentPlayers == response.maxPlayers)
+            if (response.CurrentPlayers == response.MaxPlayers)
             {
                 TurnOrderEvent turnOrderEvent = new TurnOrderEvent
                 {
-                    PlayersNames = response.playerNames,
-                    CurrentPlayerName = response.currentPlayerName,
+                    PlayersNames = response.PlayerNames,
+                    CurrentPlayerName = response.CurrentPlayerName,
                 };
 
                 if (SignalRClient.Instance == null)
