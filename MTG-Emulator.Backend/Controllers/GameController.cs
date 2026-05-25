@@ -133,6 +133,9 @@ namespace MTG_Emulator.Backend.Controllers
 
             if (player == null)
                 return NotFound("Player not found.");
+            
+            if (player.CurrentGameId == null)
+                return BadRequest("You are not in a game.");
 
             var game = await context.Games
                 .Include(g => g.Players)
@@ -140,6 +143,9 @@ namespace MTG_Emulator.Backend.Controllers
 
             if (game == null)
                 return NotFound("Game not found.");
+            
+            if (player.CurrentGameId != game.GameId)
+                return BadRequest("You are not in this game.");
 
             game.Players.Remove(player);
             game.PlayerNames.Remove(player.Username);
