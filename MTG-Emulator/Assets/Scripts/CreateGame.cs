@@ -102,14 +102,14 @@ public class CreateGame : MonoBehaviour
 
         StartCoroutine(APIManager.Instance.CreateGame(dto, onSuccess: response =>
             {
-                GameSession.GameCode = response.gameCode;
-                GameSession.MaxPlayers = response.maxPlayers;
+                GameSession.GameCode = response.GameCode;
+                GameSession.MaxPlayers = response.MaxPlayers;
                 GameSession.IsHost = true;
-                GameSession.PlayerId = response.currentPlayers - 1;
+                GameSession.PlayerId = response.CurrentPlayers - 1;
 
                 refreshCode();
-                setStatus($"Game Created! Code:\n{response.gameCode}");
-                Debug.Log($"[CreateGame] Room {response.gameCode} ready for {response.maxPlayers} players.");
+                setStatus($"Game Created! Code:\n{response.GameCode}");
+                Debug.Log($"[CreateGame] Room {response.GameCode} ready for {response.MaxPlayers} players.");
             },
             onError: error =>
             {

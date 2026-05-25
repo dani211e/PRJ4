@@ -213,6 +213,13 @@ public class APIManager : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
+        
+        string token = PlayerPrefs.GetString("jwtToken");
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            request.SetRequestHeader("Authorization", "Bearer " + token);
+        }
 
         yield return request.SendWebRequest();
 
@@ -230,6 +237,13 @@ public class APIManager : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
+        
+        string token = PlayerPrefs.GetString("jwtToken");
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            request.SetRequestHeader("Authorization", "Bearer " + token);
+        }
 
         yield return request.SendWebRequest();
 

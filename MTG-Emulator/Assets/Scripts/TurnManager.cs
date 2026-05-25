@@ -3,6 +3,7 @@ using MTG_Emulator.Unity.Synchronization.Events;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using MTG_Emulator.Threading;
 
 namespace MTG_Emulator.Backend.DB.Models
 {
@@ -34,8 +35,14 @@ namespace MTG_Emulator.Backend.DB.Models
             
             turnText.text = "waiting for players";
             endTurnButton.interactable = false;
-            
-            
+
+            if (SignalRClient.Instance.LatestTurnOrder != null)
+            {
+                HandleTurnOrderCreated(null, SignalRClient.Instance.LatestTurnOrder);
+            } else if (SignalRClient.Instance.LatestTurnChanged != null)
+            {
+                HandleTurnChanged(null, SignalRClient.Instance.LatestTurnChanged);
+            }
         }
 
         private void OnDestroy()
@@ -53,22 +60,20 @@ namespace MTG_Emulator.Backend.DB.Models
 
         private void HandleTurnChanged(object sender, TurnChangedEvent e)
         {
-            currentPlayerTurn = e.currentPlayerName;
-            currentPlayerIndex = e.turnNumber;
+                currentPlayerTurn = e.currentPlayerName;
+                currentPlayerIndex = e.turnNumber;
 
-            UpdateTurnUI();
+                UpdateTurnUI();
         }
         
         private void HandleTurnOrderCreated(object sender, TurnOrderEvent e)
         {
-            players = e.PlayersNames;
-            currentPlayerTurn = e.CurrentPlayerName;
-            currentPlayerIndex = players.IndexOf(currentPlayerTurn);
+                players = e.PlayersNames;
+                currentPlayerTurn = e.CurrentPlayerName;
+                currentPlayerIndex = players.IndexOf(currentPlayerTurn);
     
-            UpdateTurnUI();
+                UpdateTurnUI();
         }
-        
-        
 
         public void EndTurnToNextPlayer()
         {
@@ -79,23 +84,20 @@ namespace MTG_Emulator.Backend.DB.Models
                 return;
             }
 
-            currentPlayerIndex++;
-
-            if (currentPlayerIndex >= players.Count)
+            if (players.Count == 0)
             {
-                currentPlayerIndex = 0;
+                return;
             }
             
-            string nextPlayer = players[currentPlayerIndex];
+            int nextIndex = (currentPlayerIndex + 1) % players.Count;
+            string nextPlayer = players[nextIndex];
 
-            TurnChangedEvent turnEvent = new TurnChangedEvent
+            
+            SignalRClient.Instance.Broadcast(new TurnChangedEvent
             {
                 currentPlayerName = nextPlayer,
-                turnNumber = currentPlayerIndex
-            };
-            
-            SignalRClient.Instance.Broadcast(turnEvent);
-            HandleTurnChanged(this, turnEvent);
+                turnNumber = nextIndex,
+            });
         }
 
         public bool IsMyTurn()
