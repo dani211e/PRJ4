@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using MTG_Emulator.Threading;
 
-namespace MTG_Emulator.Backend.DB.Models
+namespace MTG_Emulator.Turns
 {
     public class TurnManager : MonoBehaviour
     {
@@ -30,18 +30,18 @@ namespace MTG_Emulator.Backend.DB.Models
             }
 
             
-            SignalRClient.Instance.OnTurnChangedEvent += HandleTurnChanged;
-            SignalRClient.Instance.OnTurnOrderCreatedEvent += HandleTurnOrderCreated;
+            SignalRClient.Instance.OnTurnChangedEvent += handleTurnChanged;
+            SignalRClient.Instance.OnTurnOrderCreatedEvent += handleTurnOrderCreated;
             
             turnText.text = "waiting for players";
             endTurnButton.interactable = false;
 
             if (SignalRClient.Instance.LatestTurnOrder != null)
             {
-                HandleTurnOrderCreated(null, SignalRClient.Instance.LatestTurnOrder);
+                handleTurnOrderCreated(null, SignalRClient.Instance.LatestTurnOrder);
             } else if (SignalRClient.Instance.LatestTurnChanged != null)
             {
-                HandleTurnChanged(null, SignalRClient.Instance.LatestTurnChanged);
+                handleTurnChanged(null, SignalRClient.Instance.LatestTurnChanged);
             }
         }
 
@@ -52,27 +52,27 @@ namespace MTG_Emulator.Backend.DB.Models
                 return;
             }
 
-            SignalRClient.Instance.OnTurnChangedEvent -= HandleTurnChanged;
-            SignalRClient.Instance.OnTurnOrderCreatedEvent -= HandleTurnOrderCreated;
+            SignalRClient.Instance.OnTurnChangedEvent -= handleTurnChanged;
+            SignalRClient.Instance.OnTurnOrderCreatedEvent -= handleTurnOrderCreated;
 
         }
         
 
-        private void HandleTurnChanged(object sender, TurnChangedEvent e)
+        private void handleTurnChanged(object sender, TurnChangedEvent e)
         {
                 currentPlayerTurn = e.currentPlayerName;
                 currentPlayerIndex = e.turnNumber;
 
-                UpdateTurnUI();
+                updateTurnUI();
         }
         
-        private void HandleTurnOrderCreated(object sender, TurnOrderEvent e)
+        private void handleTurnOrderCreated(object sender, TurnOrderEvent e)
         {
                 players = e.PlayersNames;
                 currentPlayerTurn = e.CurrentPlayerName;
                 currentPlayerIndex = players.IndexOf(currentPlayerTurn);
     
-                UpdateTurnUI();
+                updateTurnUI();
         }
 
         public void EndTurnToNextPlayer()
@@ -105,7 +105,7 @@ namespace MTG_Emulator.Backend.DB.Models
             return currentPlayerTurn == localPlayerName;
         }
         
-        private void UpdateTurnUI()
+        private void updateTurnUI()
         {
             turnText.text = "Turn: " + currentPlayerTurn;
 
