@@ -22,7 +22,7 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "PlayerOrAdmin")]
+        [Authorize(Policy = "PlayerOnly")]
         public async Task<ActionResult<GameResponseDto>> CreateGame([FromBody] CreateGameDto dto)
         {
             var callerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
