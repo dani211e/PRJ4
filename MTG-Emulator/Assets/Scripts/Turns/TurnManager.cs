@@ -62,7 +62,7 @@ namespace MTG_Emulator.Turns
         {
             currentPlayerTurn = e.currentPlayerName;
             currentPlayerIndex = e.turnNumber;
-
+            
             updateTurnUI();
         }
         
@@ -71,7 +71,7 @@ namespace MTG_Emulator.Turns
             players = e.PlayersNames;
             currentPlayerTurn = e.CurrentPlayerName;
             currentPlayerIndex = players.IndexOf(currentPlayerTurn);
-    
+            
             updateTurnUI();
         }
 
