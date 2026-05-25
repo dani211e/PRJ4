@@ -1,5 +1,3 @@
-using MTG_Emulator.Extensions;
-using MTG_Emulator.Unity.Synchronization.Events;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -50,10 +48,5 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
         {
             transform.SetParent(parentToReturnTo, true);
         }
-
-        SignalRClient.Instance.Broadcast(new MoveCardEvent(GameSession.PlayerId, card.Identifier)
-        {
-            Position = transform.position.ToSystem2(),
-        });
     }
 }
