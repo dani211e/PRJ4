@@ -168,7 +168,10 @@ namespace MTG_Emulator.Backend.Controllers
                 GameCode = game.GameCode,
                 MaxPlayers = game.MaxPlayers,
                 CurrentPlayers = game.CurrentPlayers,
-                Message = game.Status
+                Message = game.Status,
+                PlayerNames = game.PlayerNames,
+                CurrentPlayerName = game.PlayerNames.FirstOrDefault() ?? string.Empty
+                
             });
         }
 
