@@ -60,19 +60,19 @@ namespace MTG_Emulator.Turns
 
         private void handleTurnChanged(object sender, TurnChangedEvent e)
         {
-                currentPlayerTurn = e.currentPlayerName;
-                currentPlayerIndex = e.turnNumber;
+            currentPlayerTurn = e.currentPlayerName;
+            currentPlayerIndex = e.turnNumber;
 
-                updateTurnUI();
+            updateTurnUI();
         }
         
         private void handleTurnOrderCreated(object sender, TurnOrderEvent e)
         {
-                players = e.PlayersNames;
-                currentPlayerTurn = e.CurrentPlayerName;
-                currentPlayerIndex = players.IndexOf(currentPlayerTurn);
+            players = e.PlayersNames;
+            currentPlayerTurn = e.CurrentPlayerName;
+            currentPlayerIndex = players.IndexOf(currentPlayerTurn);
     
-                updateTurnUI();
+            updateTurnUI();
         }
 
         public void EndTurnToNextPlayer()
