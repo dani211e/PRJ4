@@ -606,8 +606,8 @@ GameObject:
   - component: {fileID: 87865248}
   - component: {fileID: 87865246}
   m_Layer: 5
-  m_Name: ExileZone
-  m_TagString: Untagged
+  m_Name: GraveyardZone
+  m_TagString: GraveyardZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -851,7 +851,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2d3da8c14ca5b94288298bb7f10507d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Drop
-  downScale: 1
   droppedScale: {x: 0.8, y: 0.8, z: 1}
   droppedRotation: {x: 0, y: 0, z: -90}
   zoneType: 4
@@ -1836,7 +1835,7 @@ GameObject:
   - component: {fileID: 414315791}
   m_Layer: 5
   m_Name: Battlefield
-  m_TagString: Untagged
+  m_TagString: BattlefieldZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1857,7 +1856,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 53, y: -50}
+  m_AnchoredPosition: {x: 52.999977, y: -50.00003}
   m_SizeDelta: {x: 1028, y: 220}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &414315791
@@ -2407,7 +2406,7 @@ GameObject:
   - component: {fileID: 535046082}
   m_Layer: 5
   m_Name: Deckzone
-  m_TagString: Untagged
+  m_TagString: DeckZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2567,7 +2566,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 53, y: 50}
+  m_AnchoredPosition: {x: 52.99996, y: 50}
   m_SizeDelta: {x: 1028, y: 220}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &713179422
@@ -2905,7 +2904,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2d3da8c14ca5b94288298bb7f10507d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Drop
-  downScale: 0
   droppedScale: {x: 0.8, y: 0.8, z: 1}
   droppedRotation: {x: 0, y: 0, z: -90}
   zoneType: 0
@@ -5054,7 +5052,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2d3da8c14ca5b94288298bb7f10507d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Drop
-  downScale: 1
   droppedScale: {x: 0.8, y: 0.8, z: 1}
   droppedRotation: {x: 0, y: 0, z: -90}
   zoneType: 3
@@ -5372,8 +5369,8 @@ MonoBehaviour:
   hand: {fileID: 1899433327}
   battlefield: {fileID: 414315789}
   library: {fileID: 535046081}
-  graveyard: {fileID: 1818310916}
-  exile: {fileID: 87865245}
+  graveyard: {fileID: 87865245}
+  exile: {fileID: 1818310916}
 --- !u!1 &1558262798
 GameObject:
   m_ObjectHideFlags: 0
@@ -6613,8 +6610,8 @@ GameObject:
   - component: {fileID: 1818310919}
   - component: {fileID: 1818310917}
   m_Layer: 5
-  m_Name: GraveyardZone
-  m_TagString: Untagged
+  m_Name: ExileZone
+  m_TagString: ExileZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6891,7 +6888,7 @@ GameObject:
   - component: {fileID: 1899433329}
   m_Layer: 5
   m_Name: HandZone
-  m_TagString: Untagged
+  m_TagString: HandZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

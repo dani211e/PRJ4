@@ -47,23 +47,12 @@ public class Card : MonoBehaviour, IPointerClickHandler
 
         if (!string.IsNullOrEmpty(card.ImageUri))
             StartCoroutine(APIManager.Instance.LoadImage(card.ImageUri, cardImage));
-
-        // SignalRClient.Instance.OnMoveCardEvent += (_, e) =>
-        // {
-        //     if (cardData.Identifier != e.Identifier)
-        //         return;
-        //     if (e.Position.HasValue)
-        //         transform.position = e.Position.Value.ToUnity3();
-        // };
     }
 
     public void SetZones(ZoneType zone)
     {
         CurrentZone = zone;
     }
-
-
-    
 
     private void Update()
     {
