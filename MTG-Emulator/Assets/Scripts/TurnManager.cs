@@ -31,9 +31,15 @@ namespace MTG_Emulator.Backend.DB.Models
 
             SignalRClient.Instance.OnTurnChangedEvent += HandleTurnChanged;
             SignalRClient.Instance.OnTurnOrderCreatedEvent += HandleTurnOrderCreated;
+            SignalRClient.Instance.OnPlayerLeaveEvent += handlePlayerLeaveEvent;
             
             turnText.text = "waiting for players";
             endTurnButton.interactable = false;
+        }
+        
+        private void Awake()
+        {
+            Debug.Log("TurnManager Awake");
         }
 
         private void OnDestroy()
@@ -45,7 +51,7 @@ namespace MTG_Emulator.Backend.DB.Models
 
             SignalRClient.Instance.OnTurnChangedEvent -= HandleTurnChanged;
             SignalRClient.Instance.OnTurnOrderCreatedEvent -= HandleTurnOrderCreated;
-
+            SignalRClient.Instance.OnPlayerLeaveEvent -= handlePlayerLeaveEvent;
         }
         
 
@@ -64,6 +70,11 @@ namespace MTG_Emulator.Backend.DB.Models
             currentPlayerIndex = players.IndexOf(currentPlayerTurn);
 
             UpdateTurnUI();
+        }
+        
+        private void handlePlayerLeaveEvent(object sender, PlayerLeaveEvent e)
+        {
+            Debug.Log($"TurnManager HandlePlayerLeaveEvent fired, player: {e.PlayerIndex}");
         }
 
         private void UpdateTurnUI()

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
+using MTG_Emulator.Threading;
 using MTG_Emulator.Unity.Synchronization;
 using MTG_Emulator.Unity.Synchronization.Events;
 using UnityEngine;
@@ -25,6 +26,7 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
     {
         if (Instance == null)
         {
+            
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
@@ -94,6 +96,7 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
 
     public void OnPlayerLeave(PlayerLeaveEvent e)
     {
-        OnPlayerLeaveEvent?.Invoke(this, e);
+        Debug.Log($"OnPlayerLeave received, subscribers: {OnPlayerLeaveEvent?.GetInvocationList().Length ?? 0}");
+        MainThreadDispatcher.Enqueue(() => OnPlayerLeaveEvent?.Invoke(this, e));
     }
 }
