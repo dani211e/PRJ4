@@ -149,5 +149,15 @@ namespace UnitTests.Backend.Controllers
             Assert.That(result.Result, Is.TypeOf<BadRequestObjectResult>());
         }
         
+        [Test]
+        public async Task UpdatePlayerStats_InvalidModelState_ReturnsBadRequest()
+        {
+            await InsertPlayerAsync();
+            uut.ModelState.AddModelError("result", "Required");
+
+            var result = await uut.UpdatePlayerStats("Test player", GameResults.Win);
+
+            Assert.That(result.Result, Is.TypeOf<BadRequestResult>());
+        }
     }
 }
