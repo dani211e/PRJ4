@@ -32,6 +32,14 @@ public class APIManager : MonoBehaviour
         }
     }
 
+    private void OnApplicationQuit()
+    {
+        // Temporary workaround for players not being allowed in multiple games
+        // so we just fireandforget a leave game request and hope for the best :)
+        if (GameSession.GameCode != "------")
+            LeaveGame(GameSession.GameCode, () => { }, _ => { }).MoveNext();
+    }
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
