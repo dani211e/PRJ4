@@ -31,6 +31,15 @@ public class APIManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    private void OnApplicationQuit()
+    {
+        // Temporary workaround for players not being allowed in multiple games
+        // so we just fireandforget a leave game request and hope for the best :)
+        if (GameSession.GameCode != "------")
+            LeaveGame(GameSession.GameCode, () => { }, _ => { }).MoveNext();
+    }
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -214,7 +223,8 @@ public class APIManager : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        string token = PlayerPrefs.GetString((""));
+        string token = PlayerPrefs.GetString("jwtToken");
+        request.SetRequestHeader("Authorization", "Bearer " + token);
         yield return request.SendWebRequest();
 
         if (request.result != UnityWebRequest.Result.Success)
@@ -231,6 +241,8 @@ public class APIManager : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
+        string token = PlayerPrefs.GetString("jwtToken");
+        request.SetRequestHeader("Authorization", "Bearer " + token);
 
         yield return request.SendWebRequest();
 
