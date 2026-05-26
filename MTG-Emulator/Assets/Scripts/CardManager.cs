@@ -26,11 +26,23 @@ namespace MTG_Emulator
 
         public static void AddObject(int playerIndex, CardInfo card, GameObject obj)
         {
+            if (cards == null || playerIndex >= cards.Length)
+            {
+                Debug.LogError($"CardManager not initialized or playerIndex {playerIndex} out of range.");
+                return;
+            }
+
             if (!cards[playerIndex].TryAdd(card.Identifier, obj))
                 return;
 
             if (playerIndex != GameSession.PlayerId)
                 return;
+            
+            if (SignalRClient.Instance == null)
+            {
+                Debug.LogWarning("SignalRClient not available, skipping broadcast.");
+                return;
+            }
 
             SignalRClient.Instance.Broadcast(new NewCardEvent(playerIndex, card.Identifier)
             {

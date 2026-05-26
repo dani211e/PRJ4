@@ -25,11 +25,18 @@ namespace MTG_Emulator.Cards
         private void Awake()
         {
             signalRClient = FindFirstObjectByType<SignalRClient>();
+    
+            if (signalRClient == null)
+            {
+                Debug.LogWarning("SignalRClient not found in scene.");
+                return;
+            }
+    
             signalRClient.OnNewCardEvent += spawnNewCard;
             signalRClient.OnMoveCardEvent += moveCard;
 
             zones = GetComponent<ZoneMapping>();
-            if(!zones)
+            if (!zones)
                 Debug.LogError("Failed to get zone mappings");
         }
 

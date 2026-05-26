@@ -19,7 +19,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
 
     public CardInfo cardData;
     private Button button;
-    private bool Istapped = false;
+    private Tapable tapable;
     public ZoneType CurrentZone { get; private set; }
 
     public void Setup(CardInfo card, Action<CardInfo> onClick = null)
@@ -55,29 +55,18 @@ public class Card : MonoBehaviour, IPointerClickHandler
         //     if (e.Position.HasValue)
         //         transform.position = e.Position.Value.ToUnity3();
         // };
+        tapable = GetComponent<Tapable>();
+        if (tapable == null)
+            tapable = gameObject.AddComponent<Tapable>();
+
+        tapable.SetIdentifier(card.Identifier);
     }
 
     public void SetZones(ZoneType zone)
     {
         CurrentZone = zone;
-    }
-
-
-    
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (CurrentZone != ZoneType.Bf)
-            {
-                return;
-            }
-
-            Debug.Log("Q is pressed");
-            transform.Rotate(0, 0, Istapped ? 90.0f : -90.0f);
-            Istapped = !Istapped;
-        }
+        Debug.Log($"SetZones called: {zone}, tapable is null: {tapable == null}");
+        tapable?.SetZone(zone);
     }
 
     public void OnPointerClick(PointerEventData eventData)

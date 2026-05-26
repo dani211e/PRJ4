@@ -22,15 +22,23 @@ public class Token : MonoBehaviour, IPointerClickHandler
     private RelatedCardDto tokenData;
     private Card card;
     private Button button;
-    private bool Istapped = false;
+    private Tapable tapable;
     private ZoneType currentzone;
 
     public void Setup(RelatedCardInfo token, Action<CardDto> onClick = null)
     {
         if (!string.IsNullOrEmpty(token.ImageUri))
-        {
             StartCoroutine(APIManager.Instance.LoadImage(token.ImageUri, tokenImage));
-        }
+
+        tapable = GetComponent<Tapable>();
+        if (tapable == null)
+            tapable = gameObject.AddComponent<Tapable>();
+    }
+
+    public void SetZones(ZoneType zone)
+    {
+        currentzone = zone;
+        tapable.SetZone(zone);
     }
     
     public void OnPointerClick(PointerEventData eventData)
