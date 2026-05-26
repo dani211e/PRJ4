@@ -14,15 +14,12 @@ namespace MTG_Emulator.Turns
 
         private List<string> players = new();
 
-        private string localPlayerName;
         private string currentPlayerTurn;
         private int currentPlayerIndex = 0;
 
 
         private void Start()
         {
-            localPlayerName = PlayerPrefs.GetString("username");
-
             if (SignalRClient.Instance == null)
             {
                 Debug.LogError("SignalRClient.Instance is null");
@@ -102,7 +99,7 @@ namespace MTG_Emulator.Turns
 
         public bool IsMyTurn()
         {
-            return currentPlayerTurn == localPlayerName;
+            return currentPlayerTurn == GameSession.PlayerName;
         }
         
         private void updateTurnUI()
