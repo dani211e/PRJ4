@@ -29,7 +29,7 @@ namespace MTG_Emulator.Cards
             signalRClient.OnMoveCardEvent += moveCard;
 
             zones = GetComponent<ZoneMapping>();
-            if(!zones)
+            if (!zones)
                 Debug.LogError("Failed to get zone mappings");
         }
 
@@ -45,10 +45,11 @@ namespace MTG_Emulator.Cards
             {
                 if (e.Card == null)
                     return;
-                var obj = Instantiate(cardPrefab, zones.GetTransformFor(ZoneType.Hand));
 
+                var zone = zones.GetTransformFor(ZoneType.Hand);
+                var obj = Instantiate(cardPrefab, zone);
                 obj.RemoveComponent<Drag>();
-                
+
                 var cardInfo = e.Card.ToCardInfo();
                 cardInfo.Identifier = e.Identifier;
                 var c = obj.GetComponent<Card>();
@@ -62,18 +63,24 @@ namespace MTG_Emulator.Cards
         {
             MainThreadDispatcher.Enqueue(() =>
             {
-                Debug.Log($"move event rec {e.Identifier}");
+                var c = CardManager.Get(e.PlayerIndex, e.Identifier);
+
+                var zone = zones.GetTransformFor(e.Zone);
+                c.transform.SetParent(zone, false);
+
+                // If no new position was given the zone itself handles placement
+                // although the zones that currently do this also apply a downscaling factor 
+                // which isn't easily accessible so we just duplicate the values
+                // TODO: fix this ^
+                c.transform.localScale = e.Zone is ZoneType.Exile or ZoneType.Graveyard ? new Vector3(0.8f, 0.8f, 1f) : Vector3.one;
+                c.transform.localRotation = e.Zone is ZoneType.Exile or ZoneType.Graveyard ? Quaternion.Euler(new Vector3(0f, 0f, -90f)) : Quaternion.identity;
+
                 if (!e.Position.HasValue)
                     return;
 
-                var c = CardManager.Get(e.PlayerIndex, e.Identifier);
-                var zone = zones.GetTransformFor(e.Zone);
-                Assert.IsNotNull(c);
-                Assert.IsNotNull(zone);
-                c.transform.SetParent(zone, false);
-
-                //var newPos = e.Position.Value.ToUnity3();
-                //c.transform.position = new Vector3(newPos.x, newPos.y - 100, 0);
+                var newPos = e.Position.Value.ToUnity2();
+                //We need to mirror the y coord to match the flipped enemy side
+                c.transform.localPosition = new Vector3(newPos.x, -newPos.y, 0);
             });
         }
     }

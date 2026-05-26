@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using MTG_Emulator.Unity.Synchronization;
 using MTG_Emulator.Unity.Synchronization.Events;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using UnityEngine;
 
 public class SignalRClient : MonoBehaviour, ISyncEventHandler
@@ -35,9 +37,14 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
 
         try
         {
+            var converter = new StringEnumConverter(new DefaultNamingStrategy());
+
             connection = new HubConnectionBuilder().WithUrl(apiURL + hubName)
                 .WithAutomaticReconnect()
-                .AddNewtonsoftJsonProtocol()
+                .AddNewtonsoftJsonProtocol(opt =>
+                {
+                    opt.PayloadSerializerSettings.Converters.Add(converter);
+                })
                 .Build();
 
             connection.On<MoveCardEvent>(nameof(ISyncEventHandler.OnMoveCard), OnMoveCard);
