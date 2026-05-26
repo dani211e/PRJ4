@@ -851,7 +851,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2d3da8c14ca5b94288298bb7f10507d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Drop
-  downScale: 1
   droppedScale: {x: 0.8, y: 0.8, z: 1}
   droppedRotation: {x: 0, y: 0, z: -90}
   zoneType: 4
@@ -2997,7 +2996,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2d3da8c14ca5b94288298bb7f10507d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Drop
-  downScale: 0
   droppedScale: {x: 0.8, y: 0.8, z: 1}
   droppedRotation: {x: 0, y: 0, z: -90}
   zoneType: 0
@@ -5289,7 +5287,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2d3da8c14ca5b94288298bb7f10507d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Drop
-  downScale: 1
   droppedScale: {x: 0.8, y: 0.8, z: 1}
   droppedRotation: {x: 0, y: 0, z: -90}
   zoneType: 3

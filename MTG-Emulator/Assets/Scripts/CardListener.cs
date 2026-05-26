@@ -68,6 +68,13 @@ namespace MTG_Emulator.Cards
                 var zone = zones.GetTransformFor(e.Zone);
                 c.transform.SetParent(zone, false);
 
+                // If no new position was given the zone itself handles placement
+                // although the zones that currently do this also apply a downscaling factor 
+                // which isn't easily accessible so we just duplicate the values
+                // TODO: fix this ^
+                c.transform.localScale = e.Zone is ZoneType.Exile or ZoneType.Graveyard ? new Vector3(0.8f, 0.8f, 1f) : Vector3.one;
+                c.transform.localRotation = e.Zone is ZoneType.Exile or ZoneType.Graveyard ? Quaternion.Euler(new Vector3(0f, 0f, -90f)) : Quaternion.identity;
+
                 if (!e.Position.HasValue)
                     return;
 

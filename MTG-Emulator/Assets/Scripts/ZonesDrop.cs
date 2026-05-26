@@ -7,9 +7,6 @@ using UnityEngine.EventSystems;
 public class ZonesDrop : MonoBehaviour, IDropHandler
 {
     [SerializeField]
-    private bool downScale = false;
-
-    [SerializeField]
     private Vector3 droppedScale = new(0.8f, 0.8f, 1f);
 
     [SerializeField]
@@ -17,6 +14,8 @@ public class ZonesDrop : MonoBehaviour, IDropHandler
 
     [SerializeField]
     private ZoneType zoneType;
+
+    private bool shouldDownScale => zoneType is ZoneType.Exile or ZoneType.Graveyard;
 
     public void OnDrop(PointerEventData eventData)
     {
@@ -35,21 +34,12 @@ public class ZonesDrop : MonoBehaviour, IDropHandler
         {
             card.SetZones(zoneType);
             SignalRClient.Instance.Broadcast(new MoveCardEvent(GameSession.PlayerId, card.Identifier)
-            { 
+            {
                 Zone = zoneType,
             });
         }
-
-
-        if (downScale)
-        {
-            dragged.transform.localScale = droppedScale;
-            dragged.transform.localRotation = Quaternion.Euler(droppedRotation);
-        }
-        else
-        {
-            dragged.transform.localScale = Vector3.one;
-            dragged.transform.localRotation = Quaternion.identity;
-        }
+        
+        dragged.transform.localScale = shouldDownScale ? droppedScale : Vector3.one;
+        dragged.transform.localRotation = shouldDownScale ? Quaternion.Euler(droppedRotation) : Quaternion.identity;
     }
 }
