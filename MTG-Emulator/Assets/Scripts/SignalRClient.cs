@@ -50,7 +50,6 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
             connection.On<PlayerStatsEvent>(nameof(ISyncEventHandler.OnUpdatePlayerStats), OnUpdatePlayerStats);
             connection.On<TurnChangedEvent>(nameof(ISyncEventHandler.OnTurnChanged), OnTurnChanged);
             connection.On<TurnOrderEvent>(nameof(ISyncEventHandler.OnTurnOrderCreated), OnTurnOrderCreated);
-
             var t = connection.StartAsync();
             t.Wait();
         }
@@ -60,9 +59,13 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
         }
     }
 
-    private void OnDestroy()
+    private void OnApplicationQuit()
     {
-        Task.Run(() => connection?.StopAsync());
+        if (connection == null)
+            return;
+
+        var t = connection.StopAsync();
+        t.Wait();
     }
 
     public void OnMoveCard(MoveCardEvent e)
