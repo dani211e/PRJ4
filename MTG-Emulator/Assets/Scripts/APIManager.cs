@@ -31,6 +31,7 @@ public class APIManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -214,7 +215,8 @@ public class APIManager : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        string token = PlayerPrefs.GetString((""));
+        string token = PlayerPrefs.GetString("jwtToken");
+        request.SetRequestHeader("Authorization", "Bearer " + token);
         yield return request.SendWebRequest();
 
         if (request.result != UnityWebRequest.Result.Success)
@@ -231,6 +233,8 @@ public class APIManager : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
+        string token = PlayerPrefs.GetString("jwtToken");
+        request.SetRequestHeader("Authorization", "Bearer " + token);
 
         yield return request.SendWebRequest();
 
