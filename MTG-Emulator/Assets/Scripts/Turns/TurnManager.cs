@@ -22,7 +22,7 @@ namespace MTG_Emulator.Turns
         {
             if (SignalRClient.Instance == null)
             {
-                Debug.LogError("SignalRClient.Instance is null");
+                // Debug.LogError("SignalRClient.Instance is null");
                 return;
             }
 
@@ -77,7 +77,7 @@ namespace MTG_Emulator.Turns
 
             if (!IsMyTurn())
             {
-                Debug.Log("not your turn");
+                // Debug.Log("not your turn");
                 return;
             }
 
@@ -109,7 +109,7 @@ namespace MTG_Emulator.Turns
             bool isMyTurn = IsMyTurn();
             endTurnButton.interactable = isMyTurn;
 
-            Debug.Log(isMyTurn ? "It is my turn" : "Waiting for " + currentPlayerTurn);
+            // Debug.Log(isMyTurn ? "It is my turn" : "Waiting for " + currentPlayerTurn);
         }
     }
 }
