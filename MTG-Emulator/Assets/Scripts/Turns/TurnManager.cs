@@ -70,7 +70,7 @@ namespace MTG_Emulator.Turns
 
         public void EndTurnToNextPlayer()
         {
-            if (!IsMyTurn())
+            if (!isMyTurn())
             {
                 // Debug.Log("not your turn");
                 return;
@@ -89,18 +89,12 @@ namespace MTG_Emulator.Turns
             });
         }
 
-        public bool IsMyTurn()
-        {
-            return currentPlayerTurn == GameSession.PlayerName;
-        }
+        private bool isMyTurn() => currentPlayerTurn == GameSession.PlayerName;
 
         private void updateTurnUI()
         {
             turnText.text = "Turn: " + currentPlayerTurn;
-
-            bool isMyTurn = IsMyTurn();
-            endTurnButton.interactable = isMyTurn;
-
+            endTurnButton.interactable = isMyTurn();
             // Debug.Log(isMyTurn ? "It is my turn" : "Waiting for " + currentPlayerTurn);
         }
     }
