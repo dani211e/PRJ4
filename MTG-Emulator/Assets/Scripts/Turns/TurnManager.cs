@@ -9,8 +9,11 @@ namespace MTG_Emulator.Turns
 {
     public class TurnManager : MonoBehaviour
     {
-        [SerializeField] private TMP_Text turnText;
-        [SerializeField] private Button endTurnButton;
+        [SerializeField]
+        private TMP_Text turnText;
+
+        [SerializeField]
+        private Button endTurnButton;
 
         private List<string> players = new();
 
@@ -26,55 +29,47 @@ namespace MTG_Emulator.Turns
                 return;
             }
 
-            
             SignalRClient.Instance.OnTurnChangedEvent += handleTurnChanged;
             SignalRClient.Instance.OnTurnOrderCreatedEvent += handleTurnOrderCreated;
-            
+
             turnText.text = "waiting for players";
             endTurnButton.interactable = false;
 
             if (SignalRClient.Instance.LatestTurnOrder != null)
-            {
                 handleTurnOrderCreated(null, SignalRClient.Instance.LatestTurnOrder);
-            } else if (SignalRClient.Instance.LatestTurnChanged != null)
-            {
+            else if (SignalRClient.Instance.LatestTurnChanged != null)
                 handleTurnChanged(null, SignalRClient.Instance.LatestTurnChanged);
-            }
         }
 
         private void OnDestroy()
         {
             if (SignalRClient.Instance == null)
-            {
                 return;
-            }
 
             SignalRClient.Instance.OnTurnChangedEvent -= handleTurnChanged;
             SignalRClient.Instance.OnTurnOrderCreatedEvent -= handleTurnOrderCreated;
-
         }
-        
+
 
         private void handleTurnChanged(object sender, TurnChangedEvent e)
         {
             currentPlayerTurn = e.currentPlayerName;
             currentPlayerIndex = e.turnNumber;
-            
+
             updateTurnUI();
         }
-        
+
         private void handleTurnOrderCreated(object sender, TurnOrderEvent e)
         {
             players = e.PlayersNames;
             currentPlayerTurn = e.CurrentPlayerName;
             currentPlayerIndex = players.IndexOf(currentPlayerTurn);
-            
+
             updateTurnUI();
         }
 
         public void EndTurnToNextPlayer()
         {
-
             if (!IsMyTurn())
             {
                 // Debug.Log("not your turn");
@@ -82,14 +77,11 @@ namespace MTG_Emulator.Turns
             }
 
             if (players.Count == 0)
-            {
                 return;
-            }
-            
+
             int nextIndex = (currentPlayerIndex + 1) % players.Count;
             string nextPlayer = players[nextIndex];
 
-            
             SignalRClient.Instance.Broadcast(new TurnChangedEvent
             {
                 currentPlayerName = nextPlayer,
@@ -101,7 +93,7 @@ namespace MTG_Emulator.Turns
         {
             return currentPlayerTurn == GameSession.PlayerName;
         }
-        
+
         private void updateTurnUI()
         {
             turnText.text = "Turn: " + currentPlayerTurn;
