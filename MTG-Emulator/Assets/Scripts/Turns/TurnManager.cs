@@ -60,8 +60,8 @@ namespace MTG_Emulator.Turns
 
         private void handleTurnChanged(object sender, TurnChangedEvent e)
         {
-            currentPlayerTurn = e.currentPlayerName;
-            currentPlayerIndex = e.turnNumber;
+            currentPlayerTurn = e.CurrentPlayerName;
+            currentPlayerIndex = e.TurnNumber;
             
             updateTurnUI();
         }
@@ -95,8 +95,8 @@ namespace MTG_Emulator.Turns
             
             SignalRClient.Instance.Broadcast(new TurnChangedEvent
             {
-                currentPlayerName = nextPlayer,
-                turnNumber = nextIndex,
+                CurrentPlayerName = nextPlayer,
+                TurnNumber = nextIndex,
             });
         }
 
@@ -109,10 +109,9 @@ namespace MTG_Emulator.Turns
         {
             turnText.text = "Turn: " + currentPlayerTurn;
 
-            bool isMyTurn = IsMyTurn();
-            endTurnButton.interactable = isMyTurn;
+            endTurnButton.interactable = IsMyTurn();
 
-            Debug.Log(isMyTurn ? "It is my turn" : "Waiting for " + currentPlayerTurn);
+            Debug.Log(endTurnButton.interactable ? "It is my turn" : "Waiting for " + currentPlayerTurn);
         }
     }
 }

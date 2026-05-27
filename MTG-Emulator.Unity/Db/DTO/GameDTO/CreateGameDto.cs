@@ -6,5 +6,5 @@ public class CreateGameDto
 {
     [Required]
     [Range(1,5)]
-    public int    MaxPlayers { get; set; }
+    public int MaxPlayers { get; set; }
 }
