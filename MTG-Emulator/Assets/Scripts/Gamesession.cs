@@ -1,6 +1,8 @@
+using UnityEngine;
+
 public static class GameSession
 {
-    public static string PlayerName { get; set; } = string.Empty;
+    public static string PlayerName { get; set; } = PlayerPrefs.GetString("username");
     public static int PlayerId { get; set; }
 
     public static string GameCode { get; set; } = "------";

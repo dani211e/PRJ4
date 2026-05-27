@@ -7,6 +7,7 @@ using MTG_Emulator.Unity.Synchronization.Events;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using UnityEngine;
+using MTG_Emulator.Threading;
 
 public class SignalRClient : MonoBehaviour, ISyncEventHandler
 {
@@ -21,6 +22,10 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
     public event EventHandler<PlayerStatsEvent> OnPlayerStatsEvent;
     public event EventHandler<TurnChangedEvent> OnTurnChangedEvent;
     public event EventHandler<TurnOrderEvent> OnTurnOrderCreatedEvent;
+    public TurnOrderEvent LatestTurnOrder { get; private set; }
+    public TurnChangedEvent LatestTurnChanged { get; private set; }
+
+
 
     public void Awake()
     {
@@ -93,11 +98,20 @@ public class SignalRClient : MonoBehaviour, ISyncEventHandler
 
     public void OnTurnChanged(TurnChangedEvent e)
     {
-        OnTurnChangedEvent?.Invoke(this, e);
+        
+        MainThreadDispatcher.Enqueue(() =>
+        {
+            LatestTurnChanged = e;
+            OnTurnChangedEvent?.Invoke(this, e);
+        });
     }
 
     public void OnTurnOrderCreated(TurnOrderEvent e)
     {
-        OnTurnOrderCreatedEvent?.Invoke(this, e);
+        MainThreadDispatcher.Enqueue(() =>
+        {
+            LatestTurnOrder = e;
+            OnTurnOrderCreatedEvent?.Invoke(this, e);
+        });
     }
 }
