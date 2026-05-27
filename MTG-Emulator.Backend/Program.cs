@@ -127,6 +127,7 @@ namespace MTG_Emulator.Backend
 
             var app = builder.Build();
 
+            app.Urls.Add("http://0.0.0.0:5042");
             var dataRoot = Environment.GetEnvironmentVariable("SCRYFALL_DATA_PATH")
                 ?? Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "scryfall-data");
 
