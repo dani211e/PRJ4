@@ -108,10 +108,8 @@ namespace MTG_Emulator.Turns
         private void updateTurnUI()
         {
             turnText.text = "Turn: " + currentPlayerTurn;
-
             endTurnButton.interactable = IsMyTurn();
-
-            Debug.Log(endTurnButton.interactable ? "It is my turn" : "Waiting for " + currentPlayerTurn);
+            // Debug.Log(isMyTurn ? "It is my turn" : "Waiting for " + currentPlayerTurn);
         }
     }
 }

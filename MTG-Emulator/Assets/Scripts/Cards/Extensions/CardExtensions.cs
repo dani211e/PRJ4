@@ -18,7 +18,7 @@ namespace MTG_Emulator.Cards.Extensions
                 Name = c.Name,
                 ImageUri = c.ImageUri,
                 AltFace = c.AltFace?.ToCardInfo(),
-                RelatedCards = c.RelatedCards?.Select(rc => ToCardInfo((RelatedCardDto)rc)).ToList()
+                RelatedCards = c.RelatedCards.Select(ToCardInfo).ToList(),
             };
         }
 
