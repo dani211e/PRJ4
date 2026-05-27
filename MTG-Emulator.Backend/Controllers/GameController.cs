@@ -14,7 +14,7 @@ namespace MTG_Emulator.Backend.Controllers
     public class GameController : MtgController
     {
         private readonly MTGContext context;
-        private readonly HashSet<string> gameCodes = new HashSet<string>();
+        private static readonly HashSet<string> gameCodes = new HashSet<string>();
 
         public GameController(MTGContext context)
         {
@@ -36,11 +36,7 @@ namespace MTG_Emulator.Backend.Controllers
                 return Conflict(new GameResponseDto { Success = false, Message = "You are already in a game." });
             
 
-            string code = generateCode();
-            while (await context.Games.AnyAsync(g => g.GameCode == code))
-                code = generateCode();
-
-            gameCodes.Add(code);
+            string code = generateUniqueCode();
 
             var game = new Game
             {
@@ -53,10 +49,10 @@ namespace MTG_Emulator.Backend.Controllers
             };
 
             context.Games.Add(game);
+            game.Players.Add(player);
             await context.SaveChangesAsync();
 
             player.CurrentGameId = game.GameId;
-            game.Players.Add(player);
             await context.SaveChangesAsync();
 
             return Ok(new GameResponseDto
@@ -200,7 +196,23 @@ namespace MTG_Emulator.Backend.Controllers
             await context.SaveChangesAsync();
             return NoContent();
         }
+        
+        private void deleteGame(Game game)
+        {
+            gameCodes.Remove(game.GameCode);
+            context.Games.Remove(game);
+        }
 
+        private static string generateUniqueCode()
+        {
+            string code;
+            do
+            {
+                code = generateCode();
+            } while (!gameCodes.Add(code));
+
+            return code;
+        }
         private static string generateCode()
         {
             const int maxlength = 6;
