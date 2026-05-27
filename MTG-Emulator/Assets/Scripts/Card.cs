@@ -12,6 +12,8 @@ public class Card : MonoBehaviour, IPointerClickHandler
     [SerializeField]
     private Image cardImage;
 
+    public Sprite cardSprite => cardImage.sprite;
+
     private TMP_Text cardName;
 
     public Guid Identifier => cardData.Identifier;
