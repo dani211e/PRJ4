@@ -6,8 +6,11 @@ left to right direction
 class DeckSelection
 class Deck
 class CardInfo
+class RelatedCardInfo
 class Card
 class Drag
+class Token
+class CardMenu
 class ZonesDrop
 class BattlefieldDrop
 class APIManager
@@ -23,9 +26,16 @@ Card --> CardInfo
 Card --> APIManager
 
 Drag --> Card
+Drag --> Token
 ZonesDrop --> Card
+ZonesDrop --> Token
 BattlefieldDrop --> Card
+BattlefieldDrop --> Token
 BattlefieldDrop --> SignalRClient
+CardMenu --> Card
+CardMenu --> Token
+Token --> RelatedCardInfo
+
 
 TurnManager --> SignalRClient
 PlayerHealth --> SignalRClient
