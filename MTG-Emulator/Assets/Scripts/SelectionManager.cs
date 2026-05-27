@@ -13,6 +13,7 @@ public class SelectionManager : MonoBehaviour
     private Vector2 startPos;
     private bool isDragging = false;
     private List<Tapable> selectedCards = new();
+    private Dictionary<Tapable, Outline> outlines = new();
 
     private void Awake()
     {
@@ -73,6 +74,36 @@ public class SelectionManager : MonoBehaviour
             SelectCardsInBox();
         }
     }
+    
+    private Outline GetOrAddOutline(Tapable tapable)
+    {
+        if (outlines.TryGetValue(tapable, out Outline existing))
+            return existing;
+
+        var graphic = tapable.GetComponent<Graphic>()
+                      ?? tapable.GetComponentInChildren<Graphic>();
+
+        GameObject target = graphic != null ? graphic.gameObject : tapable.gameObject;
+
+        Outline outline = target.GetComponent<Outline>()
+                          ?? target.AddComponent<Outline>();
+
+        outline.effectDistance = new Vector2(3, 3);
+        outline.enabled = false;
+
+        outlines[tapable] = outline;
+        return outline;
+    }
+
+    private void SetHighlight(Tapable tapable, bool active)
+    {
+        if (IsSelected(tapable))
+            return;
+
+        Outline outline = GetOrAddOutline(tapable);
+        outline.enabled = active;
+        outline.effectColor = Color.cyan;
+    }
 
     private void UpdateSelectionBox(Vector2 currentPos)
     {
@@ -102,10 +133,7 @@ public class SelectionManager : MonoBehaviour
         foreach (Tapable tapable in FindObjectsOfType<Tapable>())
         {
             Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(null, tapable.transform.position);
-            if (selectionRect.Contains(screenPos))
-                tapable.HighLight();
-            else
-                tapable.UnHighlight();
+            SetHighlight(tapable, selectionRect.Contains(screenPos));
         }
     }
 
@@ -121,17 +149,20 @@ public class SelectionManager : MonoBehaviour
         foreach (Tapable tapable in FindObjectsOfType<Tapable>())
         {
             Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(null, tapable.transform.position);
+
+            SetHighlight(tapable, false);
+
             if (selectionRect.Contains(screenPos))
-                tapable.Select();
+                Register(tapable);
             else if (!Input.GetKey(KeyCode.LeftShift))
-                tapable.Deselect();
+                Unregister(tapable);
         }
     }
 
     public void DeselectAll()
     {
         foreach (Tapable t in new List<Tapable>(selectedCards))
-            t.Deselect();
+            Unregister(t);
         selectedCards.Clear();
     }
 
@@ -139,13 +170,21 @@ public class SelectionManager : MonoBehaviour
     {
         if (!selectedCards.Contains(tapable))
             selectedCards.Add(tapable);
+
+        Outline outline = GetOrAddOutline(tapable);
+        outline.enabled = true;
+        outline.effectColor = Color.yellow;
     }
 
     public void Unregister(Tapable tapable)
     {
         selectedCards.Remove(tapable);
+
+        Outline outline = GetOrAddOutline(tapable);
+        outline.enabled = false;
     }
 
+    public bool IsSelected(Tapable tapable) => selectedCards.Contains(tapable);
     public bool HasSelection => selectedCards.Count > 0;
     public List<Tapable> SelectedCards => selectedCards;
 }

@@ -10,32 +10,8 @@ public class Tapable : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
 {
     private bool isTapped = false;
     private bool isHovered = false;
-    private bool isSelected = false;
     private ZoneType currentZone;
-    private Outline selectionOutline;
     private Guid identifier;
-
-    private void Awake()
-    {
-        var graphic = GetComponent<Graphic>() ?? GetComponentInChildren<Graphic>();
-    
-        if (graphic != null)
-        {
-            selectionOutline = graphic.gameObject.GetComponent<Outline>();
-            if (selectionOutline == null)
-                selectionOutline = graphic.gameObject.AddComponent<Outline>();
-        }
-        else
-        {
-            selectionOutline = GetComponent<Outline>();
-            if (selectionOutline == null)
-                selectionOutline = gameObject.AddComponent<Outline>();
-        }
-
-        selectionOutline.enabled = false;
-        selectionOutline.effectColor = Color.yellow;
-        selectionOutline.effectDistance = new Vector2(3, 3);
-    }
 
     private void OnEnable()
     {
@@ -49,15 +25,8 @@ public class Tapable : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
             SignalRClient.Instance.OnTapCardEvent -= OnTapCardReceived;
     }
 
-    public void SetZone(ZoneType zone)
-    {
-        currentZone = zone;
-    }
-
-    public void SetIdentifier(Guid id)
-    {
-        identifier = id;
-    }
+    public void SetZone(ZoneType zone) => currentZone = zone;
+    public void SetIdentifier(Guid id) => identifier = id;
 
     private void Update()
     {
@@ -101,35 +70,6 @@ public class Tapable : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
         });
     }
 
-    public void HighLight()
-    {
-        selectionOutline.enabled = true;
-        selectionOutline.effectColor = Color.cyan;
-    }
-
-    public void UnHighlight()
-    {
-        if (!isSelected)
-            selectionOutline.enabled = false;
-        else
-            selectionOutline.effectColor = Color.yellow;
-    }
-
-    public void Select()
-    {
-        isSelected = true;
-        selectionOutline.enabled = true;
-        selectionOutline.effectColor = Color.yellow;
-        SelectionManager.Instance?.Register(this);
-    }
-
-    public void Deselect()
-    {
-        isSelected = false;
-        selectionOutline.enabled = false;
-        SelectionManager.Instance?.Unregister(this);
-    }
-
     public void OnPointerEnter(PointerEventData eventData) => isHovered = true;
     public void OnPointerExit(PointerEventData eventData) => isHovered = false;
 
@@ -140,10 +80,13 @@ public class Tapable : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
 
         if (Input.GetKey(KeyCode.LeftShift))
         {
-            if (isSelected)
-                Deselect();
+            if (SelectionManager.Instance == null)
+                return;
+
+            if (SelectionManager.Instance.IsSelected(this))
+                SelectionManager.Instance.Unregister(this);
             else
-                Select();
+                SelectionManager.Instance.Register(this);
         }
     }
 }
