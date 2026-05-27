@@ -1,0 +1,33 @@
+@startuml
+
+hide empty members
+left to right direction
+
+class DeckSelection
+class Deck
+class CardInfo
+class Card
+class Drag
+class ZonesDrop
+class BattlefieldDrop
+class APIManager
+class TurnManager
+class PlayerHealth
+class SignalRClient
+
+DeckSelection --> Deck
+Deck --> CardInfo
+Deck --> Card
+
+Card --> CardInfo
+Card --> APIManager
+
+Drag --> Card
+ZonesDrop --> Card
+BattlefieldDrop --> Card
+BattlefieldDrop --> SignalRClient
+
+TurnManager --> SignalRClient
+PlayerHealth --> SignalRClient
+
+@enduml
