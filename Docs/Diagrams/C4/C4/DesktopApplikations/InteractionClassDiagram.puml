@@ -1,0 +1,85 @@
+@startuml
+
+
+class Card {
+ - cardImage : Image
+ - cardName : TMP_Text
+ - cardData : CardInfo
+ - button : Button
+ - isTapped : bool
+ + CurrentZone : ZoneType
+ + Identifier : Guid
+
+ + Setup(card : CardInfo) : void
+ + SetZones(zone : ZoneType) : void
+ + OnPointerClick(eventData : PointerEventData) : void
+ - Update() : void
+}
+
+class Drag {
+ - parentToReturnTo : Transform
+ - dragParent : Transform
+ - canvasGroup : CanvasGroup
+ - rectTransform : RectTransform
+ - canvas : Canvas
+ - card : Card
+ + WasDropped : bool
+
+ + OnBeginDrag(eventData : PointerEventData) : void
+ + OnDrag(eventData : PointerEventData) : void
+ + OnEndDrag(eventData : PointerEventData) : void
+}
+
+class ZonesDrop {
+ - downScale : bool
+ - droppedScale : Vector3
+ - droppedRotation : Vector3
+ - zoneType : ZoneType
+
+ + OnDrop(eventData : PointerEventData) : void
+}
+
+class BattlefieldDrop {
+ - zoneType : ZoneType
+
+ + OnDrop(eventData : PointerEventData) : void
+}
+
+class TurnManager {
+ - turnText : TMP_Text
+ - endTurnButton : Button
+ - localPlayerName : string
+ - currentPlayerTurn : string
+
+ + Start() : void
+ + IsMyTurn() : bool
+}
+
+class PlayerHealth {
+ - playerName : string
+ - healthText : TMP_Text
+ - health : int
+
+ + SetUp(ownerPlayerName : string) : void
+ + AddHealth() : void
+ + RemoveHealth() : void
+ - ChangeHealth(amount : int) : void
+}
+
+class SignalRClient {
+ + Instance : SignalRClient
+}
+
+Drag o-- Card
+
+ZonesDrop ..> Drag
+ZonesDrop ..> Card
+
+BattlefieldDrop ..> Drag
+BattlefieldDrop ..> Card
+BattlefieldDrop ..> SignalRClient
+
+TurnManager ..> SignalRClient
+PlayerHealth ..> SignalRClient
+
+@enduml
