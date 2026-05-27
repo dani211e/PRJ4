@@ -16,13 +16,13 @@ using UnityEngine.SceneManagement;
 
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
-                Debug.Log("Username or password is empty");
+                UIPopup.Instance.Show("Username or password is empty.");
                 return;
             }
 
             if (APIManager.Instance == null)
             {
-                Debug.Log("API Manager instance is null");
+                UIPopup.Instance.Show("Connection error. Please try again.");
                 return;
             }
 
@@ -37,14 +37,14 @@ using UnityEngine.SceneManagement;
                         {
                             if (error.Contains("404") || error.Contains("Not Found"))
                             {
-                                Debug.LogError("Account no longer exists.");
+                                UIPopup.Instance.Show("Account no longer exists.");
                                 PlayerPrefs.DeleteAll();
                                 PlayerPrefs.Save();
                             }
                         }
                     ));
                 },
-                error => Debug.LogError(error)
+                error => UIPopup.Instance.Show("Login failed: " + error)
             ));
         }
         

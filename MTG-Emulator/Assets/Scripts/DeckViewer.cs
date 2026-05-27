@@ -107,7 +107,7 @@ public class DeckViewer : MonoBehaviour
                 foreach (DeckDto item in result)
                     addDeckButton(item);
             },
-            error => Debug.LogError("Failed to load decks: " + error)
+            error => UIPopup.Instance.Show("Failed to load decks: " + error)
         ));
     }
 
@@ -210,7 +210,7 @@ public class DeckViewer : MonoBehaviour
                         StartCoroutine(APIManager.Instance.LoadImage(commander.ImageUri, img));
                 }
             },
-            error => Debug.LogError("Failed to load cards from deck " + deck.DeckId + " " + error)
+            error => UIPopup.Instance.Show("Failed to load deck: " + error)
         ));
     }
 
@@ -234,7 +234,7 @@ public class DeckViewer : MonoBehaviour
                 LoadDeckList();
                 ShowDeckList();
             },
-            error => Debug.LogError("Failed to delete deck: " + error)
+            error => UIPopup.Instance.Show("Failed to delete deck: " + error)
         ));
     }
 

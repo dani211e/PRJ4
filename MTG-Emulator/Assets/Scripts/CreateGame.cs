@@ -99,7 +99,8 @@ public class CreateGame : MonoBehaviour
             MaxPlayers = (int)maxPlayersSlider.value
         };
 
-        StartCoroutine(APIManager.Instance.CreateGame(dto, onSuccess: response =>
+        StartCoroutine(APIManager.Instance.CreateGame(dto,
+            onSuccess: response =>
             {
                 GameSession.GameCode = response.GameCode;
                 GameSession.MaxPlayers = response.MaxPlayers;
@@ -108,13 +109,12 @@ public class CreateGame : MonoBehaviour
 
                 refreshCode();
                 setStatus($"Game Created! Code:\n{response.GameCode}");
-                Debug.Log($"[CreateGame] Room {response.GameCode} ready for {response.MaxPlayers} players.");
             },
             onError: error =>
             {
                 createButton.interactable = true;
-                setStatus($"Error: {error}");
-                Debug.LogError($"[CreateGame] Error: {error}");
+                setStatus("Failed to create game.");
+                UIPopup.Instance.Show("Failed to create game: " + error);
             }));
     }
 

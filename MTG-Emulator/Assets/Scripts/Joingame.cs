@@ -65,40 +65,36 @@ public class JoinGame : MonoBehaviour
             GameCode = code
         };
         
-        StartCoroutine(APIManager.Instance.JoinGame(dto, onSuccess: response =>
-        {
-            GameSession.GameCode = response.GameCode;
-            GameSession.MaxPlayers = response.MaxPlayers;
-            GameSession.IsHost = false;
-            GameSession.PlayerId = response.CurrentPlayers - 1;
-            
-            SetStatus($"Joined! ({response.CurrentPlayers}/{response.MaxPlayers} players)");
-            Debug.Log($"[JoinGame] Joined room {response.GameCode}");
-
-
-            if (response.CurrentPlayers == response.MaxPlayers)
+        StartCoroutine(APIManager.Instance.JoinGame(dto,
+            onSuccess: response =>
             {
-                TurnOrderEvent turnOrderEvent = new TurnOrderEvent
-                {
-                    PlayersNames = response.PlayerNames,
-                    CurrentPlayerName = response.CurrentPlayerName,
-                };
+                GameSession.GameCode = response.GameCode;
+                GameSession.MaxPlayers = response.MaxPlayers;
+                GameSession.IsHost = false;
+                GameSession.PlayerId = response.CurrentPlayers - 1;
 
-                if (SignalRClient.Instance == null)
+                SetStatus($"Joined! ({response.CurrentPlayers}/{response.MaxPlayers} players)");
+
+                if (response.CurrentPlayers == response.MaxPlayers)
                 {
-                    return;
+                    TurnOrderEvent turnOrderEvent = new TurnOrderEvent
+                    {
+                        PlayersNames = response.PlayerNames,
+                        CurrentPlayerName = response.CurrentPlayerName,
+                    };
+
+                    if (SignalRClient.Instance == null) return;
+
+                    SignalRClient.Instance.Broadcast(turnOrderEvent);
+                    SceneManager.LoadScene("InGame");
                 }
-                
-                SignalRClient.Instance.Broadcast(turnOrderEvent);
-                SceneManager.LoadScene("InGame");
-            }
-        },
-        onError: error =>
-        {
-            joinButton.interactable = true;
-            SetStatus($"Failed: {error}");
-            Debug.LogError($"[JoinGame] {error}");
-        } ));
+            },
+            onError: error =>
+            {
+                joinButton.interactable = true;
+                SetStatus("Failed to join.");
+                UIPopup.Instance.Show("Failed to join game: " + error);
+            }));
 
     }
     public void OnClickBack()

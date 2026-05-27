@@ -60,18 +60,15 @@
         {
             if (newPasswordInput.text != confirmPasswordInput.text)
             {
-                Debug.LogError("Passwords do not match");
+                UIPopup.Instance.Show("Passwords do not match.");
                 return;
             }
 
             StartCoroutine(APIManager.Instance.ResetPassword(
                 newPasswordInput.text,
                 confirmPasswordInput.text,
-                () =>
-                {
-                    Debug.Log("Password changed");
-                },
-                Debug.LogError
+                () => UIPopup.Instance.Show("Password changed successfully!"),
+                err => UIPopup.Instance.Show("Error: " + err)
             ));
         }
         

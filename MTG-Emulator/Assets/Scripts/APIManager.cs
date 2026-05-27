@@ -65,7 +65,7 @@ public class APIManager : MonoBehaviour
 
         if (request.result != UnityWebRequest.Result.Success)
         {
-            onError?.Invoke(request.downloadHandler.text);
+            onError?.Invoke(APIManager.ParseError(request.downloadHandler.text));
         }
         else
         {
@@ -101,7 +101,7 @@ public class APIManager : MonoBehaviour
         yield return request.SendWebRequest();
 
         if (request.result != UnityWebRequest.Result.Success)
-            onError?.Invoke(request.downloadHandler.text);
+            onError?.Invoke(APIManager.ParseError(request.downloadHandler.text));
         else
         {
             string responseText = request.downloadHandler.text;
@@ -136,7 +136,7 @@ public class APIManager : MonoBehaviour
 
         if (request.result != UnityWebRequest.Result.Success)
         {
-            onError?.Invoke(request.downloadHandler.text);
+            onError?.Invoke(APIManager.ParseError(request.downloadHandler.text));
         }
         else
         {
@@ -171,7 +171,7 @@ public class APIManager : MonoBehaviour
         if (request.result != UnityWebRequest.Result.Success)
         {
             Debug.LogError("Get failed: " + request.result + " | HTTP " + request.responseCode + " | " + request.downloadHandler.text);
-            onError?.Invoke(request.result + " | HTTP " + request.responseCode + " | " + request.downloadHandler.text);
+            onError?.Invoke(APIManager.ParseError(request.downloadHandler.text));
         }
         else
         {
@@ -201,7 +201,7 @@ public class APIManager : MonoBehaviour
         if (request.result != UnityWebRequest.Result.Success)
         {
             Debug.Log("Get failed" + request.downloadHandler.text);
-            onError?.Invoke(request.downloadHandler.text);
+            onError?.Invoke(APIManager.ParseError(request.downloadHandler.text));
         }
         else
         {
@@ -228,7 +228,7 @@ public class APIManager : MonoBehaviour
         yield return request.SendWebRequest();
 
         if (request.result != UnityWebRequest.Result.Success)
-            onError?.Invoke(request.downloadHandler.text);
+            onError?.Invoke(APIManager.ParseError(request.downloadHandler.text));
         else
             onSuccess?.Invoke(JsonSerializer.Deserialize<GameResponseDto>(request.downloadHandler.text));
     }
@@ -247,7 +247,7 @@ public class APIManager : MonoBehaviour
         yield return request.SendWebRequest();
 
         if (request.result != UnityWebRequest.Result.Success)
-            onError?.Invoke(request.downloadHandler.text);
+            onError?.Invoke(APIManager.ParseError(request.downloadHandler.text));
         else
             onSuccess?.Invoke(JsonSerializer.Deserialize<GameResponseDto>(request.downloadHandler.text));
     }
@@ -264,7 +264,7 @@ public class APIManager : MonoBehaviour
         yield return request.SendWebRequest();
 
         if (request.result != UnityWebRequest.Result.Success)
-            onError?.Invoke(request.downloadHandler.text);
+            onError?.Invoke(APIManager.ParseError(request.downloadHandler.text));
         else
             onSuccess?.Invoke(request.downloadHandler.text);
     }
@@ -298,7 +298,7 @@ public class APIManager : MonoBehaviour
         
         if (request.result != UnityWebRequest.Result.Success)
         {
-            onError?.Invoke(request.downloadHandler.text);
+            onError?.Invoke(APIManager.ParseError(request.downloadHandler.text));
         }
         else
         {
@@ -354,7 +354,7 @@ public class APIManager : MonoBehaviour
 
         if (request.result != UnityWebRequest.Result.Success)
         {
-            onError?.Invoke(request.downloadHandler.text);
+            onError?.Invoke(APIManager.ParseError(request.downloadHandler.text));
         }
         else
         {
@@ -387,7 +387,7 @@ public class APIManager : MonoBehaviour
 
         if (request.result != UnityWebRequest.Result.Success)
         {
-            onError?.Invoke(request.downloadHandler.text);
+            onError?.Invoke(APIManager.ParseError(request.downloadHandler.text));
         }
         else
         {
@@ -426,7 +426,7 @@ public class APIManager : MonoBehaviour
         yield return request.SendWebRequest();
 
         if (request.result != UnityWebRequest.Result.Success)
-            onError?.Invoke(request.downloadHandler.text);
+            onError?.Invoke(APIManager.ParseError(request.downloadHandler.text));
         else
             onSuccess?.Invoke();
     }
@@ -443,8 +443,34 @@ public class APIManager : MonoBehaviour
         yield return request.SendWebRequest();
 
         if (request.result != UnityWebRequest.Result.Success)
-            onError?.Invoke(request.downloadHandler.text);
+            onError?.Invoke(APIManager.ParseError(request.downloadHandler.text));
         else
             onSuccess?.Invoke();
+    }
+    
+    public static string ParseError(string json)
+    {
+        try
+        {
+            var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+
+            // Try to get validation errors first
+            if (root.TryGetProperty("errors", out var errors))
+            {
+                var messages = new List<string>();
+                foreach (var error in errors.EnumerateObject())
+                foreach (var msg in error.Value.EnumerateArray())
+                    messages.Add(msg.GetString());
+                return string.Join("\n", messages);
+            }
+
+            // Fall back to title
+            if (root.TryGetProperty("title", out var title))
+                return title.GetString();
+        }
+        catch { }
+
+        return json;
     }
 }

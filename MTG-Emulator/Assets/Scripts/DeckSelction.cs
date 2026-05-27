@@ -57,7 +57,7 @@ public class DeckSelectPopup : MonoBehaviour
             },
             error =>
             {
-                Debug.LogError("Failed to load decks " + error);
+                UIPopup.Instance.Show("Failed to load decks: " + error);
             }
         ));
     }
