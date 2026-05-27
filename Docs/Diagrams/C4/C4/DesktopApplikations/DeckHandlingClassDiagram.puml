@@ -1,0 +1,73 @@
+@startuml
+
+class DeckSelection {
+ - settingsPopup : GameObject
+ - deckSelectionPopup : GameObject
+ - deckListParent : Transform
+ - deckButtonPrefab : GameObject
+ - gameplayDeck : Deck
+
+ - AddDeckButton(deck : DeckDto) : void
+ + OpenSettingsPopup() : void
+ + OpenDeckSelectionPopup() : void
+ + ClosePopup() : void
+ + LoadDeckList() : void
+}
+
+class Deck {
+ - countText : TMP_Text
+ - handParent : Transform
+ - cardPrefab : GameObject
+ - commanderSlot : CommanderSlot
+ - drawPile : List<CardInfo>
+
+ - UpdateCountText() : void
+ - shuffle() : void
+ - Update() : void
+ + LoadDeck(deck : DeckDto) : void
+ + DrawCard() : void
+ + DrawTopCard() : CardInfo
+ + GetRemainingCardCount() : int
+}
+
+class Card {
+ + Setup(card : CardInfo) : void
+}
+
+class CardInfo {
+ + Identifier : Guid
+ + ScryfallId : Guid
+ + Name : string
+ + ImageUri : string
+ + AltFace : CardFaceInfo
+ + RelatedCards : List<RelatedCardInfo>
+}
+
+class CardFaceInfo {
+ + Name : string
+ + ImageUri : string
+}
+
+class RelatedCardInfo {
+ + RelatedCardId : int
+ + Name : string
+ + ImageUrl : string
+}
+
+class APIManager {
+ + Instance : APIManager
+ + LoadImage(url : string, image : Image) : IEnumerator
+}
+
+DeckSelection o-- Deck
+DeckSelection ..> APIManager
+
+Deck o-- CardInfo
+Deck ..> Card
+
+Card o-- CardInfo
+
+CardInfo *-- CardFaceInfo
+CardInfo *-- RelatedCardInfo
+
+@enduml
