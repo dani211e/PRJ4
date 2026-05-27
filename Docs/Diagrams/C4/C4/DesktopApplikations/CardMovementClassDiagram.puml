@@ -1,0 +1,62 @@
+@startuml
+
+
+class Card {
+- cardData : CardInfo
+- isTapped : bool
++ CurrentZone : ZoneType
++ Identifier : Guid
+
++ Setup(card : CardInfo) : void
++ SetZones(zone : ZoneType) : void
++ OnPointerClick(eventData : PointerEventData) : void
+- Update() : void
+}
+
+class Drag {
+- parentToReturnTo : Transform
+- dragParent : Transform
+- card : Card
++ WasDropped : bool
+
++ OnBeginDrag(eventData : PointerEventData) : void
++ OnDrag(eventData : PointerEventData) : void
++ OnEndDrag(eventData : PointerEventData) : void
+}
+
+class ZonesDrop {
+- downScale : bool
+- droppedScale : Vector3
+- droppedRotation : Vector3
+- zoneType : ZoneType
+
++ OnDrop(eventData : PointerEventData) : void
+}
+
+class BattlefieldDrop {
+- zoneType : ZoneType
+
++ OnDrop(eventData : PointerEventData) : void
+}
+
+enum ZoneType {
+Hand
+Bf
+Library
+Graveyard
+Exile
+}
+
+Drag o-- Card
+
+ZonesDrop ..> Drag
+ZonesDrop ..> Card
+
+BattlefieldDrop ..> Drag
+BattlefieldDrop ..> Card
+
+Card ..> ZoneType
+ZonesDrop ..> ZoneType
+BattlefieldDrop ..> ZoneType
+
+@enduml
