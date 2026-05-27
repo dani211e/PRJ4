@@ -160,6 +160,7 @@ namespace MTG_Emulator.Backend.Controllers
         }
 
         [HttpGet("{code}")]
+        [Authorize(Policy = "PlayerOrAdmin")]
         public async Task<ActionResult<GameResponseDto>> GetGame(string code)
         {
             var game = await context.Games
