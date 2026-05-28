@@ -149,8 +149,10 @@ namespace MTG_Emulator.Backend.Controllers
             player.CurrentGameId = null;
 
             if (game.CurrentPlayers <= 0)
+            {
                 gameCodes.Remove(game.GameCode);
                 context.Games.Remove(game);
+            }
 
             await context.SaveChangesAsync();
             return NoContent();
