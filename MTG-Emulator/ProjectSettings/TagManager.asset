@@ -2,17 +2,22 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
-  tags: []
+  serializedVersion: 3
+  tags:
+  - HandZone
+  - DeckZone
+  - ExileZone
+  - BattlefieldZone
+  - GraveyardZone
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Background
   - Water
   - UI
-  - 
-  - 
+  - Buttons
+  - Postprocessing
   - 
   - 
   - 
@@ -41,3 +46,11 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Background
+    uniqueID: 2495897473
+    locked: 0
+  - name: Buttons
+    uniqueID: 2338898709
+    locked: 0
+  m_RenderingLayers:
+  - Default
