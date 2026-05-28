@@ -14,7 +14,7 @@ namespace MTG_Emulator.Backend.Controllers
     public class GameController : MtgController
     {
         private readonly MTGContext context;
-        private readonly HashSet<string> gameCodes = new HashSet<string>();
+        private static readonly HashSet<string> gameCodes = new HashSet<string>();
 
         public GameController(MTGContext context)
         {
@@ -36,11 +36,7 @@ namespace MTG_Emulator.Backend.Controllers
                 return Conflict(new GameResponseDto { Success = false, Message = "You are already in a game." });
             
 
-            string code = generateCode();
-            while (await context.Games.AnyAsync(g => g.GameCode == code))
-                code = generateCode();
-
-            gameCodes.Add(code);
+            string code = generateUniqueCode();
 
             var game = new Game
             {
@@ -53,10 +49,10 @@ namespace MTG_Emulator.Backend.Controllers
             };
 
             context.Games.Add(game);
+            game.Players.Add(player);
             await context.SaveChangesAsync();
 
             player.CurrentGameId = game.GameId;
-            game.Players.Add(player);
             await context.SaveChangesAsync();
 
             return Ok(new GameResponseDto
@@ -105,7 +101,7 @@ namespace MTG_Emulator.Backend.Controllers
             if (game.CurrentPlayers == game.MaxPlayers)
             {
                 game.Status = "InProgress";
-                game.PlayerNames = game.PlayerNames.OrderBy(n => Random.Shared.Next()).ToList();
+                game.PlayerNames = game.PlayerNames.OrderBy(_ => Random.Shared.Next()).ToList();
             }
 
             await context.SaveChangesAsync();
@@ -117,7 +113,7 @@ namespace MTG_Emulator.Backend.Controllers
                 MaxPlayers = game.MaxPlayers,
                 CurrentPlayers = game.CurrentPlayers,
                 PlayerNames = game.PlayerNames,
-                CurrentPlayerName = game.PlayerNames.FirstOrDefault(),
+                CurrentPlayerName = game.PlayerNames.FirstOrDefault() ?? string.Empty,
                 Message = "Joined successfully."
             });
         }
@@ -153,7 +149,10 @@ namespace MTG_Emulator.Backend.Controllers
             player.CurrentGameId = null;
 
             if (game.CurrentPlayers <= 0)
+            {
+                gameCodes.Remove(game.GameCode);
                 context.Games.Remove(game);
+            }
 
             await context.SaveChangesAsync();
             return NoContent();
@@ -195,21 +194,30 @@ namespace MTG_Emulator.Backend.Controllers
 
             foreach (var player in game.Players)
                 player.CurrentGameId = null;
-
+            
+            gameCodes.Remove(game.GameCode);
             context.Games.Remove(game);
             await context.SaveChangesAsync();
             return NoContent();
         }
+        
 
-        private static string generateCode()
+        private static string generateUniqueCode()
         {
             const int maxlength = 6;
             const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-            var sb = new StringBuilder(maxlength);
-            var rng = new Random(Guid.NewGuid().GetHashCode());
-            for (int i = 0; i < maxlength; i++)
-                sb.Append(chars[rng.Next(chars.Length)]);
-            return sb.ToString();
+
+            string code;
+            do
+            {
+                var sb = new StringBuilder(maxlength);
+                var rng = new Random(Guid.NewGuid().GetHashCode());
+                for (int i = 0; i < maxlength; i++)
+                    sb.Append(chars[rng.Next(chars.Length)]);
+                code = sb.ToString();
+            } while (!gameCodes.Add(code));
+
+            return code;
         }
     }
 }
