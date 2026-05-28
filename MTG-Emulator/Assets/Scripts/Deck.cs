@@ -1,68 +1,143 @@
 using System.Collections.Generic;
+using System.Linq;
+using MTG_Emulator;
+using MTG_Emulator.Cards;
+using MTG_Emulator.Cards.Extensions;
+using MTG_Emulator.Unity.Db.DTO.DeckDTO;
+using TMPro;
 using UnityEngine;
+using Random = System.Random;
 
 public class Deck : MonoBehaviour
 {
-    [SerializeField] private GameObject cardPrefab;
-    [SerializeField] private Transform deckVisualParent;
-    [SerializeField] private Transform handParent;
-    [SerializeField] private int deckSize = 100;
+    [SerializeField]
+    private TMP_Text countText;
 
-    private List<Sprite> cards = new();
-    private GameObject topVisual;
+    [SerializeField]
+    private Transform handParent;
 
-    void Awake()
+    [SerializeField]
+    private GameObject cardPrefab;
+    
+    [SerializeField] 
+    private CommanderSlot commanderSlot;
+
+
+    private List<CardInfo> drawPile = new();
+
+    public void LoadDeck(DeckDto deck)
     {
-        if (deckVisualParent == null) deckVisualParent = transform;
-    }
-
-    void Start()
-    {
-        var fronts = Resources.LoadAll<Sprite>("FrontImage");
-        cards.Clear();
-
-        if (fronts.Length == 0)
+        if (deck == null)
         {
+            Debug.LogError("Tried to load a null deck.");
             return;
         }
 
-        for (int i = 0; i < deckSize; i++)
+        StartCoroutine(APIManager.Instance.GetDeckById(
+            deck.DeckId,
+            result =>
+            {
+                Debug.Log(result.Cards);
+
+                drawPile.Clear();
+
+                if (result.Cards != null)
+                {
+                    drawPile.AddRange(result.Cards.Select(c => c.ToCardInfo()));
+                }
+                if (result.CommandZone != null && result.CommandZone.Count > 0)
+                {
+                    var commanders = result.CommandZone.Select(c => c.ToCardInfo()).ToList();
+                    drawPile.RemoveAll(c => commanders.Any(cmd => cmd.Name == c.Name));
+                    commanderSlot?.PlaceCommander(commanders);
+                }
+                
+                shuffle();
+
+                UpdateCountText();
+
+                Debug.Log("Loaded gameplay deck: " + result.DeckName);
+                Debug.Log("Cards loaded: " + drawPile.Count);
+
+                ResetGameplayStateForNewDeck();
+            }, error => { Debug.LogError("Failed to load cards from deck " + deck.DeckId + " " + error); }));
+    }
+
+    private void ResetGameplayStateForNewDeck()
+    {
+    }
+
+    public void DrawCard()
+    {
+        CardInfo card = DrawTopCard();
+
+        if (card == null)
+            return;
+
+        if (handParent == null)
         {
-            cards.Add(fronts[i % fronts.Length]);
+            Debug.LogError("Hand parent is not assigned.");
+            return;
         }
 
-        ShowTopFaceDown();
+        if (cardPrefab == null)
+        {
+            Debug.LogError("Card prefab is not assigned.");
+            return;
+        }
+
+        GameObject cardObj = Instantiate(cardPrefab, handParent);
+
+        Card cardScript = cardObj.GetComponent<Card>();
+        if (cardScript != null)
+            cardScript.Setup(card);
+        else
+            Debug.LogError("Card prefab does not have a Card script.");
+
+        CardManager.AddObject(GameSession.PlayerId, card, cardObj);
+    }
+
+    public CardInfo DrawTopCard()
+    {
+        if (drawPile.Count == 0)
+        {
+            Debug.LogWarning("No cards left in draw pile.");
+            return null;
+        }
+
+        CardInfo card = drawPile[0];
+        drawPile.RemoveAt(0);
+        UpdateCountText();
+        return card;
+    }
+
+    public int GetRemainingCardCount()
+    {
+        return drawPile.Count;
+    }
+
+    private void UpdateCountText()
+    {
+        if (countText != null)
+            countText.text = drawPile.Count.ToString();
+    }
+
+    private void shuffle()
+    {
+        var rng = new Random();
+        var n = drawPile.Count;
+        while (n > 1)
+        {
+            n--;
+            var k = rng.Next(n + 1);
+            (drawPile[k], drawPile[n]) = (drawPile[n], drawPile[k]);
+        }
+        Debug.Log("Deck shuffled.");
     }
     
-
-    public void DrawToHand()
+    private void Update()
     {
-        if (cards.Count == 0) return;
-
-        var front = cards[^1];
-        cards.RemoveAt(cards.Count - 1);
-
-        var go = Instantiate(cardPrefab, handParent, false);
-        go.GetComponent<Card>().Init(front, startFaceDown: false);
-        
-        
-        ShowTopFaceDown();
-    }
-    
-    void ShowTopFaceDown()
-    {
-        if (topVisual == null)
-        {
-            topVisual = Instantiate(cardPrefab, deckVisualParent, false);
-        }
-        
-        var drag = topVisual.GetComponent<Drag>();
-        if (drag != null)
-        {
-            Destroy(drag);
-        }
-
-        var c = topVisual.GetComponent<Card>();
-        c.Init(front: cards.Count > 0 ? cards[^1] : null, startFaceDown: true);
+        if (Input.GetKeyDown(KeyCode.V))
+            shuffle();
     }
 }

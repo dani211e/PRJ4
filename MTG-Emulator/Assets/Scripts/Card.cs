@@ -1,28 +1,81 @@
+using System;
+using MTG_Emulator.Cards;
+using MTG_Emulator.Unity.Synchronization.Enums;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Card : MonoBehaviour
+public class Card : MonoBehaviour, IPointerClickHandler
 {
-    [SerializeField] private Image image;
-    [SerializeField] private Sprite backImg;
+    [Header("Visible UI")]
+    [SerializeField]
+    private Image cardImage;
 
-    private Sprite frontUp;
-    private bool faceDown = true;
+    public Sprite cardSprite => cardImage.sprite;
 
-    void Awake()
+    private TMP_Text cardName;
+
+    public Guid Identifier => cardData.Identifier;
+
+
+    public CardInfo cardData;
+    private Button button;
+    private bool Istapped = false;
+    public ZoneType CurrentZone { get; private set; }
+
+    public void Setup(CardInfo card, Action<CardInfo> onClick = null)
     {
-        if(image == null) image = GetComponent<Image>();
+        cardData = card;
+
+        if (cardName != null)
+        {
+            cardName.text = card.Name;
+        }
+
+        button = GetComponent<Button>();
+        if (button == null)
+        {
+            button = gameObject.AddComponent<Button>();
+        }
+
+        button.onClick.RemoveAllListeners();
+        
+
+        if (onClick != null)
+        {
+            button.onClick.AddListener(() => onClick(cardData));
+        }
+
+        if (!string.IsNullOrEmpty(card.ImageUri))
+            StartCoroutine(APIManager.Instance.LoadImage(card.ImageUri, cardImage));
     }
 
-    public void Init(Sprite front, bool startFaceDown)
+    public void SetZones(ZoneType zone)
     {
-        frontUp = front;
-        faceDown = startFaceDown;
-        Refresh();
+        CurrentZone = zone;
     }
 
-    public void Refresh()
+    private void Update()
     {
-        image.sprite = faceDown ? backImg : frontUp;
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (CurrentZone != ZoneType.Bf)
+            {
+                return;
+            }
+
+            Debug.Log("Q is pressed");
+            transform.Rotate(0, 0, Istapped ? 90.0f : -90.0f);
+            Istapped = !Istapped;
+        }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            CardMenu.Instance.Open(this);
+        }
     }
 }

@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latestMajor</LangVersion>
+    <RootNamespace>MTG_Emulator.Unity</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <Target Name="CopyToUnity" AfterTargets="Build">
+    <Copy
+      SourceFiles="$(TargetDir)$(ProjectName).dll;$(TargetDir)$(ProjectName).pdb"
+      DestinationFolder="$(TargetDir)..\..\..\..\MTG-Emulator\Assets\"
+    />
+  </Target>
+
+  <ItemGroup>
+	<PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+  </ItemGroup>
+</Project>
