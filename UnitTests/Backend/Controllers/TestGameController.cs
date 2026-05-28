@@ -453,6 +453,43 @@ namespace UnitTests.Backend.Controllers
             Assert.That(deletedGame, Is.Null);
         }
         
+        [Test]
+        public async Task LeaveGame_PlayerInDifferentGame_ReturnsBadRequest()
+        {
+            var player = await InsertPlayerAsync(username: "Player", apiUserId: "user-id");
+
+            var ownedGame = new Game
+            {
+                GameCode = "GAME01",
+                MaxPlayers = 4,
+                CurrentPlayers = 1,
+                HostName = "Player",
+                PlayerNames = new List<string> { "Player" },
+                Status = "Waiting"
+            };
+            var otherGame = new Game
+            {
+                GameCode = "GAME02",
+                MaxPlayers = 4,
+                CurrentPlayers = 1,
+                HostName = "SomeoneElse",
+                PlayerNames = new List<string> { "SomeoneElse" },
+                Status = "Waiting"
+            };
+
+            Context.Games.AddRange(ownedGame, otherGame);
+            await Context.SaveChangesAsync();
+
+            player.CurrentGameId = ownedGame.GameId;
+            await Context.SaveChangesAsync();
+
+            SetControllerUser(uut, "user-id");
+
+            var result = await uut.LeaveGame(otherGame.GameCode);
+
+            Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
+        }
+        
         //GetGame
         [Test]
         public async Task GetGame_GameNotFound_ReturnsNotFound()
