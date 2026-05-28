@@ -70,13 +70,42 @@ class SignalRClient {
  + Instance : SignalRClient
 }
 
+class CardMenu{
+- currentCard : Card
+- currentToken : Token
+- Close() : void
++ Open(card : Card) : void
++ Open (toke : Token) : void
++ OnSpawnTokenClicked(index : int) : void
+}
+
+class Token{
+- tokenImage : Image
+- cardName : TMP_Text
+- tokenData : RelatedCardDto
+- card : Card
+- button : Button
+- isTapped : bool
+- currentZone : ZoneType
++  Setup(token : RelatedCardInfo) : void
++ OnPointerClick(eventData : PointerEventData) : void
+}
+
 Drag o-- Card
+Token o-- Card
+
+
+CardMenu ..> Token
+CardMenu ..> Card
 
 ZonesDrop ..> Drag
 ZonesDrop ..> Card
+ZonesDrop ..> Token
+
 
 BattlefieldDrop ..> Drag
 BattlefieldDrop ..> Card
+BattlefieldDrop ..> Token
 BattlefieldDrop ..> SignalRClient
 
 TurnManager ..> SignalRClient
