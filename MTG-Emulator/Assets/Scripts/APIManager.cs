@@ -361,27 +361,18 @@ public class APIManager : MonoBehaviour
             onSuccess?.Invoke();
         }
     }
-    public IEnumerator DeleteAccount(
-        Action onSuccess,
-        Action<string> onError)
+    public IEnumerator DeleteAccount(Action onSuccess, Action<string> onError)
     {
-        string username = PlayerPrefs.GetString("username");
         UnityWebRequest request = new UnityWebRequest(
-            baseUrl + "Player/" + UnityWebRequest.EscapeURL(username),
+            baseUrl + "Authentication/delete-account",
             "DELETE"
         );
 
         request.downloadHandler = new DownloadHandlerBuffer();
 
         string token = PlayerPrefs.GetString("jwtToken");
-
         if (!string.IsNullOrEmpty(token))
-        {
-            request.SetRequestHeader(
-                "Authorization",
-                "Bearer " + token
-            );
-        }
+            request.SetRequestHeader("Authorization", "Bearer " + token);
 
         yield return request.SendWebRequest();
 
@@ -390,9 +381,7 @@ public class APIManager : MonoBehaviour
             onError?.Invoke(APIManager.ParseError(request.downloadHandler.text));
         }
         else
-        {
             onSuccess?.Invoke();
-        }
     }
 
     public IEnumerator LoadImage(string url, Image image)
