@@ -101,7 +101,7 @@ namespace MTG_Emulator.Backend.Controllers
             if (game.CurrentPlayers == game.MaxPlayers)
             {
                 game.Status = "InProgress";
-                game.PlayerNames = game.PlayerNames.OrderBy(n => Random.Shared.Next()).ToList();
+                game.PlayerNames = game.PlayerNames.OrderBy(_ => Random.Shared.Next()).ToList();
             }
 
             await context.SaveChangesAsync();
@@ -113,7 +113,7 @@ namespace MTG_Emulator.Backend.Controllers
                 MaxPlayers = game.MaxPlayers,
                 CurrentPlayers = game.CurrentPlayers,
                 PlayerNames = game.PlayerNames,
-                CurrentPlayerName = game.PlayerNames.FirstOrDefault(),
+                CurrentPlayerName = game.PlayerNames.FirstOrDefault() ?? string.Empty,
                 Message = "Joined successfully."
             });
         }
@@ -197,11 +197,6 @@ namespace MTG_Emulator.Backend.Controllers
             return NoContent();
         }
         
-        private void deleteGame(Game game)
-        {
-            gameCodes.Remove(game.GameCode);
-            context.Games.Remove(game);
-        }
 
         private static string generateUniqueCode()
         {
