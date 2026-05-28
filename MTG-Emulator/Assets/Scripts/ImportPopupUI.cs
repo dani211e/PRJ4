@@ -97,13 +97,13 @@ public class ImportPopupUI : MonoBehaviour
 
         if (string.IsNullOrEmpty(deckName) || string.IsNullOrEmpty(importText))
         {
-            Debug.LogError("Deck name or card list is empty");
+            UIPopup.Instance.Show("Deck name or card list is empty.");
             return;
         }
 
         if (!validateCardList(importText, out string validationError))
         {
-            Debug.LogError("Invalid card list format: " + validationError);
+            UIPopup.Instance.Show("Invalid card list: " + validationError);
             return;
         }
 
@@ -125,7 +125,7 @@ public class ImportPopupUI : MonoBehaviour
                 selectedCommanders.Clear();
                 showCommanderPicker(deck);
             },
-            error => Debug.LogError("API ERROR: " + error)
+            error => UIPopup.Instance.Show("Failed to create deck: " + error)
         ));
     }
 
@@ -245,7 +245,7 @@ public class ImportPopupUI : MonoBehaviour
                 else
                     Debug.Log("Commanders saved successfully.");
             },
-            error => Debug.LogError("Failed to save commanders: " + error)
+            error => UIPopup.Instance.Show("Failed to save commanders: " + error)
         ));
     }
 

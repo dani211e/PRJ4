@@ -33,10 +33,10 @@ public class RegisterUI : MonoBehaviour
             dto,
             result =>
             {
-                Debug.Log("Registered successfully!");
+                UIPopup.Instance.Show("Registered successfully!");
                 SceneManager.LoadScene("Login screen");
             },
-            error => Debug.LogError("Register failed: " + error)
+            error => UIPopup.Instance.Show("Register failed: " + error)
         ));
     }
 
