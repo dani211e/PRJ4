@@ -200,23 +200,20 @@ namespace MTG_Emulator.Backend.Controllers
 
         private static string generateUniqueCode()
         {
+            const int maxlength = 6;
+            const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
             string code;
             do
             {
-                code = generateCode();
+                var sb = new StringBuilder(maxlength);
+                var rng = new Random(Guid.NewGuid().GetHashCode());
+                for (int i = 0; i < maxlength; i++)
+                    sb.Append(chars[rng.Next(chars.Length)]);
+                code = sb.ToString();
             } while (!gameCodes.Add(code));
 
             return code;
-        }
-        private static string generateCode()
-        {
-            const int maxlength = 6;
-            const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-            var sb = new StringBuilder(maxlength);
-            var rng = new Random(Guid.NewGuid().GetHashCode());
-            for (int i = 0; i < maxlength; i++)
-                sb.Append(chars[rng.Next(chars.Length)]);
-            return sb.ToString();
         }
     }
 }
