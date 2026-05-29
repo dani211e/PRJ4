@@ -1,0 +1,63 @@
+﻿@startuml 2
+hide empty members
+'skinparam linetype ortho
+
+class SyncEvent
+class ObjectEvent
+
+class MoveCardEvent
+class NewCardEvent
+class PlayerStatsEvent
+class TurnChangedEvent
+class TurnOrderEvent
+
+class Hub
+
+interface ISyncEventListener
+{
+    + MoveCard(e : MoveCardEvent) : Task
+    + NewCard(e : NewCardEvent) : Task
+    + UpdatePlayerStats(e : PlayerStatsEvent) : Task
+    + TurnChanged(e : TurnChangedEvent) : Task
+    + TurnOrderCreated(e : TurnOrderEvent) : Task
+}
+
+class GameStateSyncHub extends Hub
+class GameStateSyncHub implements ISyncEventListener 
+{
+    + MoveCard(e : MoveCardEvent) : Task
+    + NewCard(e : NewCardEvent) : Task
+    + UpdatePlayerStats(e : PlayerStatsEvent) : Task
+    + TurnChanged(e : TurnChangedEvent) : Task
+    + TurnOrderCreated(e : TurnOrderEvent) : Task
+}
+
+interface ISyncEventHandler 
+{
+    + OnMoveCard(e : MoveCardEvent) : void
+    + OnNewCard(e : NewCardEvent) : void
+    + OnUpdatePlayerStats(e : PlayerStatsEvent) : void
+    + OnTurnChanged(e : TurnChangedEvent) : void
+    + OnTurnOrderCreated(e : TurnOrderEvent) : void
+}
+
+SyncEvent <|-r- ObjectEvent
+
+ObjectEvent <|-u- MoveCardEvent
+ObjectEvent <|-u- NewCardEvent
+ObjectEvent <|-u- PlayerStatsEvent
+
+SyncEvent <|-u- TurnChangedEvent
+SyncEvent <|-u- TurnOrderEvent
+
+
+GameStateSyncHub .u.> ISyncEventHandler
+
+GameStateSyncHub .d.> MoveCardEvent
+GameStateSyncHub .d.> NewCardEvent
+GameStateSyncHub .d.> PlayerStatsEvent
+GameStateSyncHub .d.> TurnChangedEvent
+GameStateSyncHub .d.> TurnOrderEvent
+
+
+@enduml

@@ -1,0 +1,11 @@
+﻿@startuml CardManager
+
+class CardManager
+{
+    - {static}cards : Dictionary<Guid, GameObject>[];
+    + Awake() : void
+    + {static} AddObject(playerIndex : int, card : CardInfo, obj : GameObject) : void
+    + {static} Get(playerIndex : int, identifier : Guid) : GameObject
+}
+
+@enduml
