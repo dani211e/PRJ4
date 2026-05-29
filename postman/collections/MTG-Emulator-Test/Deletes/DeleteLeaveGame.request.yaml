@@ -1,0 +1,103 @@
+$kind: http-request
+name: DeleteLeaveGame
+url: "{{baseURL}}/api/Game/{{UserGame}}/leave"
+method: DELETE
+scripts:
+  - type: afterResponse
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Game/' + pm.environment.get('UserGame') + '/leave';\r
+
+      const test2Endpoint = baseURL + '/api/Game/' + pm.environment.get('UserGame');\r
+
+      \r
+
+      function check(responseJson) {\r
+
+      \    pm.expect(responseJson).to.have.property('Success');\r
+
+      \    pm.expect(responseJson).to.have.property('GameCode');\r
+
+      \    pm.expect(responseJson).to.have.property('MaxPlayers');\r
+
+      \    pm.expect(responseJson).to.have.property('CurrentPlayers');\r
+
+      \    pm.expect(responseJson).to.have.property('Message');\r
+
+      \r
+
+      \    pm.expect(responseJson.CurrentPlayers).to.equal(3);\r
+
+      }\r
+
+      \r
+
+      //User remove one person from game\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'DELETE',\r
+
+      \    header: [\r
+
+      \        {key: 'Content-Type', value: 'application/json'},\r
+
+      \        {key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \    ]\r
+
+      }, function(err, res){\r
+
+      \    pm.test(\"User leave is authorized (204)\", function(){\r
+
+      \        pm.expect(res.code).to.equal(204);\r
+
+      \        console.log('User DELETE code: ', res.code);\r
+
+      \    });\r
+
+      \    \r
+
+      \    // User\r
+
+      pm.sendRequest({\r
+
+      \    url: test2Endpoint,\r
+
+      \    method: 'GET',\r
+
+      \    header: [\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \    ]\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"UserToken GET is authorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(200);\r
+
+      \            console.log('User response:', JSON.stringify(res.json()));\r
+
+      \    });\r
+
+      \    pm.test(\"User get game by game code\", function(){\r
+
+      \        var responseJson = res.json();\r
+
+      \        check(responseJson);\r
+
+      \        console.log('found card', responseJson);\r
+
+      \    });\r
+
+      });\r
+
+      });\r
+
+      \r\n"
+    language: text/javascript
+order: 4093840464059162

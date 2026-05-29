@@ -1,0 +1,208 @@
+$kind: http-request
+name: PUTDeckByID
+url: "{{baseURL}}/api/Deck/{{UserDeck}}"
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"deckName\": \"test2\",\r
+
+    \     \"CommandZone\": [\r
+
+    \            \"Mountain\"\r
+
+    \    ],\r
+
+    \    \"cardList\": \"1 Mountain\\n99 Plains\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Deck/' + pm.environment.get('UserDeck');\r
+
+      const test2Endpoint = baseURL + '/api/Deck/' + pm.environment.get('UserDeck2');\r
+
+      const requestBody = pm.request.body.raw;\r
+
+      \r
+
+      function check(responseJson){\r
+
+      \    pm.expect(responseJson).to.have.property('DeckId');\r
+
+      \    pm.expect(responseJson).to.have.property('DeckName');\r
+
+      \    pm.expect(responseJson).to.have.property('CommandZone');\r
+
+      \    pm.expect(responseJson).to.have.property('Cards');\r
+
+      \    pm.expect(responseJson.Cards).to.be.an('array');\r
+
+      \    pm.expect(responseJson.Cards.length).to.be.above(0);\r
+
+      \    pm.expect(responseJson.CommandZone).to.be.an('array');\r
+
+      \    pm.expect(responseJson.CommandZone.length).to.be.above(0);\r
+
+      \r
+
+      \    responseJson.CommandZone.forEach(function(card) {\r
+
+      \        pm.expect(card).to.have.property('CardId');\r
+
+      \        pm.expect(card).to.have.property('Name');\r
+
+      \    });\r
+
+      \r
+
+      \    responseJson.Cards.forEach(function(card) {\r
+
+      \        pm.expect(card).to.have.property('CardId');\r
+
+      \        pm.expect(card).to.have.property('ScryfallId');\r
+
+      \        pm.expect(card).to.have.property('Name');\r
+
+      \        pm.expect(card).to.have.property('OracleText');\r
+
+      \        pm.expect(card).to.have.property('ImageUri');\r
+
+      \        pm.expect(card).to.have.property('AltFace');\r
+
+      \        pm.expect(card).to.have.property('RelatedCards');\r
+
+      \    });\r
+
+      \r
+
+      \    pm.expect(responseJson.DeckName).to.equal('test2');\r
+
+      \    pm.expect(responseJson.CommandZone.some(function(card) {\r
+
+      \        return card.Name === 'Mountain';\r
+
+      \    })).to.be.true;\r
+
+      }\r
+
+      \r
+
+      // Admin PUT\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'PUT',\r
+
+      \    header: [\r
+
+      \        { key: 'Content-Type', value: 'application/json' },\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('AdminToken')}\r
+
+      \    ],\r
+
+      \    body: { mode: 'raw', raw: requestBody }\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"Admin PUT is authorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(204);\r
+
+      \    });\r
+
+      \r
+
+      \    //GET to verify\r
+
+      \    pm.sendRequest({\r
+
+      \        url: testEndpoint,\r
+
+      \        method: 'GET',\r
+
+      \        header: [\r
+
+      \            { key: 'Authorization', value: 'Bearer ' + pm.environment.get('AdminToken')}\r
+
+      \        ]\r
+
+      \    }, function(err, res) {\r
+
+      \        pm.test(\"Admin deck updated correctly\", function(){\r
+
+      \            var responseJson = res.json();\r
+
+      \            check(responseJson);\r
+
+      \        });\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      // User PUT\r
+
+      pm.sendRequest({\r
+
+      \    url: test2Endpoint,\r
+
+      \    method: 'PUT',\r
+
+      \    header: [\r
+
+      \        { key: 'Content-Type', value: 'application/json' },\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \    ],\r
+
+      \    body: { mode: 'raw', raw: requestBody }\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"User PUT is authorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(204);\r
+
+      \    });\r
+
+      \r
+
+      \    //GET to verify\r
+
+      \    pm.sendRequest({\r
+
+      \        url: test2Endpoint,\r
+
+      \        method: 'GET',\r
+
+      \        header: [\r
+
+      \            { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \        ]\r
+
+      \    }, function(err, res) {\r
+
+      \        pm.test(\"User deck updated correctly\", function(){\r
+
+      \            var responseJson = res.json();\r
+
+      \            check(responseJson);\r
+
+      \        });\r
+
+      \    });\r
+
+      });"
+    language: text/javascript
+order: 4357643572482590

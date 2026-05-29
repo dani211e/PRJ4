@@ -1,0 +1,247 @@
+$kind: http-request
+name: DELETEAccount
+url: "{{baseURL}}/api/Authentication/delete-account"
+method: DELETE
+scripts:
+  - type: afterResponse
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Authentication/delete-account';\r
+
+      \r
+
+      //User delete self\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'DELETE',\r
+
+      \    header: [\r
+
+      \        {key: 'Content-Type', value: 'application/json'},\r
+
+      \        {key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \    ]\r
+
+      }, function(err, res){\r
+
+      \    pm.test(\"User DELETE user is authorized (204)\", function(){\r
+
+      \        pm.expect(res.code).to.equal(204);\r
+
+      \        console.log('User DELETE code: ', res.code);\r
+
+      \        pm.environment.unset('Username');\r
+
+      \        pm.environment.unset('UserToken');\r
+
+      \r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      //User2 delete self\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'DELETE',\r
+
+      \    header: [\r
+
+      \        {key: 'Content-Type', value: 'application/json'},\r
+
+      \        {key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken2')}\r
+
+      \    ]\r
+
+      }, function(err, res){\r
+
+      \    pm.test(\"User2 DELETE user is authorized (204)\", function(){\r
+
+      \        pm.expect(res.code).to.equal(204);\r
+
+      \        console.log('User2 DELETE code: ', res.code);\r
+
+      \        pm.environment.unset('Username2');\r
+
+      \        pm.environment.unset('UserToken2');\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      //User3 delete self\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'DELETE',\r
+
+      \    header: [\r
+
+      \        {key: 'Content-Type', value: 'application/json'},\r
+
+      \        {key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken3')}\r
+
+      \    ]\r
+
+      }, function(err, res){\r
+
+      \    pm.test(\"User3 DELETE user is authorized (204)\", function(){\r
+
+      \        pm.expect(res.code).to.equal(204);\r
+
+      \        console.log('User3 DELETE code: ', res.code);\r
+
+      \        pm.environment.unset('Username3');\r
+
+      \        pm.environment.unset('UserToken3');\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      //User4 delete self\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'DELETE',\r
+
+      \    header: [\r
+
+      \        {key: 'Content-Type', value: 'application/json'},\r
+
+      \        {key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken4')}\r
+
+      \    ]\r
+
+      }, function(err, res){\r
+
+      \    pm.test(\"User4 DELETE user is authorized (204)\", function(){\r
+
+      \        pm.expect(res.code).to.equal(204);\r
+
+      \        console.log('User4 DELETE code: ', res.code);\r
+
+      \        pm.environment.unset('Username4');\r
+
+      \        pm.environment.unset('UserToken4');\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      //User5 delete self\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'DELETE',\r
+
+      \    header: [\r
+
+      \        {key: 'Content-Type', value: 'application/json'},\r
+
+      \        {key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken5')}\r
+
+      \    ]\r
+
+      }, function(err, res){\r
+
+      \    pm.test(\"User5 DELETE user is authorized (204)\", function(){\r
+
+      \        pm.expect(res.code).to.equal(204);\r
+
+      \        console.log('User5 DELETE code: ', res.code);\r
+
+      \        pm.environment.unset('Username5');\r
+
+      \        pm.environment.unset('UserToken5');\r
+
+      \    });\r
+
+      });\r
+
+      //User6 delete self\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'DELETE',\r
+
+      \    header: [\r
+
+      \        {key: 'Content-Type', value: 'application/json'},\r
+
+      \        {key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken6')}\r
+
+      \    ]\r
+
+      }, function(err, res){\r
+
+      \    pm.test(\"User6 DELETE user is authorized (204)\", function(){\r
+
+      \        pm.expect(res.code).to.equal(204);\r
+
+      \        console.log('User6 DELETE code: ', res.code);\r
+
+      \        pm.environment.unset('Username6');\r
+
+      \        pm.environment.unset('UserToken6');\r
+
+      \    });\r
+
+      });\r
+
+      //Admin delete user\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'DELETE',\r
+
+      \    header: [\r
+
+      \        {key: 'Content-Type', value: 'application/json'},\r
+
+      \        {key: 'Authorization', value: 'Bearer ' + pm.environment.get('AdminToken')}\r
+
+      \    ]\r
+
+      }, function(err, res){\r
+
+      \    pm.test(\"Admin DELETE user is authorized (204)\", function(){\r
+
+      \        pm.expect(res.code).to.equal(204);\r
+
+      \        console.log('Admin DELETE code: ', res.code);\r
+
+      \        pm.environment.unset('AdminToken');\r
+
+      \        pm.environment.unset('OGAdminToken');\r
+
+      \    });\r
+
+      });"
+    language: text/javascript
+order: 4098275386418219

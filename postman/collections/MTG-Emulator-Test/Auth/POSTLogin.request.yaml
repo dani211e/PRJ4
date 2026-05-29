@@ -1,0 +1,173 @@
+$kind: http-request
+name: POSTLogin
+url: "{{baseURL}}/api/Authentication/login"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"email\": \"admin@mtg.com\",\r
+
+    \    \"password\": \"Admin123!\"\r
+
+    }"
+scripts:
+  - type: beforeRequest
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Authentication/login';\r
+
+      \r
+
+      // Admin login\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'POST',\r
+
+      \    header: [{ key: 'Content-Type', value: 'application/json' }],\r
+
+      \    body: {\r
+
+      \        mode: 'raw',\r
+
+      \        raw: '{\"email\":\"test@mtg.com\",\"password\":\"Test123!\"}'\r
+
+      \    }\r
+
+      }, function(err, res) {\r
+
+      \    if (err) { console.log('Admin error:', err); return; }\r
+
+      \    pm.environment.set('AdminToken', res.json().Token);\r
+
+      \    console.log('AdminToken set:', res.json().Token);\r
+
+      });\r
+
+      \   \r
+
+      \    // User login\r
+
+      \    pm.sendRequest({\r
+
+      \        url: testEndpoint,\r
+
+      \        method: 'POST',\r
+
+      \        header: [{ key: 'Content-Type', value: 'application/json' }],\r
+
+      \        body: {\r
+
+      \            mode: 'raw',\r
+
+      \            raw: '{\"email\":\"test1@mtg.com\",\"password\":\"Test123!\"}'\r
+
+      \        }\r
+
+      \    }, function(err, res) {\r
+
+      \        if (err) { console.log('User error:', err); return; }\r
+
+      \        pm.environment.set('UserToken', res.json().Token);\r
+
+      \        console.log('UserToken set:', res.json().Token);\r
+
+      \    });\r
+
+      \r
+
+      \    // User2 login nested inside User callback\r
+
+      \        pm.sendRequest({\r
+
+      \            url: testEndpoint,\r
+
+      \            method: 'POST',\r
+
+      \            header: [{ key: 'Content-Type', value: 'application/json' }],\r
+
+      \            body: {\r
+
+      \                mode: 'raw',\r
+
+      \                raw: '{\"email\":\"test12@mtg.com\",\"password\":\"Test123!\"}'\r
+
+      \            }\r
+
+      \        }, function(err, res) {\r
+
+      \            if (err) { console.log('User2 error:', err); return; }\r
+
+      \            pm.environment.set('UserToken2', res.json().Token);\r
+
+      \            console.log('UserToken2 set:', res.json().Token);\r
+
+      \            pm.environment.set('Username2', res.json().Username);\r
+
+      \            console.log('Username2 set:', res.json().Username);\r
+
+      \        });\r
+
+      \r
+
+      \        // User3 login nested inside User callback\r
+
+      \        pm.sendRequest({\r
+
+      \            url: testEndpoint,\r
+
+      \            method: 'POST',\r
+
+      \            header: [{ key: 'Content-Type', value: 'application/json' }],\r
+
+      \            body: {\r
+
+      \                mode: 'raw',\r
+
+      \                raw: '{\"email\":\"test1222@mtg.com\",\"password\":\"Test123!\"}'\r
+
+      \            }\r
+
+      \        }, function(err, res) {\r
+
+      \            if (err) { console.log('User3 error:', err); return; }\r
+
+      \            pm.environment.set('UserToken3', res.json().Token);\r
+
+      \            console.log('UserToken3 set:', res.json().Token);\r
+
+      \        });\r\n"
+    language: text/javascript
+  - type: afterResponse
+    code: "var responseJSON = pm.response.json();\r
+
+      \r
+
+      pm.test(\"Login returns 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Response contains token\", function () {\r
+
+      \    pm.expect(responseJSON.Token).to.be.a('string');\r
+
+      \    pm.expect(responseJSON.Token).to.not.be.empty;\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Response time is acceptable\", function () {\r
+
+      \    pm.expect(pm.response.responseTime).to.be.below(500);\r
+
+      });"
+    language: text/javascript
+order: 1668289870430571

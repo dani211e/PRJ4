@@ -1,0 +1,79 @@
+$kind: http-request
+name: DELETEDeckByID
+url: "{{baseURL}}/api/Deck/{{UserDeck}}"
+method: DELETE
+scripts:
+  - type: afterResponse
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Deck/' + pm.environment.get('UserDeck');\r
+
+      const test2Endpoint = baseURL + '/api/Deck/' + pm.environment.get('UserDeck2');\r
+
+      \r
+
+      \r
+
+      //Admin\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'DELETE',\r
+
+      \    header: [\r
+
+      \        {key: 'Content-Type', value: 'application/json'},\r
+
+      \        {key: 'Authorization', value: 'Bearer ' + pm.environment.get('AdminToken')}\r
+
+      \    ]\r
+
+      }, function(err, res){\r
+
+      \    pm.test(\"Admin deck DELETE is authorized (204)\", function(){\r
+
+      \        pm.expect(res.code).to.equal(204);\r
+
+      \        console.log('Admin DELETE code: ', res.code);\r
+
+      \        pm.environment.unset('UserDeck');\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      //User\r
+
+      pm.sendRequest({\r
+
+      \    url: test2Endpoint,\r
+
+      \    method: 'DELETE',\r
+
+      \    header: [\r
+
+      \        {key: 'Content-Type', value: 'application/json'},\r
+
+      \        {key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \    ]\r
+
+      }, function(err, res){\r
+
+      \    pm.test(\"User deck DELETE is authorized (204)\", function(){\r
+
+      \        pm.expect(res.code).to.equal(204);\r
+
+      \        console.log('User DELETE code: ', res.code);\r
+
+      \        pm.environment.unset('UserDeck2');\r
+
+      \    });\r
+
+      });"
+    language: text/javascript
+order: 1779097881362

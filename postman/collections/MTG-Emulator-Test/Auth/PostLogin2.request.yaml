@@ -1,0 +1,105 @@
+$kind: http-request
+name: PostLogin2
+url: "{{baseURL}}/api/Authentication/login"
+method: POST
+scripts:
+  - type: beforeRequest
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Authentication/login'; \r
+
+      \ \r
+
+      \ // User4 login nested inside User callback\r
+
+      \        pm.sendRequest({\r
+
+      \            url: testEndpoint,\r
+
+      \            method: 'POST',\r
+
+      \            header: [{ key: 'Content-Type', value: 'application/json' }],\r
+
+      \            body: {\r
+
+      \                mode: 'raw',\r
+
+      \                raw: '{\"email\":\"test124@mtg.com\",\"password\":\"Test123!\"}'\r
+
+      \            }\r
+
+      \        }, function(err, res) {\r
+
+      \            if (err) { console.log('User4 error:', err); return; }\r
+
+      \            pm.environment.set('UserToken4', res.json().Token);\r
+
+      \            console.log('UserToken4 set:', res.json().Token);\r
+
+      \r
+
+      \             // User5 login nested inside User callback\r
+
+      \        pm.sendRequest({\r
+
+      \            url: testEndpoint,\r
+
+      \            method: 'POST',\r
+
+      \            header: [{ key: 'Content-Type', value: 'application/json' }],\r
+
+      \            body: {\r
+
+      \                mode: 'raw',\r
+
+      \                raw: '{\"email\":\"test125@mtg.com\",\"password\":\"Test123!\"}'\r
+
+      \            }\r
+
+      \        }, function(err, res) {\r
+
+      \            if (err) { console.log('User5 error:', err); return; }\r
+
+      \            pm.environment.set('UserToken5', res.json().Token);\r
+
+      \            console.log('UserToken5 set:', res.json().Token);\r
+
+      \        });\r
+
+      \r
+
+      \        // User6 login nested inside User callback\r
+
+      \        pm.sendRequest({\r
+
+      \            url: testEndpoint,\r
+
+      \            method: 'POST',\r
+
+      \            header: [{ key: 'Content-Type', value: 'application/json' }],\r
+
+      \            body: {\r
+
+      \                mode: 'raw',\r
+
+      \                raw: '{\"email\":\"test126@mtg.com\",\"password\":\"Test123!\"}'\r
+
+      \            }\r
+
+      \        }, function(err, res) {\r
+
+      \            if (err) { console.log('User6 error:', err); return; }\r
+
+      \            pm.environment.set('UserToken6', res.json().Token);\r
+
+      \            console.log('UserToken6 set:', res.json().Token);\r
+
+      \        });\r
+
+      \        });\r
+
+      \        \r
+
+      \       "
+    language: text/javascript
+order: 2017348127198211

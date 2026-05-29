@@ -1,0 +1,139 @@
+$kind: http-request
+name: DeleteEveryoneLeavesGame
+url: "{{baseURL}}/api/Game/{{UserGame}}/leave"
+method: DELETE
+scripts:
+  - type: afterResponse
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Game/' + pm.environment.get('UserGame') + '/leave';\r
+
+      const test2Endpoint = baseURL + '/api/Game/' + pm.environment.get('UserGame');\r
+
+      \r
+
+      // User2 leave\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'DELETE',\r
+
+      \    header: [\r
+
+      \        { key: 'Content-Type', value: 'application/json' },\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken2')}\r
+
+      \    ]\r
+
+      }, function(err, res) {\r
+
+      \    if (err) { console.log('User2 error:', err); return; }\r
+
+      \    pm.test(\"User2 leave is authorized (204)\", function(){\r
+
+      \        pm.expect(res.code).to.equal(204);\r
+
+      \    });\r
+
+      \    console.log('User2 DELETE code:', res.code);\r
+
+      \r
+
+      \    // User3 leave nested inside User2\r
+
+      \    pm.sendRequest({\r
+
+      \        url: testEndpoint,\r
+
+      \        method: 'DELETE',\r
+
+      \        header: [\r
+
+      \            { key: 'Content-Type', value: 'application/json' },\r
+
+      \            { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken3')}\r
+
+      \        ]\r
+
+      \    }, function(err, res) {\r
+
+      \        if (err) { console.log('User3 error:', err); return; }\r
+
+      \        pm.test(\"User3 leave is authorized (204)\", function(){\r
+
+      \            pm.expect(res.code).to.equal(204);\r
+
+      \        });\r
+
+      \        console.log('User3 DELETE code:', res.code);\r
+
+      \r
+
+      \        // User4 leave nested inside User3\r
+
+      \        pm.sendRequest({\r
+
+      \            url: testEndpoint,\r
+
+      \            method: 'DELETE',\r
+
+      \            header: [\r
+
+      \                { key: 'Content-Type', value: 'application/json' },\r
+
+      \                { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken4')}\r
+
+      \            ]\r
+
+      \        }, function(err, res) {\r
+
+      \            if (err) { console.log('User4 error:', err); return; }\r
+
+      \            pm.test(\"User4 leave is authorized (204)\", function(){\r
+
+      \                pm.expect(res.code).to.equal(204);\r
+
+      \            });\r
+
+      \            console.log('User4 DELETE code:', res.code);\r
+
+      \            pm.environment.unset('UserGame');\r
+
+      \r
+
+      \            // GET nested inside User4 to verify game is gone\r
+
+      \            pm.sendRequest({\r
+
+      \                url: test2Endpoint,\r
+
+      \                method: 'GET',\r
+
+      \                header: [\r
+
+      \                    { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \                ]\r
+
+      \            }, function(err, res) {\r
+
+      \                pm.test(\"Game not found (404)\", function(){\r
+
+      \                    pm.expect(res.code).to.equal(404);\r
+
+      \                    console.log('Game state:', JSON.stringify(res.json()));\r
+
+      \                });\r
+
+      \            });\r
+
+      \        });\r
+
+      \    });\r
+
+      });"
+    language: text/javascript
+order: 4097403113057999

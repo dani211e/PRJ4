@@ -1,0 +1,101 @@
+$kind: http-request
+name: GETGameByCode
+url: "{{baseURL}}/api/Game/{{UserGame}}"
+method: GET
+scripts:
+  - type: afterResponse
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Game/' + pm.environment.get('UserGame');\r
+
+      \r
+
+      function check(responseJson) {\r
+
+      \    pm.expect(responseJson).to.have.property('Success');\r
+
+      \    pm.expect(responseJson).to.have.property('GameCode');\r
+
+      \    pm.expect(responseJson).to.have.property('MaxPlayers');\r
+
+      \    pm.expect(responseJson).to.have.property('CurrentPlayers');\r
+
+      \    pm.expect(responseJson).to.have.property('Message');\r
+
+      }\r
+
+      \r
+
+      // Admin\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'GET',\r
+
+      \    header: [\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('AdminToken')}\r
+
+      \    ]\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"AdminToken GET is authorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(200);\r
+
+      \    });\r
+
+      \    pm.test(\"Admin get game by game code\", function(){\r
+
+      \        var responseJson = res.json();\r
+
+      \        check(responseJson);\r
+
+      \        console.log('found card', responseJson);\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      // User\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'GET',\r
+
+      \    header: [\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \    ]\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"UserToken GET is authorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(200);\r
+
+      \            console.log('User response:', JSON.stringify(res.json()));\r
+
+      \    });\r
+
+      \    pm.test(\"User get game by game code\", function(){\r
+
+      \        var responseJson = res.json();\r
+
+      \        check(responseJson);\r
+
+      \        console.log('found card', responseJson);\r
+
+      \    });\r
+
+      });"
+    language: text/javascript
+order: 4281083701291396

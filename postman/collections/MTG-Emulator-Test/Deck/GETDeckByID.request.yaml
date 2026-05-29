@@ -1,0 +1,121 @@
+$kind: http-request
+name: GETDeckByID
+url: "{{baseURL}}/api/Deck/{{UserDeck}}"
+method: GET
+scripts:
+  - type: afterResponse
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Deck/' + pm.environment.get('UserDeck');\r
+
+      \r
+
+      function check(responseJson) {\r
+
+      \    pm.expect(responseJson).to.have.property('DeckId');\r
+
+      \    pm.expect(responseJson).to.have.property('DeckName');\r
+
+      \    pm.expect(responseJson).to.have.property('Cards');\r
+
+      \    pm.expect(responseJson.Cards).to.be.an('array');\r
+
+      \    pm.expect(responseJson.Cards.length).to.be.above(0);\r
+
+      \r
+
+      \    responseJson.Cards.forEach(function(card) {\r
+
+      \        pm.expect(card).to.have.property('CardId');\r
+
+      \        pm.expect(card).to.have.property('ScryfallId');\r
+
+      \        pm.expect(card).to.have.property('Name');\r
+
+      \        pm.expect(card).to.have.property('OracleText');\r
+
+      \        pm.expect(card).to.have.property('ImageUri');\r
+
+      \        pm.expect(card).to.have.property('AltFace');\r
+
+      \        pm.expect(card).to.have.property('RelatedCards');\r
+
+      \    });\r
+
+      }\r
+
+      \r
+
+      // Admin\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'GET',\r
+
+      \    header: [\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('AdminToken')}\r
+
+      \    ]\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"AdminToken GET is authorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(200);\r
+
+      \    });\r
+
+      \    pm.test(\"Admin get deck by deckID\", function(){\r
+
+      \        var responseJson = res.json();\r
+
+      \        check(responseJson);\r
+
+      \        console.log('found card', responseJson);\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      // User\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'GET',\r
+
+      \    header: [\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \    ]\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"UserToken GET is authorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(200);\r
+
+      \            console.log('User response:', JSON.stringify(res.json()));\r
+
+      \    });\r
+
+      \    pm.test(\"User get deck by deckID\", function(){\r
+
+      \        var responseJson = res.json();\r
+
+      \        check(responseJson);\r
+
+      \        console.log('found card', responseJson);\r
+
+      \    });\r
+
+      });"
+    language: text/javascript
+order: 4100968339813218

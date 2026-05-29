@@ -1,0 +1,4 @@
+name: MTG Environment
+values:
+  - key: baseURL
+    value: ''

@@ -1,0 +1,103 @@
+$kind: http-request
+name: GETDeckByUsername
+url: "{{baseURL}}/api/Deck/player/{{Username}}"
+method: GET
+scripts:
+  - type: afterResponse
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Deck/player/' + pm.environment.get('Username');\r
+
+      \r
+
+      function check(responseJson) {\r
+
+      \        pm.expect(responseJson).to.have.property('DeckId');\r
+
+      \        pm.expect(responseJson).to.have.property('DeckName');\r
+
+      \        pm.expect(responseJson).to.have.property('DeckImageUri');  \r
+
+      }\r
+
+      \r
+
+      // Admin\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'GET',\r
+
+      \    header: [\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('AdminToken')}\r
+
+      \    ]\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"AdminToken GET is authorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(200);\r
+
+      \    });\r
+
+      \    pm.test(\"Admin get deck by username\", function(){\r
+
+      \        var responseJson = res.json();\r
+
+      \        pm.expect(responseJson).to.be.an('array');\r
+
+      \        pm.expect(responseJson.length).to.be.above(0)\r
+
+      \        responseJson.forEach(check);\r
+
+      \        console.log('found card', responseJson);\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      // User\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'GET',\r
+
+      \    header: [\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \    ]\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"UserToken GET is authorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(200);\r
+
+      \    });\r
+
+      \    pm.test(\"User get deck by username\", function(){\r
+
+      \        var responseJson = res.json();\r
+
+      \        pm.expect(responseJson).to.be.an('array');\r
+
+      \        pm.expect(responseJson.length).to.be.above(0)\r
+
+      \        responseJson.forEach(check);\r
+
+      \        console.log('found card', responseJson);\r
+
+      \    });\r
+
+      });"
+    language: text/javascript
+order: 3355752309014050
