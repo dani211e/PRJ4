@@ -23,8 +23,8 @@ System_Ext(Scry, Scryfall API, "Scryfalls api which card data is drawn from",,,,
 
 'Interactions
 Rel_D(User, DSK, Uses)
-Rel_D(DSK, MTGAPI, "Makes API calls to", HTTPS)
+Rel_D(DSK, MTGAPI, "Makes API calls to", HTTP)
 Rel_L(MTGAPI, MTGDB, "Reads/Writes to", DBC)
 Rel_R(MTGAPI, LogDB, "Writes to", DBC)
-Rel_D(MTGAPI, Scry, "Fetchs from", HTTPS)
+Rel_D(MTGAPI, Scry, "Fetchs from", HTTP)
 @enduml

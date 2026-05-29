@@ -19,7 +19,7 @@ System(Emu, Magic Emulator, "The emulator",,,,"Software system")
 System_Ext(Scry, Scryfall API, "Scryfalls api which card data is drawn from",,,,"Software system")
 
 'Interactions
-Rel_R(Emu,Scry, "Fetchs from", "HTTPS")
+Rel_R(Emu,Scry, "Fetchs from", "HTTP")
 Rel_U(User, Emu, "Uses")
 
 @enduml

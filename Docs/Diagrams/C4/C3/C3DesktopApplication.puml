@@ -14,7 +14,7 @@ Container_Boundary(C3, "Main Menu - C3") {
   Component(Main, "Main Page")
   Component(Login, "Login")
   Component(Reg, "Register")
-  Component(Battle, "Battle Game")
+  Component(Battle, "InGame")
   Component(Import, "Import Deck")
   Component(Create, "Create Game")
   Component(Join, "Join Game")
@@ -37,13 +37,13 @@ Rel_D(Create, Battle, "Navigates to/from")
 Rel_D(Join, Battle, "Navigates to/from")
 
 'Unity API interactions
-Rel_D(Create,APIman,"Creates game",HTTPS)
-Rel_D(Join,APIman,"Joins game",HTTPS)
-Rel_D(Login,APIman,"Logs in",HTTPS)
-Rel_D(Reg,APIman,"Registers user",HTTPS)
-Rel_D(Battle,APIman,"Sync game",HTTPS)
-Rel_D(Import,APIman,"Imports deck",HTTPS)
+Rel_D(Create,APIman,"Creates game",HTTP)
+Rel_D(Join,APIman,"Joins game",HTTP)
+Rel_D(Login,APIman,"Logs in",HTTP)
+Rel_D(Reg,APIman,"Registers user",HTTP)
+Rel_D(Battle,APIman,"Sync game",HTTP)
+Rel_D(Import,APIman,"Imports deck",HTTP)
 
 'APIManager MTGAPI Interactions
-Rel_D(APIman,MTGAPI,"Uses", HTTPS)
+Rel_D(APIman,MTGAPI,"Uses", HTTP)
 @enduml
