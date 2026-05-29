@@ -1,0 +1,142 @@
+$kind: http-request
+name: POSTGame
+url: "{{baseURL}}/api/Game"
+method: POST
+body:
+  type: json
+  content: "{\r\n    \"MaxPlayers\": 4  \r\n}"
+scripts:
+  - type: afterResponse
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Game';\r
+
+      const requestBody = pm.request.body.raw;\r
+
+      \r
+
+      // Admin deck create\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'POST',\r
+
+      \    header: [\r
+
+      \        { key: 'Content-Type', value: 'application/json' },\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('AdminToken')}\r
+
+      \    ],\r
+
+      \    body: {\r
+
+      \        mode: 'raw',\r
+
+      \        raw: requestBody\r
+
+      \    }\r
+
+      }, function(err, res) {\r
+
+      \    if (err) { console.log('Admin error:', err); return; }\r
+
+      \    pm.test(\"Admin POST is unauthorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(403);\r
+
+      \    });\r
+
+      \    \r
+
+      \    // User create game\r
+
+      \    pm.sendRequest({\r
+
+      \        url: testEndpoint,\r
+
+      \        method: 'POST',\r
+
+      \        header: [\r
+
+      \            { key: 'Content-Type', value: 'application/json' },\r
+
+      \            { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \        ],\r
+
+      \        body: {\r
+
+      \            mode: 'raw',\r
+
+      \            raw: requestBody\r
+
+      \        }\r
+
+      \    }, function(err, res) {\r
+
+      \        if (err) { console.log('User error:', err); return; }\r
+
+      \        pm.test(\"UserToken POST is authorized\", function(){\r
+
+      \            pm.expect(res.code).to.equal(200);\r
+
+      \        });\r
+
+      \        var responseJson = res.json();\r
+
+      \        pm.environment.set('UserGame', responseJson.GameCode);\r
+
+      \        console.log('UserGame set:', responseJson.GameCode);\r
+
+      \    });\r
+
+      \r
+
+      \     // User create game\r
+
+      \    pm.sendRequest({\r
+
+      \        url: testEndpoint,\r
+
+      \        method: 'POST',\r
+
+      \        header: [\r
+
+      \            { key: 'Content-Type', value: 'application/json' },\r
+
+      \            { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken6')}\r
+
+      \        ],\r
+
+      \        body: {\r
+
+      \            mode: 'raw',\r
+
+      \            raw: requestBody\r
+
+      \        }\r
+
+      \    }, function(err, res) {\r
+
+      \        if (err) { console.log('User error:', err); return; }\r
+
+      \        pm.test(\"UserToken6 POST is authorized\", function(){\r
+
+      \            pm.expect(res.code).to.equal(200);\r
+
+      \        });\r
+
+      \        var responseJson = res.json();\r
+
+      \        pm.environment.set('UserGame2', responseJson.GameCode);\r
+
+      \        console.log('UserGame2 set:', responseJson.GameCode);\r
+
+      \    });\r
+
+      });"
+    language: text/javascript
+order: 1779142840171

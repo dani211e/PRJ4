@@ -1,0 +1,9 @@
+workspace:
+  id: ""
+localResources:
+  environments:
+    - ..\environments\MTG Environment.environment.yaml
+    - ../environments/MTG Environment.environment.yaml
+cloudResources:
+  environments:
+    ../environments/MTG Environment.environment.yaml: 53186158-d1c0dbda-9873-4656-85f0-1d3c1789b14c

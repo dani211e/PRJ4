@@ -1,0 +1,162 @@
+$kind: http-request
+name: POSTDeck
+url: "{{baseURL}}/api/Deck"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"deckName\": \"test\",\r
+
+    \    \"CommandZone\": [\r
+
+    \            \"Island\"\r
+
+    \    ] ,\r
+
+    \    \"cardList\": \"1 Island\\n99 Plains\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Deck';\r
+
+      const requestBody = pm.request.body.raw;\r
+
+      \r
+
+      // Admin deck create\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'POST',\r
+
+      \    header: [\r
+
+      \        { key: 'Content-Type', value: 'application/json' },\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('AdminToken')}\r
+
+      \    ],\r
+
+      \    body: {\r
+
+      \        mode: 'raw',\r
+
+      \        raw: requestBody\r
+
+      \    }\r
+
+      }, function(err, res) {\r
+
+      \    if (err) { console.log('Admin error:', err); return; }\r
+
+      \    pm.test(\"Admin POST is unauthorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(404);\r
+
+      \    });\r
+
+      \r
+
+      \    // User deck create\r
+
+      \    pm.sendRequest({\r
+
+      \        url: testEndpoint,\r
+
+      \        method: 'POST',\r
+
+      \        header: [\r
+
+      \            { key: 'Content-Type', value: 'application/json' },\r
+
+      \            { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \        ],\r
+
+      \        body: {\r
+
+      \            mode: 'raw',\r
+
+      \            raw: requestBody\r
+
+      \        }\r
+
+      \    }, function(err, res) {\r
+
+      \        if (err) { console.log('User error:', err); return; }\r
+
+      \        pm.test(\"UserToken POST is authorized\", function(){\r
+
+      \            pm.expect(res.code).to.equal(200);\r
+
+      \        });\r
+
+      \        var responseJson = res.json();\r
+
+      \        pm.environment.set('UserDeck', responseJson.DeckId);\r
+
+      \        console.log('UserDeck set:', responseJson.DeckId);\r
+
+      \r
+
+      \        var mainResponse = pm.response.json();\r
+
+      \        pm.environment.set('UserDeck2', mainResponse.DeckId);\r
+
+      \        console.log('UserDeck2 set:', mainResponse.DeckId);\r
+
+      \    });\r
+
+      \r
+
+      \    // User2 deck create\r
+
+      \    pm.sendRequest({\r
+
+      \        url: testEndpoint,\r
+
+      \        method: 'POST',\r
+
+      \        header: [\r
+
+      \            { key: 'Content-Type', value: 'application/json' },\r
+
+      \            { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \        ],\r
+
+      \        body: {\r
+
+      \            mode: 'raw',\r
+
+      \            raw: requestBody\r
+
+      \        }\r
+
+      \    }, function(err, res) {\r
+
+      \        if (err) { console.log('User error:', err); return; }\r
+
+      \        pm.test(\"UserToken POST is authorized\", function(){\r
+
+      \            pm.expect(res.code).to.equal(200);\r
+
+      \        });\r
+
+      \        var responseJson = res.json();\r
+
+      \        pm.environment.set('UserDeck2', responseJson.DeckId);\r
+
+      \        console.log('UserDeck2 set:', responseJson.DeckId);\r
+
+      \    });\r
+
+      });"
+    language: text/javascript
+order: 1778843022047

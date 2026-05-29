@@ -1,0 +1,99 @@
+$kind: http-request
+name: GETPlayerByUsername
+url: "{{baseURL}}/api/Player/{{Username}}"
+method: GET
+scripts:
+  - type: afterResponse
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Player/' + pm.environment.get('Username');\r
+
+      \r
+
+      function check(responseJson) {\r
+
+      \    pm.expect(responseJson).to.have.property('Username');\r
+
+      \    pm.expect(responseJson).to.have.property('GamesWon');\r
+
+      \    pm.expect(responseJson).to.have.property('GamesLost');\r
+
+      \    pm.expect(responseJson).to.have.property('GamesDrawed');\r
+
+      }\r
+
+      \r
+
+      // Admin\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'GET',\r
+
+      \    header: [\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('AdminToken')}\r
+
+      \    ]\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"AdminToken GET is authorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(200);\r
+
+      \    });\r
+
+      \    pm.test(\"Admin get player by username\", function(){\r
+
+      \        var responseJson = res.json();\r
+
+      \        check(responseJson);\r
+
+      \        console.log('found card', responseJson);\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      // User\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'GET',\r
+
+      \    header: [\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \    ]\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"UserToken GET is authorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(200);\r
+
+      \            console.log('User response:', JSON.stringify(res.json()));\r
+
+      \    });\r
+
+      \    pm.test(\"User get player by username\", function(){\r
+
+      \        var responseJson = res.json();\r
+
+      \        check(responseJson);\r
+
+      \        console.log('found card', responseJson);\r
+
+      \    });\r
+
+      });"
+    language: text/javascript
+order: 1779173197432

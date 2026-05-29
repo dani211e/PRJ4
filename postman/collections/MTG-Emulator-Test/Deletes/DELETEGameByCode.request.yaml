@@ -1,0 +1,76 @@
+$kind: http-request
+name: DELETEGameByCode
+url: "{{baseURL}}/api/Game/{{UserGame}}"
+method: DELETE
+scripts:
+  - type: afterResponse
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Game/' +
+      pm.environment.get('UserGame2');\r
+
+      \r
+
+      //User\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'DELETE',\r
+
+      \    header: [\r
+
+      \        {key: 'Content-Type', value: 'application/json'},\r
+
+      \        {key: 'Authorization', value: 'Bearer ' +
+      pm.environment.get('UserToken6')}\r
+
+      \    ]\r
+
+      }, function(err, res){\r
+
+      \    pm.test(\"User deck DELETE is authorized (403)\", function(){\r
+
+      \        pm.expect(res.code).to.equal(403);\r
+
+      \        console.log('User DELETE code: ', res.code);\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      //Admin\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'DELETE',\r
+
+      \    header: [\r
+
+      \        {key: 'Content-Type', value: 'application/json'},\r
+
+      \        {key: 'Authorization', value: 'Bearer ' +
+      pm.environment.get('AdminToken')}\r
+
+      \    ]\r
+
+      }, function(err, res){\r
+
+      \    pm.test(\"Admin deck DELETE is authorized (204)\", function(){\r
+
+      \        pm.expect(res.code).to.equal(204);\r
+
+      \        console.log('Admin DELETE code: ', res.code);\r
+
+      \        pm.environment.unset('UserGame2');\r
+
+      \    });\r
+
+      });"
+    language: text/javascript
+order: 4094951851666767

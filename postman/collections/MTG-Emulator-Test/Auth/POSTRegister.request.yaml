@@ -1,0 +1,183 @@
+$kind: http-request
+name: POSTRegister
+url: "{{baseURL}}/api/Authentication/register"
+method: POST
+body:
+  type: json
+  content: '{"username":"PMTestUser3","email":"test1222@mtg.com","password":"Test123!","role":"User"}'
+scripts:
+  - type: beforeRequest
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Authentication/register';\r
+
+      \r
+
+      // Admin\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'POST',\r
+
+      \    header: [\r
+
+      \        { key: 'Content-Type', value: 'application/json' },\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('OGAdminToken')}\r
+
+      \    ],\r
+
+      \    body: { mode: 'raw', raw: '{\"username\":\"TestAdmin\",\"email\":\"test@mtg.com\",\"password\":\"Test123!\",\"role\":\"Admin\"}' }\r
+
+      }, function(err, res) {\r
+
+      \    console.log('Admin register status:', res.status);\r
+
+      \r
+
+      \    // User1\r
+
+      \    pm.sendRequest({\r
+
+      \        url: testEndpoint,\r
+
+      \        method: 'POST',\r
+
+      \        header: [{ key: 'Content-Type', value: 'application/json' }],\r
+
+      \        body: { mode: 'raw', raw: '{\"username\":\"PMTestUser\",\"email\":\"test1@mtg.com\",\"password\":\"Test123!\",\"role\":\"User\"}' }\r
+
+      \    }, function(err, res) {\r
+
+      \        if (err) { console.log('User1 error:', err); return; }\r
+
+      \        console.log('User1 status:', res.status);\r
+
+      \        pm.environment.set('Username', 'PMTestUser');\r
+
+      \r
+
+      \        // User2\r
+
+      \        pm.sendRequest({\r
+
+      \            url: testEndpoint,\r
+
+      \            method: 'POST',\r
+
+      \            header: [{ key: 'Content-Type', value: 'application/json' }],\r
+
+      \            body: { mode: 'raw', raw: '{\"username\":\"PMTestUser2\",\"email\":\"test12@mtg.com\",\"password\":\"Test123!\",\"role\":\"User\"}' }\r
+
+      \        }, function(err, res) {\r
+
+      \            if (err) { console.log('User2 error:', err); return; }\r
+
+      \            console.log('User2 status:', res.status);\r
+
+      \            pm.environment.set('Username2', 'PMTestUser2');\r
+
+      \r
+
+      \            // User4\r
+
+      \            pm.sendRequest({\r
+
+      \                url: testEndpoint,\r
+
+      \                method: 'POST',\r
+
+      \                header: [{ key: 'Content-Type', value: 'application/json' }],\r
+
+      \                body: { mode: 'raw', raw: '{\"username\":\"PMTestUser4\",\"email\":\"test124@mtg.com\",\"password\":\"Test123!\",\"role\":\"User\"}' }\r
+
+      \            }, function(err, res) {\r
+
+      \                if (err) { console.log('User4 error:', err); return; }\r
+
+      \                console.log('User4 status:', res.status);\r
+
+      \                pm.environment.set('Username4', 'PMTestUser4');\r
+
+      \r
+
+      \                // User5\r
+
+      \                pm.sendRequest({\r
+
+      \                    url: testEndpoint,\r
+
+      \                    method: 'POST',\r
+
+      \                    header: [{ key: 'Content-Type', value: 'application/json' }],\r
+
+      \                    body: { mode: 'raw', raw: '{\"username\":\"PMTestUser5\",\"email\":\"test125@mtg.com\",\"password\":\"Test123!\",\"role\":\"User\"}' }\r
+
+      \                }, function(err, res) {\r
+
+      \                    if (err) { console.log('User5 error:', err); return; }\r
+
+      \                    console.log('User5 status:', res.status);\r
+
+      \                    pm.environment.set('Username5', 'PMTestUser5');\r
+
+      \r
+
+      \                    // User6\r
+
+      \                    pm.sendRequest({\r
+
+      \                        url: testEndpoint,\r
+
+      \                        method: 'POST',\r
+
+      \                        header: [{ key: 'Content-Type', value: 'application/json' }],\r
+
+      \                        body: { mode: 'raw', raw: '{\"username\":\"PMTestUser6\",\"email\":\"test126@mtg.com\",\"password\":\"Test123!\",\"role\":\"User\"}' }\r
+
+      \                    }, function(err, res) {\r
+
+      \                        if (err) { console.log('User6 error:', err); return; }\r
+
+      \                        console.log('User6 status:', res.status);\r
+
+      \                        pm.environment.set('Username6', 'PMTestUser6');\r
+
+      \                        pm.environment.set('Username3', 'PMTestUser3');\r
+
+      \                        console.log('Username3 set: PMTestUser3');\r
+
+      \                    });\r
+
+      \                });\r
+
+      \            });\r
+
+      \        });\r
+
+      \    });\r
+
+      });\r\n"
+    language: text/javascript
+  - type: afterResponse
+    code: "var responseJSON = pm.response.json();\r
+
+      \r
+
+      pm.test(\"Register returns 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Response time is acceptable\", function () {\r
+
+      \    pm.expect(pm.response.responseTime).to.be.below(500);\r
+
+      });"
+    language: text/javascript
+order: 1778759873505

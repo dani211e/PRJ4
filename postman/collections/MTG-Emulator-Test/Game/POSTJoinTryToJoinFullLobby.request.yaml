@@ -1,0 +1,169 @@
+$kind: http-request
+name: POSTJoinTryToJoinFullLobby
+url: "{{baseURL}}/api/Game/join"
+method: POST
+scripts:
+  - type: afterResponse
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Game/join';\r
+
+      const test2Endpoint = baseURL + '/api/Game/' + pm.environment.get('UserGame');\r
+
+      \r
+
+      function check(responseJson) {\r
+
+      \    pm.expect(responseJson).to.have.property('Success');\r
+
+      \    pm.expect(responseJson).to.have.property('GameCode');\r
+
+      \    pm.expect(responseJson).to.have.property('MaxPlayers');\r
+
+      \    pm.expect(responseJson).to.have.property('CurrentPlayers');\r
+
+      \    pm.expect(responseJson).to.have.property('Message');\r
+
+      \    pm.expect(responseJson.CurrentPlayers).to.equal(4);\r
+
+      }\r
+
+      \r
+
+      // User3\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'POST',\r
+
+      \    header: [\r
+
+      \        { key: 'Content-Type', value: 'application/json' },\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken3')}\r
+
+      \    ],\r
+
+      \    body: { mode: 'raw', raw: '{\"GameCode\": \"{{UserGame}}\",\"PlayerName\": \"{{Username3}\"}'}\r
+
+      }, function(err, res) {\r
+
+      \    if (err) { console.log('User3 error:', err); return; }\r
+
+      \    console.log('User3 status:', res.code);\r
+
+      \    pm.test(\"User3 lobby joined\", function(){\r
+
+      \        pm.expect(res.code).to.equal(200);\r
+
+      \    });\r
+
+      \r
+
+      \    // User4 nested inside User3\r
+
+      \    pm.sendRequest({\r
+
+      \        url: testEndpoint,\r
+
+      \        method: 'POST',\r
+
+      \        header: [\r
+
+      \            { key: 'Content-Type', value: 'application/json' },\r
+
+      \            { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken4')}\r
+
+      \        ],\r
+
+      \        body: { mode: 'raw', raw: '{\"GameCode\": \"{{UserGame}}\",\"PlayerName\": \"{{Username4}}\"}'}\r
+
+      \    }, function(err, res) {\r
+
+      \        if (err) { console.log('User4 error:', err); return; }\r
+
+      \        console.log('User4 status:', res.code);\r
+
+      \        pm.test(\"User4 lobby joined\", function(){\r
+
+      \            pm.expect(res.code).to.equal(200);\r
+
+      \        });\r
+
+      \r
+
+      \        // User5 nested inside User4\r
+
+      \        pm.sendRequest({\r
+
+      \            url: testEndpoint,\r
+
+      \            method: 'POST',\r
+
+      \            header: [\r
+
+      \                { key: 'Content-Type', value: 'application/json' },\r
+
+      \                { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken5')}\r
+
+      \            ],\r
+
+      \            body: { mode: 'raw', raw: '{\"GameCode\": \"{{UserGame}}\",\"PlayerName\": \"{{Username5}}\"}'}\r
+
+      \        }, function(err, res) {\r
+
+      \            if (err) { console.log('User5 error:', err); return; }\r
+
+      \            console.log('User5 status:', res.code);\r
+
+      \            pm.test(\"User5 failed to join lobby\", function(){\r
+
+      \                pm.expect(res.code).to.equal(404);\r
+
+      \            });\r
+
+      \r
+
+      \            // GET nested inside User5\r
+
+      \            pm.sendRequest({\r
+
+      \                url: test2Endpoint,\r
+
+      \                method: 'GET',\r
+
+      \                header: [\r
+
+      \                    { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \                ]\r
+
+      \            }, function(err, res) {\r
+
+      \                pm.test(\"UserToken GET is authorized\", function(){\r
+
+      \                    pm.expect(res.code).to.equal(200);\r
+
+      \                });\r
+
+      \                pm.test(\"Game has 4 current players\", function(){\r
+
+      \                    var responseJson = res.json();\r
+
+      \                    check(responseJson);\r
+
+      \                    console.log('Game state:', JSON.stringify(responseJson));\r
+
+      \                });\r
+
+      \            });\r
+
+      \        });\r
+
+      \    });\r
+
+      });"
+    language: text/javascript
+order: 2974636101404218

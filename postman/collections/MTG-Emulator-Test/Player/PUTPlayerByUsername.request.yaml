@@ -1,0 +1,177 @@
+$kind: http-request
+name: PUTPlayerByUsername
+url: "{{baseURL}}/api/Player/{{Username2}}"
+method: PUT
+scripts:
+  - type: afterResponse
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Player/' + pm.environment.get('Username')+'?result=-1';\r
+
+      const test3Endpoint = baseURL + '/api/Player/' + pm.environment.get('Username')+'?result=1';\r
+
+      const test4Endpoint = baseURL + '/api/Player/' + pm.environment.get('Username');\r
+
+      const test2Endpoint = baseURL + '/api/Player/' + pm.environment.get('Username');\r
+
+      \r
+
+      function check(responseJson){\r
+
+      \    pm.expect(responseJson).to.have.property('Username');\r
+
+      \    pm.expect(responseJson).to.have.property('GamesWon');\r
+
+      \    pm.expect(responseJson).to.have.property('GamesLost');\r
+
+      \    pm.expect(responseJson).to.have.property('GamesDrawed');\r
+
+      \r
+
+      \    pm.expect(responseJson.Username).to.equal('PMTestUser');\r
+
+      \    pm.expect(responseJson.GamesLost).to.equal(1);\r
+
+      \    pm.expect(responseJson.GamesWon).to.equal(1);\r
+
+      }\r
+
+      \r
+
+      // Admin PUT\r
+
+      pm.sendRequest({\r
+
+      \    url: test3Endpoint,\r
+
+      \    method: 'PUT',\r
+
+      \    header: [\r
+
+      \        { key: 'Content-Type', value: 'application/json' },\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('AdminToken')}\r
+
+      \    ]\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"Admin PUT is authorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(204);\r
+
+      \    });\r
+
+      \    //Admin GET to verify\r
+
+      \    pm.sendRequest({\r
+
+      \        url: test2Endpoint,\r
+
+      \        method: 'GET',\r
+
+      \        header: [\r
+
+      \            { key: 'Authorization', value: 'Bearer ' + pm.environment.get('AdminToken')}\r
+
+      \        ]\r
+
+      \    }, function(err, res) {\r
+
+      \        pm.test(\"Admin deck updated correctly\", function(){\r
+
+      \            var responseJson = res.json();\r
+
+      \            check(responseJson);\r
+
+      \        });\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      // User PUT\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'PUT',\r
+
+      \    header: [\r
+
+      \        { key: 'Content-Type', value: 'application/json' },\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \    ]\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"User PUT is authorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(204);\r
+
+      \    });\r
+
+      \    \r
+
+      \    //User GET to verify\r
+
+      \    pm.sendRequest({\r
+
+      \        url: test2Endpoint,\r
+
+      \        method: 'GET',\r
+
+      \        header: [\r
+
+      \            { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \        ]\r
+
+      \    }, function(err, res) {\r
+
+      \        pm.test(\"User deck updated correctly\", function(){\r
+
+      \            var responseJson = res.json();\r
+
+      \            check(responseJson);\r
+
+      \        });\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      // User PUT\r
+
+      pm.sendRequest({\r
+
+      \    url: test4Endpoint,\r
+
+      \    method: 'PUT',\r
+
+      \    header: [\r
+
+      \        { key: 'Content-Type', value: 'application/json' },\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \    ]\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"User PUT without query is bad request\", function(){\r
+
+      \        pm.expect(res.code).to.equal(400);\r
+
+      \    });\r
+
+      });"
+    language: text/javascript
+order: 1402561307476643

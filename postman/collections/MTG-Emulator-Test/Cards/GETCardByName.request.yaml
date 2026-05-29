@@ -1,0 +1,209 @@
+$kind: http-request
+name: GETCardByName
+url: "{{baseURL}}/api/Cards/island"
+method: GET
+scripts:
+  - type: afterResponse
+    code: "const baseURL = pm.environment.get('baseURL');\r
+
+      const testEndpoint = baseURL + '/api/Cards/island';\r
+
+      const test2Endpoint = baseURL + '/api/Cards/academy manufactor';\r
+
+      \r
+
+      function check(responseJson){\r
+
+      \    pm.expect(responseJson).to.have.property('CardId');\r
+
+      \    pm.expect(responseJson).to.have.property('ScryfallId');\r
+
+      \    pm.expect(responseJson).to.have.property('Name');\r
+
+      \    pm.expect(responseJson).to.have.property('OracleText');\r
+
+      \    pm.expect(responseJson).to.have.property('ImageUri');\r
+
+      \    pm.expect(responseJson).to.have.property('AltFace');\r
+
+      \    pm.expect(responseJson).to.have.property('RelatedCards');\r
+
+      }\r
+
+      \r
+
+      function checkWithRelated(responseJson){\r
+
+      \    pm.expect(responseJson).to.have.property('CardId');\r
+
+      \    pm.expect(responseJson).to.have.property('ScryfallId');\r
+
+      \    pm.expect(responseJson).to.have.property('Name');\r
+
+      \    pm.expect(responseJson).to.have.property('OracleText');\r
+
+      \    pm.expect(responseJson).to.have.property('ImageUri');\r
+
+      \    pm.expect(responseJson).to.have.property('AltFace');\r
+
+      \    pm.expect(responseJson).to.have.property('RelatedCards');\r
+
+      \r
+
+      \    responseJson.RelatedCards.forEach(function(card){\r
+
+      \        pm.expect(card).to.have.property('RelatedCardId');\r
+
+      \        pm.expect(card).to.have.property('Name');\r
+
+      \        pm.expect(card).to.have.property('ImageUri');\r
+
+      \    });\r
+
+      } \r
+
+      \r
+
+      // Admin\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'GET',\r
+
+      \    header: [\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('AdminToken')}\r
+
+      \    ]\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"AdminToken GET is authorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(200);\r
+
+      \    });\r
+
+      \    pm.test(\"Admin get card by name\", function(){\r
+
+      \        var responseJson = res.json();\r
+
+      \        check(responseJson);\r
+
+      \        console.log('found card', responseJson);\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      // User\r
+
+      pm.sendRequest({\r
+
+      \    url: testEndpoint,\r
+
+      \    method: 'GET',\r
+
+      \    header: [\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \    ]\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"UserToken GET is authorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(200);\r
+
+      \    });\r
+
+      \    pm.test(\"User get card by name\", function(){\r
+
+      \        var responseJson = res.json();\r
+
+      \        check(responseJson);\r
+
+      \        console.log('found card', responseJson);\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      // Admin with related\r
+
+      pm.sendRequest({\r
+
+      \    url: test2Endpoint,\r
+
+      \    method: 'GET',\r
+
+      \    header: [\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('AdminToken')}\r
+
+      \    ]\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"AdminToken GET is authorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(200);\r
+
+      \    });\r
+
+      \    pm.test(\"Admin get card by name\", function(){\r
+
+      \        var responseJson = res.json();\r
+
+      \        check(responseJson);\r
+
+      \        console.log('found card', responseJson);\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      // User with related\r
+
+      pm.sendRequest({\r
+
+      \    url: test2Endpoint,\r
+
+      \    method: 'GET',\r
+
+      \    header: [\r
+
+      \        { key: 'Authorization', value: 'Bearer ' + pm.environment.get('UserToken')}\r
+
+      \    ]\r
+
+      }, function(err, res) {\r
+
+      \    pm.test(\"UserToken GET is authorized\", function(){\r
+
+      \        pm.expect(res.code).to.equal(200);\r
+
+      \    });\r
+
+      \    pm.test(\"User get card by name\", function(){\r
+
+      \        var responseJson = res.json();\r
+
+      \        checkWithRelated(responseJson);\r
+
+      \        console.log('found card', responseJson);\r
+
+      \    });\r
+
+      });"
+    language: text/javascript
+order: 1778831952180
